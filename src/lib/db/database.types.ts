@@ -3918,6 +3918,14 @@ export type Database = {
         Args: Record<string, never>;
         Returns: Json;
       };
+      decide_lesson_change: {
+        Args: { p_change: string; p_decision: string };
+        Returns: Json;
+      };
+      delete_lesson_log: {
+        Args: { p_log: string };
+        Returns: Json;
+      };
       enrol_student: {
         Args: { p_student: string; p_class: string };
         Returns: Json;
@@ -3970,6 +3978,34 @@ export type Database = {
         Args: Record<string, never>;
         Returns: Json;
       };
+      lesson_change_list: {
+        Args: { p_class?: string };
+        Returns: Json;
+      };
+      lesson_change_request: {
+        Args: { p_class: string; p_from_date: string; p_to_date: string; p_reason: string };
+        Returns: Json;
+      };
+      lesson_controls: {
+        Args: { p_class?: string };
+        Returns: Json;
+      };
+      lesson_detail: {
+        Args: { p_lesson: string };
+        Returns: Json;
+      };
+      lesson_log_list: {
+        Args: { p_class?: string; p_from?: string; p_to?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      lesson_plans: {
+        Args: { p_class?: string; p_lesson?: string };
+        Returns: Json;
+      };
+      lesson_spine: {
+        Args: { p_programme?: string };
+        Returns: Json;
+      };
       my_attendance: {
         Args: { p_student: string };
         Returns: Json;
@@ -3992,6 +4028,18 @@ export type Database = {
       };
       save_homework: {
         Args: { p_class: string; p_date: string; p_marks: Json };
+        Returns: Json;
+      };
+      save_lesson_control: {
+        Args: { p_class: string; p_key: string; p_value: Json };
+        Returns: Json;
+      };
+      save_lesson_log: {
+        Args: { p_class: string; p_date: string; p_lesson_no?: number; p_topic?: string; p_topic_ids?: Json; p_participation?: string; p_teacher_note?: string; p_duration_min?: number };
+        Returns: Json;
+      };
+      save_lesson_plan: {
+        Args: { p_class: string; p_lesson: string; p_plan: Json; p_source?: string };
         Returns: Json;
       };
       set_enrolment_status: {

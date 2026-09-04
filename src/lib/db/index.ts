@@ -30,3 +30,18 @@ export {
   type MyAttendance,
 } from "./repos/attendance";
 export { HomeworkRepository, type HomeworkItem } from "./repos/homework";
+export {
+  LessonRepository,
+  localized,
+  type LessonSpine,
+  type LessonProgramme,
+  type LessonUnit,
+  type LessonRef,
+  type LessonDetail,
+  type LessonObjective,
+  type LessonResource,
+  type LessonLog,
+  type LessonPlan,
+  type LessonChange,
+  type LessonControl,
+} from "./repos/lessons";

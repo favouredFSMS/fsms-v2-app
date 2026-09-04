@@ -11,15 +11,18 @@ export function CursorPager({
   total,
   shown,
   nextCursor,
+  extraParams,
 }: {
   basePath: string;
   search?: string;
   total: number;
   shown: number;
   nextCursor: string | null;
+  extraParams?: Record<string, string>;
 }) {
   const params = new URLSearchParams();
   if (search) params.set("q", search);
+  if (extraParams) for (const [k, v] of Object.entries(extraParams)) if (v) params.set(k, v);
   if (nextCursor) params.set("cursor", nextCursor);
   const href = `${basePath}${params.size ? `?${params.toString()}` : ""}`;
 

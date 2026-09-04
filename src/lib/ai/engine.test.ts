@@ -9,7 +9,7 @@ const providers: AiProviderRuntime[] = [
 const budget = { maxDailyCost: 5, maxTokensPerCall: 2048, requestsPerMinute: 20 };
 const keys = { groq: "k1", gemini: "k2" };
 
-function okFetch(body: unknown): FetchFn {
+function okFetch(): FetchFn {
   return async (_url: string, init: RequestInit) => {
     const req = JSON.parse(init.body as string) as { model?: string };
     const model = req.model ?? "";
@@ -26,7 +26,7 @@ function failingFetch(status = 500): FetchFn {
 
 describe("AiEngine", () => {
   it("returns the first provider that succeeds", async () => {
-    const engine = new AiEngine({ providers, keys, budget, fetchFn: okFetch(null) });
+    const engine = new AiEngine({ providers, keys, budget, fetchFn: okFetch() });
     const res = await engine.run({
       action: "aiAsk",
       prompt: "hello",
@@ -72,7 +72,7 @@ describe("AiEngine", () => {
   });
 
   it("falls back when no key is configured", async () => {
-    const engine = new AiEngine({ providers, keys: {}, budget, fetchFn: okFetch(null) });
+    const engine = new AiEngine({ providers, keys: {}, budget, fetchFn: okFetch() });
     const res = await engine.run({ action: "aiAsk", prompt: "hi", fallback: () => "no-key", periodCost: 0 });
     expect(res.status).toBe("fallback");
     expect(res.provider).toBe("fallback");
@@ -96,7 +96,7 @@ describe("AiEngine", () => {
   });
 
   it("enforces the daily cost budget", async () => {
-    const engine = new AiEngine({ providers, keys, budget, fetchFn: okFetch(null) });
+    const engine = new AiEngine({ providers, keys, budget, fetchFn: okFetch() });
     const res = await engine.run({
       action: "aiAsk",
       prompt: "hi",

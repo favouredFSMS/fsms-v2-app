@@ -109,3 +109,14 @@ export {
   type AiUsageRow,
   type AiStatus,
 } from "./repos/ai";
+export {
+  CommsRepository,
+  type MessageRecipient,
+  type MessageConversation,
+  type MessageThread,
+  type MessageItem,
+  type SentMessage,
+  type NotificationItem,
+  type NotificationPrefs,
+  type ActivityItem,
+} from "./repos/comms";

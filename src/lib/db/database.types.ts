@@ -1200,6 +1200,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      email_outbox: {
+        Row: {
+      id: string;
+      school_id: string;
+      user_id: string | null;
+      to_address: string;
+      template: string;
+      locale: Enums["app_locale"] | null;
+      payload: Json;
+      status: string;
+      error: string | null;
+      created_at: string;
+      sent_at: string | null;
+        };
+        Insert: {
+      id?: string;
+      school_id: string;
+      user_id?: string | null;
+      to_address: string;
+      template: string;
+      locale?: Enums["app_locale"] | null;
+      payload?: Json;
+      status?: string;
+      error?: string | null;
+      created_at?: string;
+      sent_at?: string | null;
+        };
+        Update: {
+      id?: string;
+      school_id?: string;
+      user_id?: string | null;
+      to_address?: string;
+      template?: string;
+      locale?: Enums["app_locale"] | null;
+      payload?: Json;
+      status?: string;
+      error?: string | null;
+      created_at?: string;
+      sent_at?: string | null;
+        };
+        Relationships: [];
+      };
       enrolments: {
         Row: {
       id: string;
@@ -2331,6 +2373,36 @@ export type Database = {
         };
         Relationships: [];
       };
+      notification_preferences: {
+        Row: {
+      user_id: string;
+      school_id: string;
+      email_enabled: boolean;
+      in_app_enabled: boolean;
+      kinds: Json;
+      language_prompted_at: string | null;
+      updated_at: string;
+        };
+        Insert: {
+      user_id: string;
+      school_id: string;
+      email_enabled?: boolean;
+      in_app_enabled?: boolean;
+      kinds?: Json;
+      language_prompted_at?: string | null;
+      updated_at?: string;
+        };
+        Update: {
+      user_id?: string;
+      school_id?: string;
+      email_enabled?: boolean;
+      in_app_enabled?: boolean;
+      kinds?: Json;
+      language_prompted_at?: string | null;
+      updated_at?: string;
+        };
+        Relationships: [];
+      };
       notifications: {
         Row: {
       id: string;
@@ -2418,6 +2490,24 @@ export type Database = {
       text?: Json;
       cefr?: string | null;
       created_at?: string;
+        };
+        Relationships: [];
+      };
+      page_seen: {
+        Row: {
+      user_id: string;
+      page: string;
+      seen_at: string;
+        };
+        Insert: {
+      user_id: string;
+      page: string;
+      seen_at?: string;
+        };
+        Update: {
+      user_id?: string;
+      page?: string;
+      seen_at?: string;
         };
         Relationships: [];
       };
@@ -3994,8 +4084,16 @@ export type Database = {
         Args: { p: Json };
         Returns: Json;
       };
+      _notify: {
+        Args: { p_user: string; p_kind: string; p_payload?: Json };
+        Returns: Json;
+      };
       academic_structure: {
         Args: Record<string, never>;
+        Returns: Json;
+      };
+      activities_list: {
+        Args: { p_limit?: number };
         Returns: Json;
       };
       ai_provider_delete: {
@@ -4178,6 +4276,10 @@ export type Database = {
         Args: { p_log: string };
         Returns: Json;
       };
+      delete_message: {
+        Args: { p_message: string };
+        Returns: Json;
+      };
       delete_methodology: {
         Args: { p_methodology: string };
         Returns: Json;
@@ -4196,6 +4298,10 @@ export type Database = {
       };
       ensure_builtin_roles: {
         Args: { p_school: string };
+        Returns: Json;
+      };
+      ensure_language_prompt: {
+        Args: Record<string, never>;
         Returns: Json;
       };
       evidence_list: {
@@ -4290,6 +4396,18 @@ export type Database = {
         Args: { p_programme?: string };
         Returns: Json;
       };
+      mark_all_notifs_read: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      mark_message_read: {
+        Args: { p_thread: string };
+        Returns: Json;
+      };
+      mark_notif_read: {
+        Args: { p_notif: string };
+        Returns: Json;
+      };
       material_access_admin: {
         Args: { p_material: string };
         Returns: Json;
@@ -4310,12 +4428,48 @@ export type Database = {
         Args: { p_material?: string; p_status?: string };
         Returns: Json;
       };
+      message_conversations: {
+        Args: { p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      message_recipients: {
+        Args: { p_search?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      message_thread: {
+        Args: { p_thread: string };
+        Returns: Json;
+      };
+      message_unread_count: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
       methodology: {
         Args: { p_level?: string };
         Returns: Json;
       };
       my_attendance: {
         Args: { p_student: string };
+        Returns: Json;
+      };
+      notification_prefs: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      notification_unread_count: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      notifications_list: {
+        Args: { p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      notify: {
+        Args: { p_user: string; p_kind: string; p_payload?: Json };
+        Returns: Json;
+      };
+      page_activity: {
+        Args: { p_page: string };
         Returns: Json;
       };
       parent_search: {
@@ -4336,6 +4490,10 @@ export type Database = {
       };
       remove_teacher: {
         Args: { p_class: string; p_user: string };
+        Returns: Json;
+      };
+      reply_message: {
+        Args: { p_thread: string; p_body?: string };
         Returns: Json;
       };
       report_export_list: {
@@ -4442,6 +4600,10 @@ export type Database = {
         Args: { p_id?: string; p_title?: string; p_body?: string; p_level_code?: string };
         Returns: Json;
       };
+      save_notification_prefs: {
+        Args: { p_email_enabled?: boolean; p_in_app_enabled?: boolean; p_kinds?: Json };
+        Returns: Json;
+      };
       save_objective: {
         Args: { p_id?: string; p_lesson?: string; p_text?: string; p_code?: string; p_cefr?: string };
         Returns: Json;
@@ -4464,6 +4626,14 @@ export type Database = {
       };
       save_upload: {
         Args: { p_storage_path: string; p_bucket: string; p_mime?: string; p_size_bytes?: number; p_original_name?: string };
+        Returns: Json;
+      };
+      seen_page: {
+        Args: { p_page: string };
+        Returns: Json;
+      };
+      send_message: {
+        Args: { p_thread?: string; p_to?: Json; p_subject?: string; p_body?: string };
         Returns: Json;
       };
       set_enrolment_status: {

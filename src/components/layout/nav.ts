@@ -69,7 +69,8 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     title: "Communication",
     items: [
-      { href: "/messaging", label: "Messaging", icon: "messaging", permission: "messaging" },
+      // canonical "messaging" lands in Phase 22; messageConversations is the gate
+      { href: "/messaging", label: "Messaging", icon: "messaging", permission: "messageConversations" },
       { href: "/notifications", label: "Notifications", icon: "notifications", permission: "notifications" },
     ],
   },

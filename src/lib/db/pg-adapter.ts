@@ -48,6 +48,11 @@ const RPC_ARG_ORDER: Record<string, string[]> = {
   remove_teacher: ["p_class", "p_user"],
   enrol_student: ["p_student", "p_class"],
   set_enrolment_status: ["p_enrolment", "p_status"],
+  attendance_grid: ["p_class", "p_date"],
+  save_attendance: ["p_class", "p_date", "p_marks"],
+  attendance_history: ["p_class", "p_student", "p_from", "p_to", "p_page_size", "p_cursor"],
+  attendance_stats: ["p_class", "p_from", "p_to"],
+  my_attendance: ["p_student"],
 };
 
 export class PgAdapter implements DbAdapter {

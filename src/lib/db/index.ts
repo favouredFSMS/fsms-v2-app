@@ -22,3 +22,10 @@ export {
   type ClassTeacher,
 } from "./repos/classes";
 export { AcademicRepository, type AcademicStructure } from "./repos/academic";
+export {
+  AttendanceRepository,
+  type AttendanceGrid,
+  type AttendanceRecord,
+  type AttendanceStats,
+  type MyAttendance,
+} from "./repos/attendance";

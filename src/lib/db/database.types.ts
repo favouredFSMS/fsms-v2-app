@@ -3854,6 +3854,18 @@ export type Database = {
         Args: { p_user: string; p_role_key: string };
         Returns: Json;
       };
+      attendance_grid: {
+        Args: { p_class: string; p_date: string };
+        Returns: Json;
+      };
+      attendance_history: {
+        Args: { p_class?: string; p_student?: string; p_from?: string; p_to?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      attendance_stats: {
+        Args: { p_class: string; p_from?: string; p_to?: string };
+        Returns: Json;
+      };
       can_see_class: {
         Args: { p_class: string };
         Returns: Json;
@@ -3946,6 +3958,10 @@ export type Database = {
         Args: Record<string, never>;
         Returns: Json;
       };
+      my_attendance: {
+        Args: { p_student: string };
+        Returns: Json;
+      };
       parent_search: {
         Args: { p_search?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
@@ -3956,6 +3972,10 @@ export type Database = {
       };
       role_rank: {
         Args: Record<string, never>;
+        Returns: Json;
+      };
+      save_attendance: {
+        Args: { p_class: string; p_date: string; p_marks: Json };
         Returns: Json;
       };
       set_enrolment_status: {

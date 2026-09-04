@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FSMS V2 — application
 
-## Getting Started
+Next.js + React + TypeScript front end for **FSMS** (FAVOURED Student Management
+System) — the V2 successor to the V101 Google Apps Script system. Supabase
+(PostgreSQL) is the persistence + auth backend.
 
-First, run the development server:
+## Status
+
+Phases 5–8 complete: development environment, database foundation, data
+migration engine, and authentication & authorization.
+
+## Run locally (dev harness)
+
+No Supabase project is required for local development. When
+`NEXT_PUBLIC_SUPABASE_URL` is empty, the app uses the **dev auth harness**
+against a local PostgreSQL harness:
 
 ```bash
+# 1. provision + migrate the local database (from the FSMS-V2 root)
+bash scripts/db_reset.sh
+
+# 2. run the app
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 → sign in with a seeded demo account:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Role | Email | Password |
+|---|---|---|
+| Owner (admin1) | `owner@favoured.test` | `owner123` |
+| Teacher | `teacher@favoured.test` | `teacher123` |
+| Parent (ru locale) | `parent@favoured.test` | `parent123` |
+| Student | `student@favoured.test` | `student123` |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+> These credentials and the dev harness are **local-only**. Production
+> authentication is Supabase Auth (email/password + O1 email recovery) —
+> configuration-only via environment variables, never committed.
 
-## Learn More
+## Environment
 
-To learn more about Next.js, take a look at the following resources:
+Copy `.env.example` → `.env.local` (never commit `.env.local`). Key variables:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY` — Supabase project (production auth).
+- `AUTH_MODE` — `supabase` (production) or `local` (dev-only harness).
+- `LOCAL_DB_URL`, `AUTH_LOCAL_SECRET` — dev harness only.
+- `RESEND_API_KEY`, `EMAIL_FROM` — email provider (O5).
+- `GOOGLE_TRANSLATE_API_KEY` — translation provider (O3).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
+- `npm run dev` — development server
+- `npm run build` — production build
+- `npm run lint` — ESLint
+- `npm test` — vitest (unit + local-DB integration; integration skips if the
+  harness DB is unreachable)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Code layout
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/lib/auth/` — roles, permission catalog, authorize, session, guards,
+  actions, dev adapter (see `docs/PHASE8_AUTH_AUTHORIZATION.md`).
+- `src/lib/supabase/` — server (service-role + SSR) and browser clients.
+- `src/lib/env.ts` — typed env access (secrets stay out of the repo).
+- `src/proxy.ts` — session refresh + route protection.
+- `src/app/` — routes: `/login`, `/forgot-password`, `/auth/*`, `/dashboard`.

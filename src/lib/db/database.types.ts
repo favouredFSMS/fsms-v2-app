@@ -165,6 +165,99 @@ export type Database = {
         };
         Relationships: [];
       };
+      ai_providers: {
+        Row: {
+      id: string;
+      school_id: string;
+      key_slug: string;
+      label: string;
+      kind: string;
+      base_url: string | null;
+      model: string;
+      enabled: boolean;
+      sort_order: number;
+      is_custom: boolean;
+      created_at: string;
+      updated_at: string;
+        };
+        Insert: {
+      id?: string;
+      school_id: string;
+      key_slug: string;
+      label: string;
+      kind?: string;
+      base_url?: string | null;
+      model: string;
+      enabled?: boolean;
+      sort_order?: number;
+      is_custom?: boolean;
+      created_at?: string;
+      updated_at?: string;
+        };
+        Update: {
+      id?: string;
+      school_id?: string;
+      key_slug?: string;
+      label?: string;
+      kind?: string;
+      base_url?: string | null;
+      model?: string;
+      enabled?: boolean;
+      sort_order?: number;
+      is_custom?: boolean;
+      created_at?: string;
+      updated_at?: string;
+        };
+        Relationships: [];
+      };
+      ai_usage_logs: {
+        Row: {
+      id: string;
+      school_id: string;
+      user_id: string | null;
+      action: string;
+      provider: string | null;
+      model: string | null;
+      prompt_tokens: number;
+      completion_tokens: number;
+      cost: number;
+      status: string;
+      error: string | null;
+      latency_ms: number | null;
+      created_at: string;
+        };
+        Insert: {
+      id?: string;
+      school_id: string;
+      user_id?: string | null;
+      action: string;
+      provider?: string | null;
+      model?: string | null;
+      prompt_tokens?: number;
+      completion_tokens?: number;
+      cost?: number;
+      status?: string;
+      error?: string | null;
+      latency_ms?: number | null;
+      created_at?: string;
+        };
+        Update: {
+      id?: string;
+      school_id?: string;
+      user_id?: string | null;
+      action?: string;
+      provider?: string | null;
+      model?: string | null;
+      prompt_tokens?: number;
+      completion_tokens?: number;
+      cost?: number;
+      status?: string;
+      error?: string | null;
+      latency_ms?: number | null;
+      created_at?: string;
+        };
+        Relationships: [];
+      };
       assessment_tests: {
         Row: {
       id: string;
@@ -3903,6 +3996,38 @@ export type Database = {
       };
       academic_structure: {
         Args: Record<string, never>;
+        Returns: Json;
+      };
+      ai_provider_delete: {
+        Args: { p_id: string };
+        Returns: Json;
+      };
+      ai_provider_list: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      ai_provider_order: {
+        Args: { p_order: Json };
+        Returns: Json;
+      };
+      ai_provider_save: {
+        Args: { p_id?: string; p_key_slug?: string; p_label?: string; p_kind?: string; p_base_url?: string; p_model?: string; p_enabled?: boolean; p_sort_order?: number };
+        Returns: Json;
+      };
+      ai_status: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      ai_usage_list: {
+        Args: { p_from?: string; p_to?: string; p_action?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      ai_usage_log: {
+        Args: { p_action: string; p_provider?: string; p_model?: string; p_prompt_tokens?: number; p_completion_tokens?: number; p_cost?: number; p_status?: string; p_error?: string; p_latency_ms?: number };
+        Returns: Json;
+      };
+      ai_usage_totals: {
+        Args: { p_from?: string; p_to?: string };
         Returns: Json;
       };
       archive_assessment_test: {

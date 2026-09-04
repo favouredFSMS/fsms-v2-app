@@ -136,6 +136,14 @@ const RPC_ARG_ORDER: Record<string, string[]> = {
   report_export_process: [],
   report_export_list: [],
   report_export_result: ["p_job"],
+  ai_provider_list: [],
+  ai_provider_save: ["p_id", "p_key_slug", "p_label", "p_kind", "p_base_url", "p_model", "p_enabled", "p_sort_order"],
+  ai_provider_delete: ["p_id"],
+  ai_provider_order: ["p_order"],
+  ai_usage_log: ["p_action", "p_provider", "p_model", "p_prompt_tokens", "p_completion_tokens", "p_cost", "p_status", "p_error", "p_latency_ms"],
+  ai_usage_totals: ["p_from", "p_to"],
+  ai_usage_list: ["p_from", "p_to", "p_action", "p_page_size", "p_cursor"],
+  ai_status: [],
 };
 
 export class PgAdapter implements DbAdapter {

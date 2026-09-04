@@ -51,6 +51,20 @@ export const env = {
     return read("OPENROUTER_API_KEY");
   },
 
+  /** Phase 21 AI budget / rate controls. SERVER-SIDE ONLY. */
+  get aiMaxDailyCost(): number {
+    const v = Number(read("AI_MAX_DAILY_COST", false, "5"));
+    return Number.isFinite(v) && v > 0 ? v : 5;
+  },
+  get aiMaxTokensPerCall(): number {
+    const v = Number(read("AI_MAX_TOKENS_PER_CALL", false, "2048"));
+    return Number.isFinite(v) && v > 0 ? v : 2048;
+  },
+  get aiRequestsPerMinute(): number {
+    const v = Number(read("AI_REQUESTS_PER_MINUTE", false, "20"));
+    return Number.isFinite(v) && v > 0 ? v : 20;
+  },
+
   /** Translation provider (O3). SERVER-SIDE ONLY. */
   get googleTranslateApiKey(): string {
     return read("GOOGLE_TRANSLATE_API_KEY");

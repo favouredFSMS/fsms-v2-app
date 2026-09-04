@@ -101,3 +101,11 @@ export {
   type ReportExportResult,
   type ReportExportRequested,
 } from "./repos/reporting";
+export {
+  AiRepository,
+  type AiProviderConfig,
+  type AiProviderStatus,
+  type AiUsageTotals,
+  type AiUsageRow,
+  type AiStatus,
+} from "./repos/ai";

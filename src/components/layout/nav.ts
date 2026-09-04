@@ -55,6 +55,8 @@ export const NAV_SECTIONS: NavSection[] = [
       { href: "/curriculum", label: "Curriculum", icon: "curriculum", permission: "curriculum" },
       // canonical "materials" lands in Phase 19; materialCatalog is the current gate
       { href: "/materials", label: "Materials", icon: "materials", permission: "materialCatalog" },
+      // canonical "ai" lands in Phase 21; aiAsk is the staff gate
+      { href: "/ai", label: "AI", icon: "ai", permission: "aiAsk" },
     ],
   },
   {

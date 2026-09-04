@@ -8,7 +8,7 @@ export type IconName =
   | "dashboard" | "people" | "students" | "parents" | "classes" | "attendance"
   | "homework" | "lessons" | "assessments" | "curriculum" | "materials"
   | "payments" | "payroll" | "messaging" | "notifications" | "learning"
-  | "family" | "reports" | "roles" | "settings" | "admin"
+  | "family" | "reports" | "roles" | "settings" | "admin" | "ai"
   | "search" | "close" | "check" | "chevron-left" | "chevron-right"
   | "chevron-down" | "menu" | "bell" | "logout" | "user" | "filter"
   | "calendar" | "inbox" | "info" | "success" | "warning" | "danger" | "plus";
@@ -238,6 +238,15 @@ const P: Record<IconName, ReactNode> = {
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
+  ai: (
+    <>
+      <rect x="4" y="7" width="16" height="12" rx="2" />
+      <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+      <path d="M12 10v0" />
+      <path d="m9.5 14 1.2-2.4a.5.5 0 0 1 .9 0l1.2 2.4-1.2 2.4a.5.5 0 0 1-.9 0Z" />
+      <path d="M12 14h4" />
+    </>
+  ),
 };
 
 export interface IconProps {

@@ -79,7 +79,7 @@ describe("ReportingRepository", () => {
     const adapter = fakeAdapter({
       async rpc<T>(_n: string, a?: Record<string, unknown>) {
         args = a;
-        return { data: null, error: null };
+        return { data: null as T, error: null };
       },
     });
     await new ReportingRepository(ctx(adapter, student())).studentProgressReport({ studentId: STU });

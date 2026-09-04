@@ -3846,6 +3846,26 @@ export type Database = {
         Args: Record<string, never>;
         Returns: Json;
       };
+      archive_assessment_test: {
+        Args: { p_test: string };
+        Returns: Json;
+      };
+      assessment_list: {
+        Args: { p_student?: string; p_class?: string; p_from?: string; p_to?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      assessment_performance: {
+        Args: { p_student?: string; p_from?: string; p_to?: string };
+        Returns: Json;
+      };
+      assessment_test_detail: {
+        Args: { p_test: string };
+        Returns: Json;
+      };
+      assessment_tests: {
+        Args: { p_student?: string; p_status?: string };
+        Returns: Json;
+      };
       assign_teacher: {
         Args: { p_class: string; p_user: string; p_primary?: boolean };
         Returns: Json;
@@ -4014,12 +4034,24 @@ export type Database = {
         Args: { p_search?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
       };
+      record_assessment_test: {
+        Args: { p_test: string; p_marks: Json };
+        Returns: Json;
+      };
       remove_teacher: {
         Args: { p_class: string; p_user: string };
         Returns: Json;
       };
       role_rank: {
         Args: Record<string, never>;
+        Returns: Json;
+      };
+      save_assessment: {
+        Args: { p_student: string; p_class?: string; p_date?: string; p_type?: string; p_title?: string; p_score?: number; p_max_score?: number; p_note?: string };
+        Returns: Json;
+      };
+      save_assessment_test: {
+        Args: { p_student: string; p_class?: string; p_title?: string; p_difficulty?: string; p_types?: Json; p_tasks?: Json; p_mode?: string };
         Returns: Json;
       };
       save_attendance: {

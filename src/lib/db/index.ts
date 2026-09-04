@@ -45,3 +45,10 @@ export {
   type LessonChange,
   type LessonControl,
 } from "./repos/lessons";
+export {
+  AssessmentRepository,
+  type AssessmentItem,
+  type AssessmentTest,
+  type AssessmentTestDetail,
+  type AssessmentPerformance,
+} from "./repos/assessments";

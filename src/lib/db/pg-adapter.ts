@@ -69,6 +69,14 @@ const RPC_ARG_ORDER: Record<string, string[]> = {
   decide_lesson_change: ["p_change", "p_decision"],
   lesson_controls: ["p_class"],
   save_lesson_control: ["p_class", "p_key", "p_value"],
+  assessment_tests: ["p_student", "p_status"],
+  assessment_test_detail: ["p_test"],
+  save_assessment_test: ["p_student", "p_class", "p_title", "p_difficulty", "p_types", "p_tasks", "p_mode"],
+  record_assessment_test: ["p_test", "p_marks"],
+  save_assessment: ["p_student", "p_class", "p_date", "p_type", "p_title", "p_score", "p_max_score", "p_note"],
+  assessment_list: ["p_student", "p_class", "p_from", "p_to", "p_page_size", "p_cursor"],
+  assessment_performance: ["p_student", "p_from", "p_to"],
+  archive_assessment_test: ["p_test"],
 };
 
 export class PgAdapter implements DbAdapter {

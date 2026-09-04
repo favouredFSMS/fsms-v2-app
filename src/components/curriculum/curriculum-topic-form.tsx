@@ -2,12 +2,14 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { saveTopicAction, type CurriculumActionState } from "@/lib/actions/curriculum";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
 import { Input, Select } from "@/components/ui/input";
 
 export function CurriculumTopicForm() {
+  const [t, st, commonT] = [useTranslations("curriculum"), useTranslations("status"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<CurriculumActionState | null, FormData>(
     saveTopicAction,
     null,
@@ -25,26 +27,26 @@ export function CurriculumTopicForm() {
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Topic title" htmlFor="title" required>
+        <Field label={t("topicTitle")} htmlFor="title" required>
           <Input id="title" name="title" required placeholder="Present simple: daily routines" />
         </Field>
-        <Field label="Level" htmlFor="levelCode">
+        <Field label={commonT("level")} htmlFor="levelCode">
           <Input id="levelCode" name="levelCode" placeholder="a2" />
         </Field>
-        <Field label="Course section" htmlFor="courseSection">
+        <Field label={t("courseSection")} htmlFor="courseSection">
           <Input id="courseSection" name="courseSection" placeholder="grammar" />
         </Field>
-        <Field label="Publish" htmlFor="published">
+        <Field label={t("publishLabel")} htmlFor="published">
           <Select id="published" name="published" defaultValue="false">
-            <option value="false">Draft</option>
-            <option value="true">Published</option>
+            <option value="false">{st("draft")}</option>
+            <option value="true">{st("published")}</option>
           </Select>
         </Field>
       </div>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
       <div>
         <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Save topic"}
+          {pending ? commonT("saving") : t("saveTopic")}
         </Button>
       </div>
     </form>

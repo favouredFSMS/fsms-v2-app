@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -47,11 +48,11 @@ export async function saveLessonLogAction(
       durationMin: optionalInt(formData, "durationMin"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Lesson record was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.lessonsRecordNotSavedDenied") };
     revalidatePath("/lessons");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save lesson record" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.lessonsSaveRecordFailed") };
   }
 }
 
@@ -69,11 +70,11 @@ export async function saveLessonPlanAction(
       source: field(formData, "source"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Plan was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.lessonsPlanNotSavedDenied") };
     revalidatePath("/lessons");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save lesson plan" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.lessonsSavePlanFailed") };
   }
 }
 
@@ -90,11 +91,11 @@ export async function requestLessonChangeAction(
       reason: field(formData, "reason"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Change request was not accepted (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.lessonsChangeNotAcceptedDenied") };
     revalidatePath("/lessons");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to request lesson change" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.lessonsRequestChangeFailed") };
   }
 }
 
@@ -106,18 +107,18 @@ export async function decideLessonChangeAction(
     const ctx = await requireDbContext();
     const decision = field(formData, "decision") as "approved" | "declined" | null;
     if (decision !== "approved" && decision !== "declined") {
-      return { ok: false, message: "Pick a decision" };
+      return { ok: false, message: await translate("actions.lessonsPickDecision") };
     }
     const res = await new LessonRepository(ctx).decideChange({
       changeId: field(formData, "changeId"),
       decision,
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Decision was not recorded (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.lessonsDecisionNotRecordedDenied") };
     revalidatePath("/lessons");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to record decision" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.lessonsRecordDecisionFailed") };
   }
 }
 
@@ -133,11 +134,11 @@ export async function saveLessonControlAction(
       value: field(formData, "value"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Control was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.lessonsControlNotSavedDenied") };
     revalidatePath("/lessons");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save lesson control" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.lessonsSaveControlFailed") };
   }
 }
 
@@ -152,6 +153,6 @@ export async function deleteLessonLogAction(
     revalidatePath("/lessons");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to remove lesson record" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.lessonsRemoveRecordFailed") };
   }
 }

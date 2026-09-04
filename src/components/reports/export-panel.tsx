@@ -2,6 +2,7 @@
 
 import { useActionState, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   requestExportAction,
   processExportsAction,
@@ -15,14 +16,6 @@ import { Select, Input } from "@/components/ui/input";
 import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
 import type { ReportExportJob } from "@/lib/db";
 import type { PickOption } from "./report-picker";
-
-const EXPORT_KIND_LABEL: Record<string, string> = {
-  attendance: "Attendance (CSV)",
-  assessment: "Assessments (CSV)",
-  "learner-progress": "Learner progress (CSV)",
-  "class-earnings": "Class earnings (CSV)",
-  salary: "Salary history (CSV)",
-};
 
 function fmt(iso: string | null): string {
   if (!iso) return "—";
@@ -45,6 +38,7 @@ export function ExportPanel({
   teachers: PickOption[];
   jobs: ReportExportJob[];
 }) {
+  const [t, st, commonT] = [useTranslations("reports"), useTranslations("status"), useTranslations("common")];
   const router = useRouter();
   const [kind, setKind] = useState("attendance");
   const [requestState, requestAction, requesting] = useActionState<ReportingActionState | null, FormData>(
@@ -55,6 +49,23 @@ export function ExportPanel({
   const [processMsg, setProcessMsg] = useState<ReportingActionState | null>(null);
   const [downloading, startDownload] = useTransition();
   const [dlMsg, setDlMsg] = useState<string | null>(null);
+
+  const kindLabel = (k: string): string => {
+    switch (k) {
+      case "attendance":
+        return t("attendanceCsv");
+      case "assessment":
+        return t("assessmentsCsv");
+      case "learner-progress":
+        return t("learnerProgressCsv");
+      case "class-earnings":
+        return t("classEarningsCsv");
+      case "salary":
+        return t("salaryCsv");
+      default:
+        return k;
+    }
+  };
 
   function runProcess() {
     startProcess(async () => {
@@ -81,7 +92,7 @@ export function ExportPanel({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      setDlMsg(kind);
+      setDlMsg(kindLabel(kind));
     });
   }
 
@@ -89,19 +100,19 @@ export function ExportPanel({
     <div className="flex flex-col gap-4">
       <form action={requestAction} className="flex flex-col gap-3">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <Field label="Export type">
+          <Field label={t("exportType")}>
             <Select name="kind" value={kind} onChange={(e) => setKind(e.target.value)}>
-              {Object.entries(EXPORT_KIND_LABEL).map(([k, label]) => (
+              {["attendance", "assessment", "learner-progress", "class-earnings", "salary"].map((k) => (
                 <option key={k} value={k}>
-                  {label}
+                  {kindLabel(k)}
                 </option>
               ))}
             </Select>
           </Field>
           {(kind === "attendance" || kind === "assessment" || kind === "learner-progress") && (
-            <Field label="Class">
+            <Field label={commonT("class")}>
               <Select name="classId" defaultValue="">
-                <option value="">All classes</option>
+                <option value="">{t("allClasses")}</option>
                 {classes.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
@@ -111,9 +122,9 @@ export function ExportPanel({
             </Field>
           )}
           {kind === "salary" && (
-            <Field label="Teacher">
+            <Field label={commonT("teacher")}>
               <Select name="userId" defaultValue="">
-                <option value="">All teachers</option>
+                <option value="">{t("allTeachers")}</option>
                 {teachers.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.name}
@@ -123,7 +134,7 @@ export function ExportPanel({
             </Field>
           )}
           {kind === "salary" && (
-            <Field label="Month">
+            <Field label={commonT("month")}>
               <Input type="month" name="month" />
             </Field>
           )}
@@ -131,11 +142,11 @@ export function ExportPanel({
         {requestState && !requestState.ok && <FieldError>{requestState.message}</FieldError>}
         <div className="flex flex-wrap items-center gap-2">
           <Button type="submit" disabled={requesting}>
-            {requesting ? "Queuing…" : "Request export"}
+            {requesting ? t("queuing") : t("requestExport")}
           </Button>
           {canProcess && (
             <Button type="button" variant="secondary" disabled={processing} onClick={runProcess}>
-              {processing ? "Processing…" : "Process queue (office)"}
+              {processing ? t("processing") : t("processQueue")}
             </Button>
           )}
           {processMsg && !processMsg.ok && <span className="text-sm text-danger-600">{processMsg.message}</span>}
@@ -143,32 +154,32 @@ export function ExportPanel({
         </div>
       </form>
 
-      {dlMsg && <p className="text-sm text-ink-500">Downloaded {dlMsg}.</p>}
+      {dlMsg && <p className="text-sm text-ink-500">{t("downloaded", { kind: dlMsg })}</p>}
 
       <Table>
         <THead>
           <TR>
-            <TH>Type</TH>
-            <TH>Requested by</TH>
-            <TH>Status</TH>
-            <TH>Requested</TH>
-            <TH>Completed</TH>
-            <TH>Action</TH>
+            <TH>{t("type")}</TH>
+            <TH>{t("requestedBy")}</TH>
+            <TH>{commonT("status")}</TH>
+            <TH>{t("requested")}</TH>
+            <TH>{t("completed")}</TH>
+            <TH>{t("action")}</TH>
           </TR>
         </THead>
         <TBody>
           {jobs.length === 0 ? (
-            <TableEmpty colSpan={6}>No export jobs yet.</TableEmpty>
+            <TableEmpty colSpan={6}>{t("noExportJobs")}</TableEmpty>
           ) : (
             jobs.map((j) => (
               <TR key={j.id}>
-                <TD>{EXPORT_KIND_LABEL[j.kind] ?? j.kind}</TD>
+                <TD>{kindLabel(j.kind)}</TD>
                 <TD>{j.requested_by_name ?? "—"}</TD>
                 <TD>
                   <Badge
                     variant={j.status === "ready" ? "success" : j.status === "failed" ? "danger" : "neutral"}
                   >
-                    {j.status}
+                    {st.has(j.status) ? st(j.status) : j.status}
                   </Badge>
                   {j.error ? <span className="ml-2 text-xs text-danger-600">{j.error}</span> : null}
                 </TD>
@@ -177,7 +188,7 @@ export function ExportPanel({
                 <TD>
                   {j.status === "ready" ? (
                     <Button size="sm" variant="secondary" disabled={downloading} onClick={() => download(j.id, j.kind)}>
-                      Download CSV
+                      {t("downloadCsv")}
                     </Button>
                   ) : null}
                 </TD>
@@ -186,10 +197,7 @@ export function ExportPanel({
           )}
         </TBody>
       </Table>
-      <p className="text-xs text-ink-500">
-        Queued jobs sit in <code>report_exports</code> and are converted to CSV by an office-role
-        worker. Download the result any time afterwards.
-      </p>
+      <p className="text-xs text-ink-500">{t("exportNote")}</p>
       <button type="button" hidden onClick={() => router.refresh()} aria-label="refresh" />
     </div>
   );

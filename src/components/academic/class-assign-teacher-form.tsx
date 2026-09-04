@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { assignTeacherAction, type AcademicActionState } from "@/lib/actions/academic";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -15,6 +16,7 @@ export function ClassAssignTeacherForm({
   classId: string;
   teachers: Option[];
 }) {
+  const [t, commonT] = [useTranslations("academic"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<AcademicActionState | null, FormData>(
     assignTeacherAction,
     null,
@@ -28,9 +30,9 @@ export function ClassAssignTeacherForm({
   return (
     <form action={formAction} className="flex flex-wrap items-end gap-3">
       <input type="hidden" name="classId" value={classId} />
-      <Field label="Teacher" htmlFor="userId" className="min-w-48">
+      <Field label={commonT("teacher")} htmlFor="userId" className="min-w-48">
         <Select id="userId" name="userId" required defaultValue="">
-          <option value="" disabled>Select a teacher…</option>
+          <option value="" disabled>{t("selectTeacher")}</option>
           {teachers.map((t) => (
             <option key={t.id} value={t.id}>{t.name}</option>
           ))}
@@ -38,9 +40,9 @@ export function ClassAssignTeacherForm({
       </Field>
       <label className="flex items-center gap-2 pb-2 text-sm text-ink-muted">
         <input type="checkbox" name="primary" className="accent-brand-600" />
-        Primary teacher
+        {t("primaryTeacher")}
       </label>
-      <Button type="submit" loading={pending}>Assign</Button>
+      <Button type="submit" loading={pending}>{commonT("assign")}</Button>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
     </form>
   );

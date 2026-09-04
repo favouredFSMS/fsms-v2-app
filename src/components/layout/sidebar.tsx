@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/ui/cn";
 import { Icon } from "@/components/ui/icons";
 import type { NavSection } from "./nav";
@@ -14,6 +15,7 @@ export interface SidebarProps {
 
 export function Sidebar({ sections, brand, onNavigate }: SidebarProps) {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   return (
     <div className="flex h-full flex-col">
@@ -31,7 +33,7 @@ export function Sidebar({ sections, brand, onNavigate }: SidebarProps) {
           <div key={section.title ?? i} className="mb-5">
             {section.title && (
               <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-ink-faint">
-                {section.title}
+                {t(section.title)}
               </p>
             )}
             <ul className="space-y-0.5">
@@ -52,7 +54,7 @@ export function Sidebar({ sections, brand, onNavigate }: SidebarProps) {
                       )}
                     >
                       <Icon name={item.icon} size={18} />
-                      <span className="truncate">{item.label}</span>
+                      <span className="truncate">{t(item.label)}</span>
                     </Link>
                   </li>
                 );

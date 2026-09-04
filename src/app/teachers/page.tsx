@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +14,11 @@ export default async function TeachersPage({
 }: {
   searchParams: Promise<{ q?: string; cursor?: string }>;
 }) {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("teachers"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -24,39 +30,37 @@ export default async function TeachersPage({
   });
 
   return (
-    <PageShell title="Teachers" permission="teachers">
+    <PageShell title={t("title")} permission="teachers">
       <Card>
         <CardHeader>
-          <CardTitle>Teachers</CardTitle>
-          <CardDescription>
-            Staff accounts with the teacher role. Class assignments are managed in Classes.
-          </CardDescription>
+          <CardTitle>{t("title")}</CardTitle>
+          <CardDescription>{t("desc")}</CardDescription>
         </CardHeader>
         <CardBody className="px-0">
           <form method="get" className="flex items-center gap-2 px-4 pb-3">
             <input
               name="q"
               defaultValue={sp.q ?? ""}
-              placeholder="Search name / email…"
+              placeholder={t("searchPlaceholder")}
               className="w-full max-w-xs rounded-field border bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-brand-500 focus-ring"
             />
             <button type="submit" className="rounded-field bg-brand-600 px-3 py-2 text-sm text-ink-inverse hover:bg-brand-700">
-              Search
+              {commonT("search")}
             </button>
           </form>
 
           {res.ok ? (
             res.data.items.length === 0 ? (
-              <TableEmpty colSpan={4}>No teachers found.</TableEmpty>
+              <TableEmpty colSpan={4}>{t("noTeachers")}</TableEmpty>
             ) : (
               <>
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Name</TH>
-                      <TH>Email</TH>
-                      <TH>Phone</TH>
-                      <TH className="text-right">Status</TH>
+                      <TH>{commonT("name")}</TH>
+                      <TH>{commonT("email")}</TH>
+                      <TH>{commonT("phone")}</TH>
+                      <TH className="text-right">{commonT("status")}</TH>
                     </TR>
                   </THead>
                   <TBody>
@@ -66,7 +70,7 @@ export default async function TeachersPage({
                         <TD>{t.email}</TD>
                         <TD>{t.phone ?? "—"}</TD>
                         <TD className="text-right">
-                          <Badge variant={t.status === "active" ? "success" : "neutral"}>{t.status}</Badge>
+                          <Badge variant={t.status === "active" ? "success" : "neutral"}>{t.status && st.has(t.status) ? st(t.status) : t.status}</Badge>
                         </TD>
                       </TR>
                     ))}

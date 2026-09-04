@@ -5,6 +5,9 @@ import { redirect } from "next/navigation";
 import { env } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isLocalAuthEnabled, verifyLocalCredentials, issueLocalSession } from "@/lib/auth/local";
+import { getAuthProfile } from "@/lib/auth/session";
+import { translate } from "@/i18n/server";
+import { LOCALE_COOKIE, normaliseLocale } from "@/i18n/locales";
 
 /**
  * FSMS V2 — auth server actions (Phase 8).
@@ -22,12 +25,12 @@ export async function loginAction(_prev: AuthFormState, formData: FormData): Pro
   const password = String(formData.get("password") ?? "");
 
   if (!email || !password) {
-    return { error: "Email and password are required." };
+    return { error: await translate("auth.emailPasswordRequired") };
   }
 
   if (isLocalAuthEnabled()) {
     const id = await verifyLocalCredentials(email, password);
-    if (!id) return { error: "Invalid email or password." };
+    if (!id) return { error: await translate("auth.invalidCredentials") };
     const store = await cookies();
     store.set("fsms_local_session", issueLocalSession(id, email), {
       httpOnly: true,
@@ -43,6 +46,17 @@ export async function loginAction(_prev: AuthFormState, formData: FormData): Pro
       return { error: error.message };
     }
   }
+
+  // Mirror the durable per-user UI language into the locale cookie so the
+  // i18n request config resolves it without a DB round-trip on every request.
+  const profile = await getAuthProfile();
+  const locale = normaliseLocale(profile?.locale);
+  (await cookies()).set(LOCALE_COOKIE, locale, {
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    maxAge: SESSION_MAX_AGE,
+    path: "/",
+  });
 
   redirect("/dashboard");
 }
@@ -64,13 +78,10 @@ export async function forgotPasswordAction(
   formData: FormData,
 ): Promise<AuthFormState> {
   const email = String(formData.get("email") ?? "").trim();
-  if (!email) return { error: "Email is required." };
+  if (!email) return { error: await translate("auth.emailRequired") };
 
   if (isLocalAuthEnabled()) {
-    return {
-      error:
-        "Password recovery needs a provisioned Supabase project (O1: email recovery). In local dev, use the seeded demo passwords.",
-    };
+    return { error: await translate("auth.recoveryNeedsSupabase") };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -88,8 +99,8 @@ export async function resetPasswordAction(
 ): Promise<AuthFormState> {
   const password = String(formData.get("password") ?? "");
   const confirm = String(formData.get("confirm") ?? "");
-  if (password.length < 8) return { error: "Password must be at least 8 characters." };
-  if (password !== confirm) return { error: "Passwords do not match." };
+  if (password.length < 8) return { error: await translate("auth.passwordMin") };
+  if (password !== confirm) return { error: await translate("auth.passwordMismatch") };
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.updateUser({ password });

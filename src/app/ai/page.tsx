@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
@@ -15,6 +16,10 @@ export const metadata = { title: "AI — FSMS V2" };
 const LEADERSHIP = ["admin1", "admin", "manager"];
 
 export default async function AiPage() {
+  const [t, commonT] = await Promise.all([
+    getTranslations("ai"),
+    getTranslations("common"),
+  ]);
   const profile = await requireUser();
   const ctx = await requireDbContext();
   const ai = new AiRepository(ctx);
@@ -63,36 +68,34 @@ export default async function AiPage() {
   const usageToday = status?.usage_today;
 
   return (
-    <PageShell title="AI" permission="aiAsk">
+    <PageShell title={t("title")} permission="aiAsk">
       <div className="grid gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>AI assistant</CardTitle>
-            <CardDescription>
-              Reports, remarks, at-risk checks, practice plans, quizzes, assessment tasks, lesson
-              plans and learner help — with provider failover, rate limiting, cost tracking and an
-              offline fallback when no key is configured.
-            </CardDescription>
+            <CardTitle>{t("assistant")}</CardTitle>
+            <CardDescription>{t("assistantDesc")}</CardDescription>
           </CardHeader>
           <CardBody>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-              <Stat label="Providers enabled" value={String(status?.providers.length ?? 0)} />
-              <Stat label="Keys configured" value={`${providerRows.filter((p) => p.configured).length} / ${providerRows.length || status?.providers.length || 0}`} />
-              <Stat label="Calls today" value={String(usageToday?.calls ?? 0)} />
-              <Stat label="Cost today" value={`$${Number(usageToday?.cost ?? 0).toFixed(4)}`} />
+              <Stat label={t("providersEnabled")} value={String(status?.providers.length ?? 0)} />
+              <Stat label={t("keysConfigured")} value={`${providerRows.filter((p) => p.configured).length} / ${providerRows.length || status?.providers.length || 0}`} />
+              <Stat label={t("callsToday")} value={String(usageToday?.calls ?? 0)} />
+              <Stat label={t("costToday")} value={`$${Number(usageToday?.cost ?? 0).toFixed(4)}`} />
             </div>
             <p className="mt-2 text-xs text-ink-500">
-              Budget: $/day cap ${budget.maxDailyCost} · max {budget.maxTokensPerCall} prompt tokens/call ·
-              {budget.requestsPerMinute} req/min per provider. All model output is AI-generated and
-              should be reviewed before use.
+              {t("budgetLine", {
+                maxDailyCost: budget.maxDailyCost,
+                maxTokensPerCall: budget.maxTokensPerCall,
+                requestsPerMinute: budget.requestsPerMinute,
+              })}
             </p>
           </CardBody>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Ask</CardTitle>
-            <CardDescription>Pick a task; results include a provider + status badge.</CardDescription>
+            <CardTitle>{t("ask")}</CardTitle>
+            <CardDescription>{t("askDesc")}</CardDescription>
           </CardHeader>
           <CardBody>
             <AskForm students={students} classes={classes} />
@@ -102,8 +105,8 @@ export default async function AiPage() {
         {canGenerate && (
           <Card>
             <CardHeader>
-              <CardTitle>Generate</CardTitle>
-              <CardDescription>Quizzes, assessment tasks and lesson plans from your curriculum targets.</CardDescription>
+              <CardTitle>{t("generate")}</CardTitle>
+              <CardDescription>{t("generateDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <GenerateForm />
@@ -114,10 +117,8 @@ export default async function AiPage() {
         {canConfig && (
           <Card>
             <CardHeader>
-              <CardTitle>Providers (owner)</CardTitle>
-              <CardDescription>
-                Provider metadata only — API keys live in environment variables and never in the database.
-              </CardDescription>
+              <CardTitle>{t("providersOwner")}</CardTitle>
+              <CardDescription>{t("providersOwnerDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <ProviderAdmin providers={providerRows} />
@@ -128,25 +129,25 @@ export default async function AiPage() {
         {canUsage && (
           <Card>
             <CardHeader>
-              <CardTitle>Usage & cost log</CardTitle>
-              <CardDescription>Recent AI calls across the school.</CardDescription>
+              <CardTitle>{t("usageLog")}</CardTitle>
+              <CardDescription>{t("usageLogDesc")}</CardDescription>
             </CardHeader>
             <CardBody className="px-0">
               <Table>
                 <THead>
                   <TR>
-                    <TH>Action</TH>
-                    <TH>User</TH>
-                    <TH>Provider</TH>
-                    <TH>Tokens</TH>
-                    <TH>Cost</TH>
-                    <TH>Status</TH>
-                    <TH>When</TH>
+                    <TH>{t("action")}</TH>
+                    <TH>{t("user")}</TH>
+                    <TH>{t("provider")}</TH>
+                    <TH>{t("tokens")}</TH>
+                    <TH>{commonT("cost")}</TH>
+                    <TH>{commonT("status")}</TH>
+                    <TH>{t("when")}</TH>
                   </TR>
                 </THead>
                 <TBody>
                   {usageRows.length === 0 ? (
-                    <TableEmpty colSpan={7}>No AI calls yet.</TableEmpty>
+                    <TableEmpty colSpan={7}>{t("noCalls")}</TableEmpty>
                   ) : (
                     usageRows.map((r) => (
                       <TR key={r.id}>

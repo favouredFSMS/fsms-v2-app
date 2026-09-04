@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -47,11 +48,11 @@ export async function saveAssessmentAction(
       note: field(formData, "note"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Assessment was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.assessmentsNotSavedDenied") };
     revalidatePath("/assessments");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save assessment" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.assessmentsSaveFailed") };
   }
 }
 
@@ -66,7 +67,7 @@ export async function saveAssessmentTestAction(
     try {
       tasks = rawTasks ? JSON.parse(String(rawTasks)) : null;
     } catch {
-      return { ok: false, message: "Tasks payload is not valid JSON" };
+      return { ok: false, message: await translate("actions.assessmentsTasksInvalidJson") };
     }
     const types = rawTypes
       ? String(rawTypes)
@@ -86,11 +87,11 @@ export async function saveAssessmentTestAction(
       mode: field(formData, "mode"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Test was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.assessmentsTestNotSavedDenied") };
     revalidatePath("/assessments");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save assessment test" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.assessmentsSaveTestFailed") };
   }
 }
 
@@ -100,16 +101,16 @@ export async function recordAssessmentTestAction(
 ): Promise<AssessmentActionState> {
   try {
     const testId = field(formData, "testId");
-    if (!testId) return { ok: false, message: "Pick a test" };
+    if (!testId) return { ok: false, message: await translate("actions.assessmentsPickTest") };
 
     const ctx = await requireDbContext();
     const repo = new AssessmentRepository(ctx);
 
     // Build marks against the test's own task list.
     const detail = await repo.testDetail({ testId });
-    if (!detail.ok || !detail.data) return { ok: false, message: "Test not found" };
+    if (!detail.ok || !detail.data) return { ok: false, message: await translate("actions.assessmentsTestNotFound") };
     const total = detail.data.tasks?.length ?? 0;
-    if (total === 0) return { ok: false, message: "Test has no tasks" };
+    if (total === 0) return { ok: false, message: await translate("actions.assessmentsTestNoTasks") };
 
     const correctTasks = field(formData, "correctTasks");
     const correctSet = new Set<number>(
@@ -125,11 +126,11 @@ export async function recordAssessmentTestAction(
 
     const res = await repo.recordTest({ testId, marks });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Result was not recorded (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.assessmentsResultNotRecordedDenied") };
     revalidatePath("/assessments");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to record assessment result" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.assessmentsRecordResultFailed") };
   }
 }
 
@@ -144,6 +145,6 @@ export async function archiveAssessmentTestAction(
     revalidatePath("/assessments");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to archive test" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.assessmentsArchiveFailed") };
   }
 }

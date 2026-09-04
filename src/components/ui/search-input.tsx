@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useEffect, useState, type InputHTMLAttributes } from "react";
 import { cn } from "@/lib/ui/cn";
 import { useDebouncedValue } from "@/lib/ui/use-debounced-value";
@@ -28,6 +30,7 @@ export function SearchInput({
   className,
   ...rest
 }: SearchInputProps) {
+  const t = useTranslations("common");
   const [internal, setInternal] = useState("");
   const current = value ?? internal;
   const debounced = useDebouncedValue(current, debounceMs);
@@ -59,7 +62,7 @@ export function SearchInput({
           type="button"
           onClick={() => setValue("")}
           className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-ink-faint hover:bg-surface-sunken hover:text-ink focus-ring"
-          aria-label="Clear search"
+          aria-label={t("clearSearch")}
         >
           <Icon name="close" size={14} />
         </button>

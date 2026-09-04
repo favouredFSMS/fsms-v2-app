@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -63,7 +64,7 @@ export async function authorCurriculumAction(
         standard: bool(formData, "programmeStandard"),
       });
       if (!pr.ok) return toState(pr);
-      if (!pr.data) return { ok: false, message: "Programme was not created (denied)" };
+      if (!pr.data) return { ok: false, message: await translate("actions.curriculumProgrammeNotCreatedDenied") };
       programmeId = pr.data.id;
     }
 
@@ -74,7 +75,7 @@ export async function authorCurriculumAction(
       no: optionalInt(formData, "unitNo"),
     });
     if (!un.ok) return toState(un);
-    if (!un.data) return { ok: false, message: "Unit was not created (denied)" };
+    if (!un.data) return { ok: false, message: await translate("actions.curriculumUnitNotCreatedDenied") };
 
     const le = await repo.saveLesson({
       unitId: un.data.id,
@@ -83,7 +84,7 @@ export async function authorCurriculumAction(
       no: optionalInt(formData, "lessonNo"),
     });
     if (!le.ok) return toState(le);
-    if (!le.data) return { ok: false, message: "Lesson was not created (denied)" };
+    if (!le.data) return { ok: false, message: await translate("actions.curriculumLessonNotCreatedDenied") };
 
     const objectiveText = field(formData, "objectiveText");
     if (objectiveText) {
@@ -94,13 +95,13 @@ export async function authorCurriculumAction(
         cefr: field(formData, "objectiveCefr"),
       });
       if (!ob.ok) return toState(ob);
-      if (!ob.data) return { ok: false, message: "Objective was not created (denied)" };
+      if (!ob.data) return { ok: false, message: await translate("actions.curriculumObjectiveNotCreatedDenied") };
     }
 
     revalidatePath("/curriculum");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to author curriculum node" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.curriculumAuthorFailed") };
   }
 }
 
@@ -117,11 +118,11 @@ export async function saveTopicAction(
       published: bool(formData, "published"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Topic was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.curriculumTopicNotSavedDenied") };
     revalidatePath("/curriculum");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save topic" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.curriculumSaveTopicFailed") };
   }
 }
 
@@ -142,11 +143,11 @@ export async function saveEvidenceAction(
       note: field(formData, "note"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Evidence was not recorded (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.curriculumEvidenceNotRecordedDenied") };
     revalidatePath("/curriculum");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to record evidence" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.curriculumEvidenceFailed") };
   }
 }
 
@@ -163,11 +164,11 @@ export async function importCurriculumAction(
       payload: field(formData, "payload"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Curriculum was not imported (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.curriculumNotImportedDenied") };
     revalidatePath("/curriculum");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to import curriculum" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.curriculumImportFailed") };
   }
 }
 
@@ -181,11 +182,11 @@ export async function publishCurriculumAction(
       curriculumId: field(formData, "curriculumId"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Curriculum was not published (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.curriculumNotPublishedDenied") };
     revalidatePath("/curriculum");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to publish curriculum" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.curriculumPublishFailed") };
   }
 }
 
@@ -199,11 +200,11 @@ export async function archiveCurriculumAction(
       curriculumId: field(formData, "curriculumId"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Curriculum was not archived (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.curriculumNotArchivedDenied") };
     revalidatePath("/curriculum");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to archive curriculum" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.curriculumArchiveFailed") };
   }
 }
 
@@ -216,11 +217,11 @@ function decisionAction(fn: "submitReview" | "unpublishCurriculum" | "deleteCurr
         curriculumId: field(formData, "curriculumId"),
       });
       if (!res.ok) return toState(res);
-      if (!res.data) return { ok: false, message: "Action was not applied (denied)" };
+      if (!res.data) return { ok: false, message: await translate("actions.curriculumNotAppliedDenied") };
       revalidatePath("/curriculum");
       return { ok: true };
     } catch (e) {
-      return { ok: false, message: e instanceof Error ? e.message : "Action failed" };
+      return { ok: false, message: e instanceof Error ? e.message : await translate("actions.curriculumActionFailed") };
     }
   };
 }
@@ -241,11 +242,11 @@ export async function duplicateCurriculumAction(
       title: field(formData, "title"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Curriculum was not duplicated (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.curriculumNotDuplicatedDenied") };
     revalidatePath("/curriculum");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to duplicate curriculum" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.curriculumDuplicateFailed") };
   }
 }
 
@@ -259,11 +260,11 @@ export async function permanentlyDeleteCurriculumAction(
       curriculumId: field(formData, "curriculumId"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Curriculum was not permanently deleted (denied or not soft-deleted)" };
+    if (!res.data) return { ok: false, message: await translate("actions.curriculumNotPermanentlyDeletedDenied") };
     revalidatePath("/curriculum");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to permanently delete curriculum" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.curriculumPermanentDeleteFailed") };
   }
 }
 
@@ -278,10 +279,10 @@ export async function assignCurriculumAction(
       classId: field(formData, "classId"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Curriculum was not assigned (denied or not published)" };
+    if (!res.data) return { ok: false, message: await translate("actions.curriculumNotAssignedDenied") };
     revalidatePath("/curriculum");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to assign curriculum" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.curriculumAssignFailed") };
   }
 }

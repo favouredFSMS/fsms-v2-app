@@ -2,12 +2,14 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createSubjectAction, type AcademicActionState } from "@/lib/actions/academic";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 export function SubjectCreateForm() {
+  const [t, commonT] = [useTranslations("academic"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<AcademicActionState | null, FormData>(
     createSubjectAction,
     null,
@@ -24,13 +26,13 @@ export function SubjectCreateForm() {
 
   return (
     <form ref={formRef} action={formAction} className="flex flex-wrap items-end gap-3">
-      <Field label="Subject name" htmlFor="name" required>
+      <Field label={commonT("subjectName")} htmlFor="name" required>
         <Input id="name" name="name" required placeholder="Science" />
       </Field>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
-      {state?.ok && <p className="text-sm text-success-600">Subject added.</p>}
+      {state?.ok && <p className="text-sm text-success-600">{t("subjectAdded")}</p>}
       <Button type="submit" loading={pending}>
-        Add subject
+        {t("addSubject")}
       </Button>
     </form>
   );

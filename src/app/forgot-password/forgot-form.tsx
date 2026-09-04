@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { forgotPasswordAction } from "@/lib/auth/actions";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -8,17 +9,17 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
 export function ForgotForm() {
+  const t = useTranslations("auth");
   const [state, formAction, pending] = useActionState(forgotPasswordAction, null);
 
   if (state?.ok) {
     return (
       <div className="flex flex-col gap-4">
         <div className="rounded-field bg-success-50 px-3 py-2.5 text-sm text-success-700">
-          If an account exists for that address, a recovery link has been sent.
-          Check your inbox.
+          {t("recoverySent")}
         </div>
         <ButtonLink href="/login" variant="secondary" className="w-full">
-          Back to sign in
+          {t("backToSignIn")}
         </ButtonLink>
       </div>
     );
@@ -26,7 +27,7 @@ export function ForgotForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
-      <Field label="Email" htmlFor="email" hint="We never reveal whether an address is registered.">
+      <Field label={t("email")} htmlFor="email" hint={t("emailHint")}>
         <Input
           id="email"
           name="email"
@@ -40,14 +41,14 @@ export function ForgotForm() {
       {state?.error && <FieldError>{state.error}</FieldError>}
 
       <Button type="submit" loading={pending} className="w-full">
-        {pending ? "Sending…" : "Send recovery link"}
+        {pending ? t("sending") : t("sendRecoveryLink")}
       </Button>
 
       <div className="flex items-center justify-between">
         <a href="/login" className="text-sm text-brand-600 hover:text-brand-700">
-          Back to sign in
+          {t("backToSignIn")}
         </a>
-        <Badge variant="neutral">O1 · email recovery</Badge>
+        <Badge variant="neutral">{t("o1Badge")}</Badge>
       </div>
     </form>
   );

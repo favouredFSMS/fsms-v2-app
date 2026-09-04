@@ -17,6 +17,7 @@ import type { IconName } from "@/components/ui/icons";
 
 export interface NavItem {
   href: string;
+  /** Translation key under the `nav` namespace (rendered via next-intl). */
   label: string;
   icon: IconName;
   /** V101 permission action required to see the item (fail-closed). */
@@ -31,67 +32,67 @@ export interface NavSection {
 export const NAV_SECTIONS: NavSection[] = [
   {
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: "dashboard", permission: "dashboard" },
+      { href: "/dashboard", label: "dashboard", icon: "dashboard", permission: "dashboard" },
     ],
   },
   {
-    title: "School",
+    title: "school",
     items: [
-      { href: "/people", label: "People", icon: "people", permission: "people" },
-      { href: "/students", label: "Students", icon: "students", permission: "students" },
-      { href: "/parents", label: "Parents", icon: "parents", permission: "parents" },
-      { href: "/classes", label: "Classes", icon: "classes", permission: "classes" },
+      { href: "/people", label: "people", icon: "people", permission: "people" },
+      { href: "/students", label: "students", icon: "students", permission: "students" },
+      { href: "/parents", label: "parents", icon: "parents", permission: "parents" },
+      { href: "/classes", label: "classes", icon: "classes", permission: "classes" },
       // canonical "attendance" lands in Phase 14; attendanceGrid is the current gate
-      { href: "/attendance", label: "Attendance", icon: "attendance", permission: "attendanceGrid" },
+      { href: "/attendance", label: "attendance", icon: "attendance", permission: "attendanceGrid" },
     ],
   },
   {
-    title: "Teaching",
+    title: "teaching",
     items: [
-      { href: "/homework", label: "Homework", icon: "homework", permission: "homework" },
+      { href: "/homework", label: "homework", icon: "homework", permission: "homework" },
       // canonical "lessons" lands in Phase 16; lessonCalendar is the current gate
-      { href: "/lessons", label: "Lessons", icon: "lessons", permission: "lessonCalendar" },
-      { href: "/assessments", label: "Assessments", icon: "assessments", permission: "assessments" },
-      { href: "/curriculum", label: "Curriculum", icon: "curriculum", permission: "curriculum" },
+      { href: "/lessons", label: "lessons", icon: "lessons", permission: "lessonCalendar" },
+      { href: "/assessments", label: "assessments", icon: "assessments", permission: "assessments" },
+      { href: "/curriculum", label: "curriculum", icon: "curriculum", permission: "curriculum" },
       // canonical "materials" lands in Phase 19; materialCatalog is the current gate
-      { href: "/materials", label: "Materials", icon: "materials", permission: "materialCatalog" },
+      { href: "/materials", label: "materials", icon: "materials", permission: "materialCatalog" },
       // canonical "ai" lands in Phase 21; aiAsk is the staff gate
-      { href: "/ai", label: "AI", icon: "ai", permission: "aiAsk" },
+      { href: "/ai", label: "ai", icon: "ai", permission: "aiAsk" },
     ],
   },
   {
-    title: "Finances",
+    title: "finances",
     items: [
       // canonical "finance" lands in Phase 23; payments is the family+staff gate
-      { href: "/finance", label: "Payments", icon: "payments", permission: "payments" },
-      { href: "/payroll", label: "Payroll", icon: "payroll", permission: "payrollRoster" },
+      { href: "/finance", label: "payments", icon: "payments", permission: "payments" },
+      { href: "/payroll", label: "payroll", icon: "payroll", permission: "payrollRoster" },
     ],
   },
   {
-    title: "Communication",
+    title: "communication",
     items: [
       // canonical "messaging" lands in Phase 22; messageConversations is the gate
-      { href: "/messaging", label: "Messaging", icon: "messaging", permission: "messageConversations" },
-      { href: "/notifications", label: "Notifications", icon: "notifications", permission: "notifications" },
+      { href: "/messaging", label: "messaging", icon: "messaging", permission: "messageConversations" },
+      { href: "/notifications", label: "notifications", icon: "notifications", permission: "notifications" },
     ],
   },
   {
-    title: "Learning",
+    title: "learning",
     items: [
-      { href: "/learning", label: "My learning", icon: "learning", permission: "learning" },
-      { href: "/family", label: "Family", icon: "family", permission: "familyDashboard" },
+      { href: "/learning", label: "myLearning", icon: "learning", permission: "learning" },
+      { href: "/family", label: "family", icon: "family", permission: "familyDashboard" },
     ],
   },
   {
-    title: "Administration",
+    title: "administration",
     items: [
       // canonical "reports" lands in Phase 20; the base `report` action is granted
       // to every role, and each report re-checks its own finer permission inside
       // its SECURITY DEFINER RPC.
-      { href: "/reports", label: "Reports", icon: "reports", permission: "report" },
-      { href: "/roles", label: "Roles", icon: "roles", permission: "roles" },
-      { href: "/settings", label: "Settings", icon: "settings", permission: "settings" },
-      { href: "/admin", label: "Admin", icon: "admin", permission: "admin" },
+      { href: "/reports", label: "reports", icon: "reports", permission: "report" },
+      { href: "/roles", label: "roles", icon: "roles", permission: "roles" },
+      { href: "/settings", label: "settings", icon: "settings", permission: "settings" },
+      { href: "/admin", label: "admin", icon: "admin", permission: "admin" },
     ],
   },
 ];

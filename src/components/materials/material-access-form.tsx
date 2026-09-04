@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { saveMaterialAccessAction, type MaterialActionState } from "@/lib/actions/materials";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -15,6 +16,7 @@ export function MaterialAccessForm({
   classes: Array<{ id: string; name: string | null }>;
   current: string[];
 }) {
+  const [t, commonT] = [useTranslations("materials"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<MaterialActionState | null, FormData>(
     saveMaterialAccessAction,
     null,
@@ -31,9 +33,9 @@ export function MaterialAccessForm({
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-2">
       <input type="hidden" name="materialId" value={materialId} />
-      <Field label="Classes with access" htmlFor={`access-${materialId}`}>
+      <Field label={t("classesWithAccess")} htmlFor={`access-${materialId}`}>
         <div className="flex max-h-40 flex-wrap gap-2 overflow-auto rounded-field border border-line bg-surface p-2">
-          {classes.length === 0 && <span className="text-xs text-ink-faint">No classes yet.</span>}
+          {classes.length === 0 && <span className="text-xs text-ink-faint">{commonT("noClass")}</span>}
           {classes.map((c) => (
             <label key={c.id} className="flex items-center gap-1.5 text-xs text-ink">
               <input
@@ -50,7 +52,7 @@ export function MaterialAccessForm({
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
       <div>
         <Button type="submit" size="sm" disabled={pending}>
-          {pending ? "Saving…" : "Save access"}
+          {pending ? commonT("saving") : t("saveAccess")}
         </Button>
       </div>
     </form>

@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -29,24 +30,24 @@ export async function saveAttendanceAction(
     const date = formData.get("date");
     const rawMarks = formData.get("marks");
     if (typeof classId !== "string" || typeof date !== "string" || typeof rawMarks !== "string") {
-      return { ok: false, message: "Missing class, date or marks" };
+      return { ok: false, message: await translate("actions.attendanceMissingFields") };
     }
 
     let marks: unknown;
     try {
       marks = JSON.parse(rawMarks);
     } catch {
-      return { ok: false, message: "Marks payload is not valid JSON" };
+      return { ok: false, message: await translate("actions.attendanceMarksInvalidJson") };
     }
 
     const ctx = await requireDbContext();
     const res = await new AttendanceRepository(ctx).save({ classId, date, marks });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Attendance could not be saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.attendanceNotSavedDenied") };
 
     revalidatePath("/attendance");
     return { ok: true, saved: res.data.saved };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save attendance" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.attendanceSaveFailed") };
   }
 }

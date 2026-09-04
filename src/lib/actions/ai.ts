@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -57,7 +58,7 @@ export async function aiAskAction(_prev: AiActionState | null, formData: FormDat
 
     if (action === "report" && studentId) {
       const res = await new ReportingRepository(ctx).studentProgressReport({ studentId });
-      if (!res.ok || !res.data) return { ok: false, message: "Student report unavailable" };
+      if (!res.ok || !res.data) return { ok: false, message: await translate("actions.aiStudentReportUnavailable") };
       const s = res.data;
       const fbs: fb.FallbackStudent = {
         name: s.student?.name ?? null,
@@ -79,7 +80,7 @@ export async function aiAskAction(_prev: AiActionState | null, formData: FormDat
       fallback = () => fb.remarks(name, subject);
     } else if (action === "atRisk" && classId) {
       const res = await new ReportingRepository(ctx).learnerProgressOverview({ classId });
-      if (!res.ok || !res.data) return { ok: false, message: "Learner overview unavailable" };
+      if (!res.ok || !res.data) return { ok: false, message: await translate("actions.aiLearnerOverviewUnavailable") };
       const rows: fb.FallbackAtRiskRow[] = res.data.students.map((r) => ({
         id: r.id,
         name: r.name,
@@ -127,7 +128,7 @@ export async function aiAskAction(_prev: AiActionState | null, formData: FormDat
       message: result.status === "fallback" && result.error ? `Fallback used: ${result.error}` : undefined,
     };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "AI request failed" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.aiRequestFailed") };
   }
 }
 
@@ -208,7 +209,7 @@ export async function aiGenerateAction(_prev: AiActionState | null, formData: Fo
       message: result.status === "fallback" && result.error ? `Fallback used: ${result.error}` : undefined,
     };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "AI generation failed" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.aiGenerationFailed") };
   }
 }
 
@@ -219,7 +220,7 @@ export async function aiLessonSummaryAction(_prev: AiActionState | null, formDat
     const classId = field(formData, "classId");
     const lessonNoRaw = field(formData, "lessonNo");
     const date = field(formData, "date");
-    if (!classId) return { ok: false, message: "Choose a class" };
+    if (!classId) return { ok: false, message: await translate("actions.aiChooseClass") };
     const lessonNo = lessonNoRaw ? Number(lessonNoRaw) : null;
 
     // Pull the latest matching lesson log for the summary context.
@@ -249,7 +250,7 @@ export async function aiLessonSummaryAction(_prev: AiActionState | null, formDat
 
     return { ok: true, text: result.text, provider: result.provider, status: result.status };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Lesson summary failed" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.aiLessonSummaryFailed") };
   }
 }
 
@@ -270,9 +271,9 @@ export async function aiProviderSaveAction(_prev: AiActionState | null, formData
     });
     if (!res.ok) return toState(res);
     revalidatePath("/ai");
-    return { ok: true, message: "Provider saved" };
+    return { ok: true, message: await translate("actions.aiProviderSaved") };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save provider" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.aiSaveProviderFailed") };
   }
 }
 
@@ -282,9 +283,9 @@ export async function aiProviderDeleteAction(_prev: AiActionState | null, formDa
     const res = await new AiRepository(ctx).deleteProvider({ providerId: field(formData, "providerId") ?? "" });
     if (!res.ok) return toState(res);
     revalidatePath("/ai");
-    return { ok: true, message: res.data ? "Provider deleted" : "Provider not deleted (built-in or missing)" };
+    return { ok: true, message: res.data ? await translate("actions.aiProviderDeleted") : await translate("actions.aiProviderNotDeleted") };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to delete provider" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.aiDeleteProviderFailed") };
   }
 }
 
@@ -296,13 +297,13 @@ export async function aiProviderOrderAction(_prev: AiActionState | null, formDat
     try {
       order = JSON.parse(raw);
     } catch {
-      return { ok: false, message: "Invalid order payload" };
+      return { ok: false, message: await translate("actions.aiInvalidOrderPayload") };
     }
     const res = await new AiRepository(ctx).orderProviders({ order });
     if (!res.ok) return toState(res);
     revalidatePath("/ai");
-    return { ok: true, message: `Reordered ${res.data?.updated ?? 0} provider(s)` };
+    return { ok: true, message: await translate("actions.aiReorderedProviders", { count: res.data?.updated ?? 0 }) };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to reorder providers" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.aiReorderProvidersFailed") };
   }
 }

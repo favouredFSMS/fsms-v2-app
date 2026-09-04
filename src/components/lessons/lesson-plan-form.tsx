@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { saveLessonPlanAction, type LessonActionState } from "@/lib/actions/lessons";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -14,6 +15,7 @@ export function LessonPlanForm({
   classes: Array<{ id: string; name: string | null }>;
   lessons: Array<{ id: string; label: string }>;
 }) {
+  const [t, commonT] = [useTranslations("lessons"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<LessonActionState | null, FormData>(
     saveLessonPlanAction,
     null,
@@ -31,10 +33,10 @@ export function LessonPlanForm({
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Class" htmlFor="classId" required>
+        <Field label={commonT("class")} htmlFor="classId" required>
           <Select id="classId" name="classId" required defaultValue="">
             <option value="" disabled>
-              Select class…
+              {t("selectClass")}
             </option>
             {classes.map((c) => (
               <option key={c.id} value={c.id}>
@@ -43,9 +45,9 @@ export function LessonPlanForm({
             ))}
           </Select>
         </Field>
-        <Field label="Lesson (optional)" htmlFor="lessonId">
+        <Field label={t("lessonOptional")} htmlFor="lessonId">
           <Select id="lessonId" name="lessonId" defaultValue="">
-            <option value="">(no specific lesson)</option>
+            <option value="">{t("noSpecificLesson")}</option>
             {lessons.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.label}
@@ -53,7 +55,7 @@ export function LessonPlanForm({
             ))}
           </Select>
         </Field>
-        <Field label="Plan" htmlFor="plan" className="sm:col-span-2">
+        <Field label={t("planLabel")} htmlFor="plan" className="sm:col-span-2">
           <Textarea
             id="plan"
             name="plan"
@@ -61,14 +63,14 @@ export function LessonPlanForm({
             placeholder="Warm-up, main activity, wrap-up…"
           />
         </Field>
-        <Field label="Source" htmlFor="source" className="sm:col-span-2">
+        <Field label={commonT("source")} htmlFor="source" className="sm:col-span-2">
           <Input id="source" name="source" placeholder="Textbook, self-made, imported…" />
         </Field>
       </div>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
       <div>
         <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Save plan"}
+          {pending ? commonT("saving") : t("savePlan")}
         </Button>
       </div>
     </form>

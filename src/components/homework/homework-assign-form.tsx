@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { assignHomeworkAction, type HomeworkActionState } from "@/lib/actions/homework";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -16,6 +17,7 @@ export function HomeworkAssignForm({
   date: string;
   students: Array<{ id: string; name: string | null }>;
 }) {
+  const [t, commonT] = [useTranslations("homework"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<HomeworkActionState | null, FormData>(
     assignHomeworkAction,
     null,
@@ -39,24 +41,30 @@ export function HomeworkAssignForm({
       <input type="hidden" name="studentIds" value={studentIds} />
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Title" htmlFor="title" required>
+        <Field label={commonT("title")} htmlFor="title" required>
           <Input id="title" name="title" required placeholder="Workbook Unit 2" />
         </Field>
-        <Field label="Due date" htmlFor="dueDate">
+        <Field label={commonT("dueDate")} htmlFor="dueDate">
           <Input id="dueDate" name="dueDate" type="date" />
         </Field>
-        <Field label="Note" htmlFor="note" className="sm:col-span-2">
-          <Input id="note" name="note" placeholder="Optional instructions" />
+        <Field label={commonT("note")} htmlFor="note" className="sm:col-span-2">
+          <Input id="note" name="note" placeholder={t("optionalInstructions")} />
         </Field>
       </div>
 
       <p className="text-xs text-ink-faint">
-        Assigns to {students.length} active student{students.length === 1 ? "" : "s"}.
+        {t("assignsTo")} {students.length}{" "}
+        {students.length === 1 ? t("activeStudent") : t("activeStudents")}.
       </p>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
-      {state?.ok && <p className="text-sm text-success-600">Assigned to {state.created} student{state.created === 1 ? "" : "s"}.</p>}
+      {state?.ok && (
+        <p className="text-sm text-success-600">
+          {t("assignedTo")} {state.created}{" "}
+          {state.created === 1 ? commonT("student") : commonT("students")}.
+        </p>
+      )}
       <Button type="submit" loading={pending} className="self-start">
-        Assign homework
+        {t("assignHomeworkBtn")}
       </Button>
     </form>
   );

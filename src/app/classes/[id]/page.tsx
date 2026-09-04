@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,12 @@ export const metadata = { title: "Class — FSMS V2" };
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export default async function ClassDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const [t, st, commonT, statesT] = await Promise.all([
+    getTranslations("classDetail"),
+    getTranslations("status"),
+    getTranslations("common"),
+    getTranslations("states"),
+  ]);
   const profile = await requireUser();
   const { id } = await params;
   const ctx = await requireDbContext();
@@ -23,11 +30,11 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ id
   const detail = await new ClassRepository(ctx).detail(id);
   if (!detail.ok || !detail.data) {
     return (
-      <PageShell title="Class" permission="classes">
+      <PageShell title={t("title")} permission="classes">
         <EmptyState
           icon="warning"
-          title="Not available"
-          description="This class does not exist or is not visible to your account."
+          title={statesT("notAvailable")}
+          description={t("notAvailableDesc")}
         />
       </PageShell>
     );
@@ -53,35 +60,35 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ id
     : [];
 
   return (
-    <PageShell title={c?.name ?? "Class"} permission="classes">
+    <PageShell title={c?.name ?? t("title")} permission="classes">
       <div className="grid gap-4">
         <Card>
           <CardHeader>
             <CardTitle>
               {c?.name}
               <span className="ml-2 align-middle">
-                <Badge variant={c?.status === "active" ? "success" : "neutral"}>{c?.status}</Badge>
+                <Badge variant={c?.status === "active" ? "success" : "neutral"}>{st.has(c?.status ?? "") ? st(c?.status ?? "") : c?.status}</Badge>
               </span>
             </CardTitle>
             <CardDescription>
-              {c?.class_type ?? "group"} · learner {c?.learner_type ?? "—"} · room {c?.room ?? "—"}
+              {c?.class_type ?? t("group")} · {t("learner")} {c?.learner_type ?? "—"} · {t("room")} {c?.room ?? "—"}
             </CardDescription>
           </CardHeader>
           <CardBody>
             <dl className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
-              <Row k="Level" v={c?.level_code?.toUpperCase() ?? "—"} />
-              <Row k="Recurrence" v={c?.recurrence ?? "—"} />
-              <Row k="Schedule" v={c?.schedule ?? "—"} />
-              <Row k="Fee" v={c?.fee != null ? `${c.fee} ${c.fee_currency ?? ""}` : "—"} />
+              <Row k={t("level")} v={c?.level_code?.toUpperCase() ?? "—"} />
+              <Row k={t("recurrence")} v={c?.recurrence ?? "—"} />
+              <Row k={t("schedule")} v={c?.schedule ?? "—"} />
+              <Row k={t("fee")} v={c?.fee != null ? `${c.fee} ${c.fee_currency ?? ""}` : "—"} />
               <Row
-                k="Day times"
+                k={t("dayTimes")}
                 v={
                   d.day_times.length
                     ? d.day_times.map((dt) => `${DAYS[dt.day_of_week - 1] ?? dt.day_of_week} ${dt.start_time ?? ""}–${dt.end_time ?? ""}`).join(" · ")
                     : "—"
                 }
               />
-              <Row k="Created" v={c?.created_at?.slice(0, 10) ?? "—"} />
+              <Row k={t("created")} v={c?.created_at?.slice(0, 10) ?? "—"} />
             </dl>
           </CardBody>
         </Card>
@@ -89,22 +96,22 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ id
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Teachers</CardTitle>
-              <CardDescription>Assigned staff.</CardDescription>
+              <CardTitle>{t("teachers")}</CardTitle>
+              <CardDescription>{t("teachersDesc")}</CardDescription>
             </CardHeader>
             <CardBody className="px-0">
               <Table>
                 <TBody>
-                  {d.teachers.map((t) => (
-                    <TR key={t.id}>
-                      <TD className="font-medium">{t.name}</TD>
-                      <TD>{t.is_primary ? "Primary" : "Assistant"}</TD>
+                  {d.teachers.map((tch) => (
+                    <TR key={tch.id}>
+                      <TD className="font-medium">{tch.name}</TD>
+                      <TD>{tch.is_primary ? t("primary") : t("assistant")}</TD>
                       <TD className="text-right">
-                        {canAssign && <TeacherRemoveButton classId={id} userId={t.id} />}
+                        {canAssign && <TeacherRemoveButton classId={id} userId={tch.id} />}
                       </TD>
                     </TR>
                   ))}
-                  {d.teachers.length === 0 && <TableEmpty colSpan={3}>No teachers assigned.</TableEmpty>}
+                  {d.teachers.length === 0 && <TableEmpty colSpan={3}>{t("noTeachersAssigned")}</TableEmpty>}
                 </TBody>
               </Table>
             </CardBody>
@@ -117,16 +124,16 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ id
 
           <Card>
             <CardHeader>
-              <CardTitle>Students</CardTitle>
-              <CardDescription>Enrolled learners.</CardDescription>
+              <CardTitle>{t("students")}</CardTitle>
+              <CardDescription>{t("studentsDesc")}</CardDescription>
             </CardHeader>
             <CardBody className="px-0">
               <Table>
                 <THead>
                   <TR>
-                    <TH>Name</TH>
-                    <TH>Student no</TH>
-                    <TH className="text-right">Status</TH>
+                    <TH>{commonT("name")}</TH>
+                    <TH>{t("studentNo")}</TH>
+                    <TH className="text-right">{commonT("status")}</TH>
                   </TR>
                 </THead>
                 <TBody>
@@ -140,12 +147,12 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ id
                             <EnrolmentStatusForm enrolmentId={s.enrolment_id} status={s.status} />
                           </div>
                         ) : (
-                          <Badge variant={s.status === "active" ? "success" : "neutral"}>{s.status}</Badge>
+                          <Badge variant={s.status === "active" ? "success" : "neutral"}>{s.status && st.has(s.status) ? st(s.status) : s.status}</Badge>
                         )}
                       </TD>
                     </TR>
                   ))}
-                  {d.students.length === 0 && <TableEmpty colSpan={3}>No students enrolled.</TableEmpty>}
+                  {d.students.length === 0 && <TableEmpty colSpan={3}>{t("noStudentsEnrolled")}</TableEmpty>}
                 </TBody>
               </Table>
             </CardBody>

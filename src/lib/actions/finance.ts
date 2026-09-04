@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -53,11 +54,11 @@ export async function savePricingAction(
       currency: field(formData, "currency") ?? "RUB",
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Pricing was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.financePricingNotSavedDenied") };
     refresh();
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save pricing" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.financeSavePricingFailed") };
   }
 }
 
@@ -74,11 +75,11 @@ export async function requestPaymentAction(
       payType: field(formData, "payType"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Payment was not requested (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.financePaymentNotRequestedDenied") };
     refresh();
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to request payment" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.financeRequestPaymentFailed") };
   }
 }
 
@@ -99,9 +100,17 @@ export async function paymentAction(
             : await repo.markPaid({ paymentId });
     if (!res.ok) return toState(res);
     refresh();
-    return { ok: true, message: `Payment ${op}` };
+    const opKey =
+      op === "confirm"
+        ? "actions.paymentConfirmed"
+        : op === "cancel"
+          ? "actions.paymentCancelled"
+          : op === "revert"
+            ? "actions.paymentReverted"
+            : "actions.paymentMarkedPaid";
+    return { ok: true, message: await translate(opKey) };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Payment action failed" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.financeActionFailed") };
   }
 }
 
@@ -119,11 +128,11 @@ export async function saveDiscountAction(
       reason: field(formData, "reason"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Discount was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.financeDiscountNotSavedDenied") };
     refresh();
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save discount" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.financeSaveDiscountFailed") };
   }
 }
 
@@ -139,11 +148,11 @@ export async function setCreditAction(
       note: field(formData, "note"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Credit was not applied (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.financeNotAppliedDenied") };
     refresh();
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to apply credit" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.financeApplyCreditFailed") };
   }
 }
 
@@ -160,11 +169,11 @@ export async function saveSalaryAction(
       currency: field(formData, "currency") ?? "RUB",
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Salary was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.financeSalaryNotSavedDenied") };
     refresh();
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save salary" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.financeSaveSalaryFailed") };
   }
 }
 
@@ -181,10 +190,10 @@ export async function saveWalletAction(
       kind: field(formData, "kind"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Wallet entry was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.financeWalletNotSavedDenied") };
     refresh();
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save wallet entry" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.financeSaveWalletFailed") };
   }
 }

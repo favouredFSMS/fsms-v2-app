@@ -11,7 +11,8 @@ export type IconName =
   | "family" | "reports" | "roles" | "settings" | "admin" | "ai"
   | "search" | "close" | "check" | "chevron-left" | "chevron-right"
   | "chevron-down" | "menu" | "bell" | "logout" | "user" | "filter"
-  | "calendar" | "inbox" | "info" | "success" | "warning" | "danger" | "plus";
+  | "calendar" | "inbox" | "info" | "success" | "warning" | "danger" | "plus"
+  | "globe";
 
 const P: Record<IconName, ReactNode> = {
   dashboard: (
@@ -174,6 +175,12 @@ const P: Record<IconName, ReactNode> = {
   "chevron-right": <path d="m9 5 7 7-7 7" />,
   "chevron-down": <path d="m6 9 6 6 6-6" />,
   menu: <path d="M4 6h16M4 12h16M4 18h16" />,
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" />
+    </>
+  ),
   bell: (
     <>
       <path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6" />

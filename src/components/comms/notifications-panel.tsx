@@ -2,21 +2,31 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { markNotifReadAction, markAllNotifsReadAction } from "@/lib/actions/comms";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { NotificationItem } from "@/lib/db";
 
-const KIND_LABEL: Record<string, string> = {
-  message: "New message",
-  "language-prompt": "Language reminder",
-  homework: "Homework",
-  attendance: "Attendance",
-};
-
 export function NotificationsPanel({ items }: { items: NotificationItem[] }) {
+  const [t, st] = [useTranslations("notifications"), useTranslations("status")];
   const router = useRouter();
   const [pending, start] = useTransition();
+
+  const kindLabel = (k: string | null): string => {
+    switch (k) {
+      case "message":
+        return t("kindMessage");
+      case "language-prompt":
+        return t("kindLanguagePrompt");
+      case "homework":
+        return t("kindHomework");
+      case "attendance":
+        return t("kindAttendance");
+      default:
+        return k ?? "";
+    }
+  };
 
   function markRead(id: string) {
     start(async () => {
@@ -36,11 +46,11 @@ export function NotificationsPanel({ items }: { items: NotificationItem[] }) {
     <div className="flex flex-col gap-3">
       <div className="flex justify-end">
         <Button variant="secondary" size="sm" onClick={markAll} disabled={pending || items.every((i) => i.read_at)}>
-          Mark all read
+          {t("markAllRead")}
         </Button>
       </div>
       {items.length === 0 ? (
-        <p className="py-8 text-center text-sm text-ink-500">No notifications.</p>
+        <p className="py-8 text-center text-sm text-ink-500">{t("noNotifications")}</p>
       ) : (
         <div className="flex flex-col gap-2">
           {items.map((n) => (
@@ -52,8 +62,8 @@ export function NotificationsPanel({ items }: { items: NotificationItem[] }) {
             >
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-ink-900">{KIND_LABEL[n.kind ?? ""] ?? n.kind}</span>
-                  {!n.read_at && <Badge variant="brand">unread</Badge>}
+                  <span className="text-sm font-medium text-ink-900">{kindLabel(n.kind ?? "")}</span>
+                  {!n.read_at && <Badge variant="brand">{st("unread")}</Badge>}
                 </div>
                 {n.payload?.subject ? (
                   <p className="text-sm text-ink-700">{String(n.payload.subject)}</p>
@@ -64,7 +74,7 @@ export function NotificationsPanel({ items }: { items: NotificationItem[] }) {
               </div>
               {!n.read_at && (
                 <Button variant="ghost" size="sm" onClick={() => markRead(n.id)} disabled={pending}>
-                  Mark read
+                  {t("markRead")}
                 </Button>
               )}
             </div>

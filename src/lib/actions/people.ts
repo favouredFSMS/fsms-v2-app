@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -42,7 +43,7 @@ export async function createStudentAction(
     revalidatePath("/students");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to create student" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.peopleCreateStudentFailed") };
   }
 }
 
@@ -61,7 +62,7 @@ export async function createParentAction(
     revalidatePath("/parents");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to create parent" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.peopleCreateParentFailed") };
   }
 }
 
@@ -80,7 +81,7 @@ export async function linkParentAction(
     revalidatePath("/students/[id]", "page");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to link parent" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.peopleLinkParentFailed") };
   }
 }
 
@@ -94,7 +95,7 @@ export async function updateUserAction(
     const userId = field(formData, "userId");
     const status = field(formData, "status");
     const roleKey = field(formData, "roleKey");
-    if (!userId) return { ok: false, message: "Missing user id" };
+    if (!userId) return { ok: false, message: await translate("actions.peopleMissingUserId") };
 
     if (status) {
       const res = await repo.setStatus({ userId, status });
@@ -108,6 +109,6 @@ export async function updateUserAction(
     revalidatePath("/teachers");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to update user" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.peopleUpdateUserFailed") };
   }
 }

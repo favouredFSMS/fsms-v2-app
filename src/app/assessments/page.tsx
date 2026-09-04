@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,11 +25,22 @@ function pct(score: number | string | null, max: number | string | null): string
   return `${Math.round((s / m) * 100)}%`;
 }
 
+function statusLabel(st: (k: string) => string, value: string): string {
+  const k = value.toLowerCase();
+  const out = st(k);
+  return out !== k ? out : value;
+}
+
 export default async function AssessmentsPage({
   searchParams,
 }: {
   searchParams: Promise<{ student?: string; cursor?: string }>;
 }) {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("assessments"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   const profile = await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -49,13 +61,13 @@ export default async function AssessmentsPage({
   ]);
 
   return (
-    <PageShell title="Assessments" permission="assessments">
+    <PageShell title={t("title")} permission="assessments">
       <div className="grid gap-4">
         {canRecord && (
           <Card>
             <CardHeader>
-              <CardTitle>Record assessment</CardTitle>
-              <CardDescription>Enter a mark (type, title, score) for a student.</CardDescription>
+              <CardTitle>{t("recordAssessment")}</CardTitle>
+              <CardDescription>{t("recordAssessmentDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <AssessmentMarkForm students={students} />
@@ -66,8 +78,8 @@ export default async function AssessmentsPage({
         {canRecord && (
           <Card>
             <CardHeader>
-              <CardTitle>Assessment tests</CardTitle>
-              <CardDescription>Build a test from tasks, then record a completed result.</CardDescription>
+              <CardTitle>{t("assessmentTests")}</CardTitle>
+              <CardDescription>{t("assessmentTestsDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <AssessmentTestForm students={students} />
@@ -76,34 +88,34 @@ export default async function AssessmentsPage({
               {tests.ok && tests.data.length > 0 ? (
                 <>
                   <AssessmentRecordForm
-                    tests={tests.data.map((t) => ({
-                      id: t.id,
-                      label: `${t.title ?? "Test"} — ${t.student_name ?? "?"} (${t.task_count ?? 0} tasks)`,
-                      taskCount: t.task_count,
+                    tests={tests.data.map((tt) => ({
+                      id: tt.id,
+                      label: `${tt.title ?? t("test")} — ${tt.student_name ?? "?"} (${tt.task_count ?? 0} ${commonT("tasks")})`,
+                      taskCount: tt.task_count,
                     }))}
                   />
                   <div className="px-4 pt-3">
                     <Table>
                       <THead>
                         <TR>
-                          <TH>Title</TH>
-                          <TH>Student</TH>
-                          <TH>Tasks</TH>
-                          <TH>Difficulty</TH>
-                          <TH>Status</TH>
-                          <TH className="text-right">Action</TH>
+                          <TH>{commonT("title")}</TH>
+                          <TH>{commonT("student")}</TH>
+                          <TH>{commonT("tasks")}</TH>
+                          <TH>{commonT("difficulty")}</TH>
+                          <TH>{commonT("status")}</TH>
+                          <TH className="text-right">{commonT("actions")}</TH>
                         </TR>
                       </THead>
                       <TBody>
-                        {tests.data.map((t) => (
-                          <TR key={t.id}>
-                            <TD>{t.title ?? "—"}</TD>
-                            <TD>{t.student_name ?? "—"}</TD>
-                            <TD>{t.task_count ?? 0}</TD>
-                            <TD>{t.difficulty ?? "—"}</TD>
-                            <TD><Badge variant={t.status === "published" ? "success" : "neutral"}>{t.status}</Badge></TD>
+                        {tests.data.map((tt) => (
+                          <TR key={tt.id}>
+                            <TD>{tt.title ?? "—"}</TD>
+                            <TD>{tt.student_name ?? "—"}</TD>
+                            <TD>{tt.task_count ?? 0}</TD>
+                            <TD>{tt.difficulty ?? "—"}</TD>
+                            <TD><Badge variant={tt.status === "published" ? "success" : "neutral"}>{statusLabel(st, tt.status)}</Badge></TD>
                             <TD className="text-right">
-                              <AssessmentArchiveButton testId={t.id} />
+                              <AssessmentArchiveButton testId={tt.id} />
                             </TD>
                           </TR>
                         ))}
@@ -112,7 +124,7 @@ export default async function AssessmentsPage({
                   </div>
                 </>
               ) : (
-                <TableEmpty colSpan={6}>No assessment tests.</TableEmpty>
+                <TableEmpty colSpan={6}>{t("noAssessmentTests")}</TableEmpty>
               )}
             </CardBody>
           </Card>
@@ -120,38 +132,38 @@ export default async function AssessmentsPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Results</CardTitle>
-            <CardDescription>{canRecord ? "All assessment results (filterable)." : "Your assessment results."}</CardDescription>
+            <CardTitle>{t("results")}</CardTitle>
+            <CardDescription>{canRecord ? t("resultsStaffDesc") : t("resultsSelfDesc")}</CardDescription>
           </CardHeader>
           <CardBody className="px-0">
             {canRecord && (
               <form method="get" className="flex flex-wrap items-center gap-2 px-4 pb-3">
                 <select name="student" defaultValue={sp.student ?? ""} className="rounded-field border bg-surface px-3 py-2 text-sm text-ink">
-                  <option value="">All students</option>
+                  <option value="">{t("allStudents")}</option>
                   {students.map((s) => (
                     <option key={s.id} value={s.id}>{s.name}</option>
                   ))}
                 </select>
                 <button type="submit" className="rounded-field bg-brand-600 px-3 py-2 text-sm text-ink-inverse hover:bg-brand-700">
-                  Filter
+                  {commonT("filter")}
                 </button>
               </form>
             )}
 
             {list.ok ? (
               list.data.items.length === 0 ? (
-                <TableEmpty colSpan={6}>No assessment results.</TableEmpty>
+                <TableEmpty colSpan={6}>{t("noAssessmentResults")}</TableEmpty>
               ) : (
                 <>
                   <Table>
                     <THead>
                       <TR>
-                        <TH>Date</TH>
-                        <TH>Student</TH>
-                        <TH>Type</TH>
-                        <TH>Title</TH>
-                        <TH>Score</TH>
-                        <TH>Note</TH>
+                        <TH>{commonT("date")}</TH>
+                        <TH>{commonT("student")}</TH>
+                        <TH>{commonT("type")}</TH>
+                        <TH>{commonT("title")}</TH>
+                        <TH>{commonT("score")}</TH>
+                        <TH>{commonT("note")}</TH>
                       </TR>
                     </THead>
                     <TBody>
@@ -189,21 +201,21 @@ export default async function AssessmentsPage({
         {canPerformance && performance && performance.ok && performance.data && (
           <Card>
             <CardHeader>
-              <CardTitle>Performance</CardTitle>
-              <CardDescription>Per-student averages and best results.</CardDescription>
+              <CardTitle>{t("performance")}</CardTitle>
+              <CardDescription>{t("performanceDesc")}</CardDescription>
             </CardHeader>
             <CardBody className="px-0">
               {performance.data.students.length === 0 ? (
-                <TableEmpty colSpan={5}>No performance data yet.</TableEmpty>
+                <TableEmpty colSpan={5}>{t("noPerformanceData")}</TableEmpty>
               ) : (
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Student</TH>
-                      <TH>Assessments</TH>
-                      <TH>Average</TH>
-                      <TH>Best</TH>
-                      <TH>Latest</TH>
+                      <TH>{commonT("student")}</TH>
+                      <TH>{t("results")}</TH>
+                      <TH>{t("average")}</TH>
+                      <TH>{t("best")}</TH>
+                      <TH>{t("latest")}</TH>
                     </TR>
                   </THead>
                   <TBody>

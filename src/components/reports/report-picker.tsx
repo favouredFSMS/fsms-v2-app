@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ButtonLink } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Select, Input } from "@/components/ui/input";
@@ -37,6 +38,7 @@ export interface ReportPickerProps {
  * report is deep-linkable and server-rendered.
  */
 export function ReportPicker(props: ReportPickerProps) {
+  const [t, commonT] = [useTranslations("reports"), useTranslations("common")];
   const router = useRouter();
   const params = useSearchParams();
 
@@ -67,12 +69,12 @@ export function ReportPicker(props: ReportPickerProps) {
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {props.showClass && (
-          <Field label="Class">
+          <Field label={commonT("class")}>
             <Select
               value={props.classId ?? ""}
               onChange={(e) => patch({ class: e.target.value || undefined })}
             >
-              <option value="">All classes</option>
+              <option value="">{t("allClasses")}</option>
               {props.classes.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
@@ -82,12 +84,12 @@ export function ReportPicker(props: ReportPickerProps) {
           </Field>
         )}
         {props.showStudent && (
-          <Field label="Student">
+          <Field label={commonT("student")}>
             <Select
               value={props.studentId ?? ""}
               onChange={(e) => patch({ student: e.target.value || undefined })}
             >
-              <option value="">Choose a student</option>
+              <option value="">{t("chooseStudent")}</option>
               {props.students.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.name}
@@ -97,12 +99,12 @@ export function ReportPicker(props: ReportPickerProps) {
           </Field>
         )}
         {props.showTeacher && (
-          <Field label="Teacher">
+          <Field label={commonT("teacher")}>
             <Select
               value={props.teacherId ?? ""}
               onChange={(e) => patch({ teacher: e.target.value || undefined })}
             >
-              <option value="">Me</option>
+              <option value="">{t("me")}</option>
               {props.teachers.map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name}
@@ -112,12 +114,12 @@ export function ReportPicker(props: ReportPickerProps) {
           </Field>
         )}
         {props.showLevel && (
-          <Field label="Level">
+          <Field label={commonT("level")}>
             <Select
               value={props.level ?? ""}
               onChange={(e) => patch({ level: e.target.value || undefined })}
             >
-              <option value="">All levels</option>
+              <option value="">{t("allLevels")}</option>
               {["a1", "a2", "b1", "b2", "c1", "c2"].map((l) => (
                 <option key={l} value={l}>
                   {l.toUpperCase()}
@@ -128,14 +130,14 @@ export function ReportPicker(props: ReportPickerProps) {
         )}
         {props.showPeriod && (
           <>
-            <Field label="From">
+            <Field label={commonT("from")}>
               <Input
                 type="date"
                 value={props.from ?? ""}
                 onChange={(e) => patch({ from: e.target.value || undefined })}
               />
             </Field>
-            <Field label="To">
+            <Field label={commonT("to")}>
               <Input
                 type="date"
                 value={props.to ?? ""}
@@ -145,7 +147,7 @@ export function ReportPicker(props: ReportPickerProps) {
           </>
         )}
         {props.showMonth && (
-          <Field label="Month">
+          <Field label={commonT("month")}>
             <Input
               type="month"
               value={props.month ?? ""}

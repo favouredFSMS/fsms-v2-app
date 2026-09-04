@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,11 @@ export default async function StudentsPage({
 }: {
   searchParams: Promise<{ q?: string; cursor?: string }>;
 }) {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("students"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   const profile = await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -28,40 +34,38 @@ export default async function StudentsPage({
   const canCreate = profileCan(profile, "saveStudent");
 
   return (
-    <PageShell title="Students" permission="students">
+    <PageShell title={t("title")} permission="students">
       <div className="grid gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Students</CardTitle>
-            <CardDescription>
-              School-scoped, visibility-scoped listing (RLS) with server-side search + keyset pagination.
-            </CardDescription>
+            <CardTitle>{t("title")}</CardTitle>
+            <CardDescription>{t("desc")}</CardDescription>
           </CardHeader>
           <CardBody className="px-0">
             <form method="get" className="flex items-center gap-2 px-4 pb-3">
               <input
                 name="q"
                 defaultValue={sp.q ?? ""}
-                placeholder="Search name / student no…"
+                placeholder={t("searchPlaceholder")}
                 className="w-full max-w-xs rounded-field border bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-brand-500 focus-ring"
               />
               <button type="submit" className="rounded-field bg-brand-600 px-3 py-2 text-sm text-ink-inverse hover:bg-brand-700">
-                Search
+                {commonT("search")}
               </button>
             </form>
 
             {res.ok ? (
               res.data.items.length === 0 ? (
-                <TableEmpty colSpan={4}>No students found.</TableEmpty>
+                <TableEmpty colSpan={4}>{t("noStudents")}</TableEmpty>
               ) : (
                 <>
                   <Table>
                     <THead>
                       <TR>
-                        <TH>Name</TH>
-                        <TH>Student no</TH>
-                        <TH>Level</TH>
-                        <TH className="text-right">Status</TH>
+                        <TH>{commonT("name")}</TH>
+                        <TH>{t("studentNo")}</TH>
+                        <TH>{commonT("level")}</TH>
+                        <TH className="text-right">{commonT("status")}</TH>
                       </TR>
                     </THead>
                     <TBody>
@@ -75,7 +79,7 @@ export default async function StudentsPage({
                           <TD className="font-mono text-xs text-ink-faint">{s.student_no}</TD>
                           <TD>{s.level_code?.toUpperCase()}</TD>
                           <TD className="text-right">
-                            <Badge variant={s.status === "active" ? "success" : "neutral"}>{s.status}</Badge>
+                            <Badge variant={s.status === "active" ? "success" : "neutral"}>{s.status && st.has(s.status) ? st(s.status) : s.status}</Badge>
                           </TD>
                         </TR>
                       ))}
@@ -99,8 +103,8 @@ export default async function StudentsPage({
         {canCreate && (
           <Card>
             <CardHeader>
-              <CardTitle>Add student</CardTitle>
-              <CardDescription>Created in your school; link a parent or enrol in a class afterwards.</CardDescription>
+              <CardTitle>{t("addStudent")}</CardTitle>
+              <CardDescription>{t("addStudentDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <StudentCreateForm />

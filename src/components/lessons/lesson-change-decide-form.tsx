@@ -1,11 +1,13 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { decideLessonChangeAction, type LessonActionState } from "@/lib/actions/lessons";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 
 export function LessonChangeDecideForm({ changeId }: { changeId: string }) {
+  const t = useTranslations("lessons");
   const [state, formAction, pending] = useActionState<LessonActionState | null, FormData>(
     decideLessonChangeAction,
     null,
@@ -16,10 +18,10 @@ export function LessonChangeDecideForm({ changeId }: { changeId: string }) {
       <input type="hidden" name="changeId" value={changeId} />
       <div className="flex gap-2">
         <Button type="submit" name="decision" value="approved" disabled={pending}>
-          Approve
+          {t("approve")}
         </Button>
         <Button type="submit" name="decision" value="declined" variant="secondary" disabled={pending}>
-          Decline
+          {t("decline")}
         </Button>
       </div>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}

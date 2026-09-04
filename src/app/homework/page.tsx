@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,11 +32,23 @@ function statusVariant(status: string): "success" | "warning" | "danger" | "info
   }
 }
 
+type StatusT = (key: string) => string;
+function statusLabel(st: StatusT, value: string): string {
+  const k = value.toLowerCase();
+  const out = st(k);
+  return out !== k ? out : value;
+}
+
 export default async function HomeworkPage({
   searchParams,
 }: {
   searchParams: Promise<{ class?: string; status?: string; cursor?: string }>;
 }) {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("homework"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   const profile = await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -46,33 +59,32 @@ export default async function HomeworkPage({
   const canSubmit = profileCan(profile, "submitHomework");
 
   if (!canAssign) {
-    // Family / student view: their own homework.
     const list = await homework.list({ pageSize: 50, cursor: sp.cursor });
     const classes = await new ClassRepository(ctx).search({ pageSize: 100 });
     const classOptions = classes.ok ? classes.data.items : [];
 
     return (
-      <PageShell title="Homework" permission="homework">
+      <PageShell title={t("title")} permission="homework">
         <div className="grid gap-4">
           <Card>
             <CardHeader>
-              <CardTitle>My homework</CardTitle>
-              <CardDescription>Assignments for you and your children.</CardDescription>
+              <CardTitle>{t("myHomework")}</CardTitle>
+              <CardDescription>{t("myHomeworkDesc")}</CardDescription>
             </CardHeader>
             <CardBody className="px-0">
               {list.ok ? (
                 list.data.items.length === 0 ? (
-                  <TableEmpty colSpan={4}>No homework.</TableEmpty>
+                  <TableEmpty colSpan={5}>{t("noHomework")}</TableEmpty>
                 ) : (
                   <>
                     <Table>
                       <THead>
                         <TR>
-                          <TH>Date</TH>
-                          <TH>Class</TH>
-                          <TH>Title</TH>
-                          <TH>Status</TH>
-                          <TH className="text-right">Action</TH>
+                          <TH>{commonT("date")}</TH>
+                          <TH>{commonT("class")}</TH>
+                          <TH>{commonT("title")}</TH>
+                          <TH>{commonT("status")}</TH>
+                          <TH className="text-right">{commonT("actions")}</TH>
                         </TR>
                       </THead>
                       <TBody>
@@ -83,12 +95,12 @@ export default async function HomeworkPage({
                             <TD>
                               <div className="font-medium">{h.title}</div>
                               <div className="text-xs text-ink-faint">
-                                {h.student_name}{h.due_date ? ` · due ${h.due_date}` : ""}
+                                {h.student_name}{h.due_date ? ` · ${t("deadline")} ${h.due_date}` : ""}
                               </div>
-                              {h.score && <div className="text-xs text-success-700">Score: {h.score}</div>}
+                              {h.score && <div className="text-xs text-success-700">{t("grade")}: {h.score}</div>}
                               {h.feedback && <div className="text-xs text-ink-muted">{h.feedback}</div>}
                             </TD>
-                            <TD><Badge variant={statusVariant(h.status)}>{h.status}</Badge></TD>
+                            <TD><Badge variant={statusVariant(h.status)}>{statusLabel(st, h.status)}</Badge></TD>
                             <TD className="text-right">
                               {canSubmit && (h.status === "assigned" || h.status === "overdue") ? (
                                 <div className="flex justify-end">
@@ -116,14 +128,13 @@ export default async function HomeworkPage({
             </CardBody>
           </Card>
           {classOptions.length === 0 && (
-            <EmptyState icon="info" title="No classes" description="Homework appears once you are enrolled or linked." />
+            <EmptyState icon="info" title={commonT("noneYet")} description={t("noSubmissions")} />
           )}
         </div>
       </PageShell>
     );
   }
 
-  // Staff workflow: assign + list + grade.
   const classes = await new ClassRepository(ctx).search({ pageSize: 100 });
   const list = classes.ok ? classes.data.items : [];
   const selectedClassId = sp.class ?? list[0]?.id ?? null;
@@ -139,13 +150,13 @@ export default async function HomeworkPage({
   });
 
   return (
-    <PageShell title="Homework" permission="homework">
+    <PageShell title={t("title")} permission="homework">
       <div className="grid gap-4">
         {canAssign && selectedClassId && roster?.ok && roster.data && (
           <Card>
             <CardHeader>
-              <CardTitle>Assign homework</CardTitle>
-              <CardDescription>Assign a task to every active student in the class.</CardDescription>
+              <CardTitle>{t("assignHomework")}</CardTitle>
+              <CardDescription>{t("assignHomeworkDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <HomeworkAssignForm
@@ -159,44 +170,42 @@ export default async function HomeworkPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Homework</CardTitle>
-            <CardDescription>Assignments, submissions and grading.</CardDescription>
+            <CardTitle>{t("title")}</CardTitle>
+            <CardDescription>{t("desc")}</CardDescription>
           </CardHeader>
           <CardBody className="px-0">
             <form method="get" className="flex flex-wrap items-center gap-2 px-4 pb-3">
               <select name="class" defaultValue={selectedClassId ?? ""} className="rounded-field border bg-surface px-3 py-2 text-sm text-ink">
-                <option value="">All classes</option>
+                <option value="">{t("allClasses")}</option>
                 {list.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
               <select name="status" defaultValue={sp.status ?? ""} className="rounded-field border bg-surface px-3 py-2 text-sm text-ink">
-                <option value="">All statuses</option>
-                <option value="assigned">assigned</option>
-                <option value="submitted">submitted</option>
-                <option value="graded">graded</option>
-                <option value="overdue">overdue</option>
-                <option value="missing">missing</option>
+                <option value="">{commonT("all")}</option>
+                {["assigned", "submitted", "graded", "overdue", "missing"].map((s) => (
+                  <option key={s} value={s}>{statusLabel(st, s)}</option>
+                ))}
               </select>
               <button type="submit" className="rounded-field bg-brand-600 px-3 py-2 text-sm text-ink-inverse hover:bg-brand-700">
-                Filter
+                {commonT("filter")}
               </button>
             </form>
 
             {items.ok ? (
               items.data.items.length === 0 ? (
-                <TableEmpty colSpan={6}>No homework records.</TableEmpty>
+                <TableEmpty colSpan={6}>{t("noHomework")}</TableEmpty>
               ) : (
                 <>
                   <Table>
                     <THead>
                       <TR>
-                        <TH>Date</TH>
-                        <TH>Student</TH>
-                        <TH>Title</TH>
-                        <TH>Status</TH>
-                        <TH>Submissions</TH>
-                        <TH className="text-right">Grade</TH>
+                        <TH>{commonT("date")}</TH>
+                        <TH>{commonT("student")}</TH>
+                        <TH>{commonT("title")}</TH>
+                        <TH>{commonT("status")}</TH>
+                        <TH>{t("submissions")}</TH>
+                        <TH className="text-right">{t("grade")}</TH>
                       </TR>
                     </THead>
                     <TBody>
@@ -208,7 +217,7 @@ export default async function HomeworkPage({
                             <div>{h.title}</div>
                             {h.latest_note && <div className="text-xs text-ink-faint">“{h.latest_note}”</div>}
                           </TD>
-                          <TD><Badge variant={statusVariant(h.status)}>{h.status}</Badge></TD>
+                          <TD><Badge variant={statusVariant(h.status)}>{statusLabel(st, h.status)}</Badge></TD>
                           <TD className="tabular-nums">{h.submissions}</TD>
                           <TD className="text-right">
                             {canGrade ? (

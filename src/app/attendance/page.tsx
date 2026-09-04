@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,11 +21,22 @@ function today(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+function statusLabel(st: (k: string) => string, value: string): string {
+  const k = value.toLowerCase();
+  const out = st(k);
+  return out !== k ? out : value;
+}
+
 export default async function AttendancePage({
   searchParams,
 }: {
   searchParams: Promise<{ class?: string; date?: string; cursor?: string }>;
 }) {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("attendance"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   const profile = await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -33,7 +45,6 @@ export default async function AttendancePage({
   const canMark = profileCan(profile, "attendanceSheet");
 
   if (!canMark) {
-    // Family / student view: their own attendance summaries.
     const mine = await new StudentRepository(ctx).search({ pageSize: 100 });
     const children = mine.ok ? mine.data.items : [];
     const summaries = await Promise.all(
@@ -41,37 +52,37 @@ export default async function AttendancePage({
     );
 
     return (
-      <PageShell title="Attendance" permission="attendanceGrid">
+      <PageShell title={t("title")} permission="attendanceGrid">
         <div className="grid gap-4">
           {summaries.map((res, i) => {
             const child = children[i];
             if (!res.ok || !res.data) return null;
             const d = res.data;
-            const t = d.totals;
+            const tot = d.totals;
             return (
               <Card key={child.id}>
                 <CardHeader>
                   <CardTitle>{child.name}</CardTitle>
-                  <CardDescription>Attendance summary</CardDescription>
+                  <CardDescription>{t("summary")}</CardDescription>
                 </CardHeader>
                 <CardBody>
                   <div className="grid gap-4 sm:grid-cols-4">
-                    <Stat label="Present" value={String(t.present)} variant="success" />
-                    <Stat label="Late" value={String(t.late)} variant="warning" />
-                    <Stat label="Absent" value={String(t.absent)} variant="danger" />
-                    <Stat label="Rate" value={t.rate == null ? "—" : `${t.rate}%`} variant="info" />
+                    <Stat label={t("present")} value={String(tot.present)} variant="success" />
+                    <Stat label={t("late")} value={String(tot.late)} variant="warning" />
+                    <Stat label={t("absent")} value={String(tot.absent)} variant="danger" />
+                    <Stat label={t("rate")} value={tot.rate == null ? "—" : `${tot.rate}%`} variant="info" />
                   </div>
 
                   {d.recent.length > 0 && (
                     <div className="mt-4">
-                      <h3 className="text-sm font-medium text-ink-muted">Recent</h3>
+                      <h3 className="text-sm font-medium text-ink-muted">{t("recent")}</h3>
                       <ul className="mt-1 divide-y divide-line text-sm">
                         {d.recent.map((r, j) => (
                           <li key={j} className="flex items-center gap-2 py-1.5">
                             <span className="text-ink-faint">{r.date}</span>
                             <span>{r.class_name ?? "—"}</span>
                             <Badge variant={r.status === "present" ? "success" : r.status === "late" ? "warning" : "danger"}>
-                              {r.status}
+                              {statusLabel(st, r.status)}
                             </Badge>
                           </li>
                         ))}
@@ -81,14 +92,14 @@ export default async function AttendancePage({
 
                   {d.by_class.length > 0 && (
                     <div className="mt-4">
-                      <h3 className="text-sm font-medium text-ink-muted">By class</h3>
+                      <h3 className="text-sm font-medium text-ink-muted">{t("byClass")}</h3>
                       <Table>
                         <THead>
                           <TR>
-                            <TH>Class</TH>
-                            <TH className="text-right">Present</TH>
-                            <TH className="text-right">Late</TH>
-                            <TH className="text-right">Absent</TH>
+                            <TH>{commonT("class")}</TH>
+                            <TH className="text-right">{t("present")}</TH>
+                            <TH className="text-right">{t("late")}</TH>
+                            <TH className="text-right">{t("absent")}</TH>
                           </TR>
                         </THead>
                         <TBody>
@@ -111,8 +122,8 @@ export default async function AttendancePage({
           {children.length === 0 && (
             <EmptyState
               icon="info"
-              title="No linked students"
-              description="Attendance appears here once students are linked to your account."
+              title={t("noLinkedStudents")}
+              description={t("noLinkedStudentsDesc")}
             />
           )}
         </div>
@@ -120,7 +131,6 @@ export default async function AttendancePage({
     );
   }
 
-  // Staff workflow: pick a class + date, mark the sheet, review stats/history.
   const classes = await new ClassRepository(ctx).search({ pageSize: 100 });
   const list = classes.ok ? classes.data.items : [];
   const selectedClassId = sp.class ?? list[0]?.id ?? null;
@@ -135,17 +145,17 @@ export default async function AttendancePage({
     : null;
 
   return (
-    <PageShell title="Attendance" permission="attendanceGrid">
+    <PageShell title={t("title")} permission="attendanceGrid">
       <div className="grid gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Mark attendance</CardTitle>
-            <CardDescription>Bulk-mark a class for a date — one save per class.</CardDescription>
+            <CardTitle>{t("markAttendance")}</CardTitle>
+            <CardDescription>{t("markAttendanceDesc")}</CardDescription>
           </CardHeader>
           <CardBody className="px-0">
             <form method="get" className="flex flex-wrap items-center gap-2 px-4 pb-3">
               <select name="class" defaultValue={selectedClassId ?? ""} className="rounded-field border bg-surface px-3 py-2 text-sm text-ink">
-                <option value="">Select a class…</option>
+                <option value="">{t("selectClass")}</option>
                 {list.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
@@ -157,14 +167,14 @@ export default async function AttendancePage({
                 className="rounded-field border bg-surface px-3 py-2 text-sm text-ink"
               />
               <button type="submit" className="rounded-field bg-brand-600 px-3 py-2 text-sm text-ink-inverse hover:bg-brand-700">
-                Load
+                {t("load")}
               </button>
             </form>
 
             {!selectedClassId ? (
-              <p className="px-4 pb-3 text-sm text-ink-faint">Select a class to load the marking sheet.</p>
+              <p className="px-4 pb-3 text-sm text-ink-faint">{t("selectClassHint")}</p>
             ) : !grid || !grid.ok || !grid.data ? (
-              <p className="px-4 pb-3 text-sm text-ink-faint">No marking sheet available.</p>
+              <p className="px-4 pb-3 text-sm text-ink-faint">{t("noSheet")}</p>
             ) : (
               <div className="px-4 pb-3">
                 <AttendanceSheet classId={selectedClassId} date={selectedDate} students={grid.data.students} />
@@ -176,18 +186,18 @@ export default async function AttendancePage({
         {stats?.ok && stats.data && (
           <Card>
             <CardHeader>
-              <CardTitle>Statistics</CardTitle>
-              <CardDescription>Per-student totals for {stats.data.class?.name}.</CardDescription>
+              <CardTitle>{t("statistics")}</CardTitle>
+              <CardDescription>{t("statisticsDesc", { name: stats.data.class?.name ?? "—" })}</CardDescription>
             </CardHeader>
             <CardBody className="px-0">
               <Table>
                 <THead>
                   <TR>
-                    <TH>Student</TH>
-                    <TH className="text-right">Present</TH>
-                    <TH className="text-right">Late</TH>
-                    <TH className="text-right">Absent</TH>
-                    <TH className="text-right">Rate</TH>
+                    <TH>{commonT("student")}</TH>
+                    <TH className="text-right">{t("present")}</TH>
+                    <TH className="text-right">{t("late")}</TH>
+                    <TH className="text-right">{t("absent")}</TH>
+                    <TH className="text-right">{t("rate")}</TH>
                   </TR>
                 </THead>
                 <TBody>
@@ -200,7 +210,7 @@ export default async function AttendancePage({
                       <TD className="text-right">{s.rate == null ? "—" : `${s.rate}%`}</TD>
                     </TR>
                   ))}
-                  {stats.data.students.length === 0 && <TableEmpty colSpan={5}>No students.</TableEmpty>}
+                  {stats.data.students.length === 0 && <TableEmpty colSpan={5}>{t("noStudents")}</TableEmpty>}
                 </TBody>
               </Table>
             </CardBody>
@@ -210,18 +220,18 @@ export default async function AttendancePage({
         {history?.ok && (
           <Card>
             <CardHeader>
-              <CardTitle>History</CardTitle>
-              <CardDescription>Most recent records for this class.</CardDescription>
+              <CardTitle>{t("history")}</CardTitle>
+              <CardDescription>{t("historyDesc")}</CardDescription>
             </CardHeader>
             <CardBody className="px-0">
               <Table>
                 <THead>
                   <TR>
-                    <TH>Date</TH>
-                    <TH>Student</TH>
-                    <TH>Status</TH>
-                    <TH>Late</TH>
-                    <TH>By</TH>
+                    <TH>{commonT("date")}</TH>
+                    <TH>{commonT("student")}</TH>
+                    <TH>{commonT("status")}</TH>
+                    <TH>{t("late")}</TH>
+                    <TH>{t("by")}</TH>
                   </TR>
                 </THead>
                 <TBody>
@@ -231,14 +241,14 @@ export default async function AttendancePage({
                       <TD className="font-medium">{h.student_name}</TD>
                       <TD>
                         <Badge variant={h.status === "present" ? "success" : h.status === "late" ? "warning" : "danger"}>
-                          {h.status}
+                          {statusLabel(st, h.status)}
                         </Badge>
                       </TD>
                       <TD>{h.minutes_late > 0 ? `${h.minutes_late}′` : "—"}</TD>
                       <TD className="text-xs text-ink-faint">{h.taken_by ?? "—"}</TD>
                     </TR>
                   ))}
-                  {history.data.items.length === 0 && <TableEmpty colSpan={5}>No records yet.</TableEmpty>}
+                  {history.data.items.length === 0 && <TableEmpty colSpan={5}>{t("noRecords")}</TableEmpty>}
                 </TBody>
               </Table>
               <CursorPager

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,11 @@ export default async function PeoplePage({
 }: {
   searchParams: Promise<{ q?: string; cursor?: string }>;
 }) {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("people"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   const profile = await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -26,39 +32,37 @@ export default async function PeoplePage({
   const roleOptions = roles.ok ? roles.data : [];
 
   return (
-    <PageShell title="People" permission="users">
+    <PageShell title={t("title")} permission="users">
       <Card>
         <CardHeader>
-          <CardTitle>Accounts</CardTitle>
-          <CardDescription>
-            Office administration — roles, status and permissions per account.
-          </CardDescription>
+          <CardTitle>{t("accounts")}</CardTitle>
+          <CardDescription>{t("desc")}</CardDescription>
         </CardHeader>
         <CardBody className="px-0">
           <form method="get" className="flex items-center gap-2 px-4 pb-3">
             <input
               name="q"
               defaultValue={sp.q ?? ""}
-              placeholder="Search name / email…"
+              placeholder={t("searchPlaceholder")}
               className="w-full max-w-xs rounded-field border bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-brand-500 focus-ring"
             />
             <button type="submit" className="rounded-field bg-brand-600 px-3 py-2 text-sm text-ink-inverse hover:bg-brand-700">
-              Search
+              {commonT("search")}
             </button>
           </form>
 
           {res.ok ? (
             res.data.items.length === 0 ? (
-              <TableEmpty colSpan={4}>No accounts found.</TableEmpty>
+              <TableEmpty colSpan={4}>{t("noAccounts")}</TableEmpty>
             ) : (
               <>
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Name</TH>
-                      <TH>Role</TH>
-                      <TH>Status</TH>
-                      <TH className="text-right">Admin</TH>
+                      <TH>{commonT("name")}</TH>
+                      <TH>{commonT("role")}</TH>
+                      <TH>{commonT("status")}</TH>
+                      <TH className="text-right">{commonT("admin")}</TH>
                     </TR>
                   </THead>
                   <TBody>
@@ -73,7 +77,7 @@ export default async function PeoplePage({
                         </TD>
                         <TD>
                           <Badge variant={u.status === "active" ? "success" : u.status === "pending" ? "warning" : "danger"}>
-                            {u.status}
+                            {u.status && st.has(u.status) ? st(u.status) : u.status}
                           </Badge>
                         </TD>
                         <TD className="text-right">

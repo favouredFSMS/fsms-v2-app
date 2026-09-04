@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { enrolStudentAction, type AcademicActionState } from "@/lib/actions/academic";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -15,6 +16,7 @@ export function ClassEnrolStudentForm({
   classId: string;
   students: Option[];
 }) {
+  const [t, commonT] = [useTranslations("academic"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<AcademicActionState | null, FormData>(
     enrolStudentAction,
     null,
@@ -28,15 +30,15 @@ export function ClassEnrolStudentForm({
   return (
     <form action={formAction} className="flex flex-wrap items-end gap-3">
       <input type="hidden" name="classId" value={classId} />
-      <Field label="Student" htmlFor="studentId" className="min-w-48">
+      <Field label={commonT("student")} htmlFor="studentId" className="min-w-48">
         <Select id="studentId" name="studentId" required defaultValue="">
-          <option value="" disabled>Select a student…</option>
+          <option value="" disabled>{t("selectStudent")}</option>
           {students.map((s) => (
             <option key={s.id} value={s.id}>{s.name}</option>
           ))}
         </Select>
       </Field>
-      <Button type="submit" loading={pending}>Enrol</Button>
+      <Button type="submit" loading={pending}>{t("enrol")}</Button>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
     </form>
   );

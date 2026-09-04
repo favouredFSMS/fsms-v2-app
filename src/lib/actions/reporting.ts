@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -35,7 +36,7 @@ export async function requestExportAction(
 ): Promise<ReportingActionState> {
   try {
     const kind = field(formData, "kind");
-    if (!kind) return { ok: false, message: "Choose an export type" };
+    if (!kind) return { ok: false, message: await translate("actions.reportingChooseExportType") };
     const classId = field(formData, "classId");
     const userId = field(formData, "userId");
     const month = field(formData, "month");
@@ -47,11 +48,11 @@ export async function requestExportAction(
     const ctx = await requireDbContext();
     const res = await new ReportingRepository(ctx).requestExport({ kind, params });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Export was not queued (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.reportingNotQueuedDenied") };
     revalidatePath("/reports");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to queue export" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.reportingQueueFailed") };
   }
 }
 
@@ -61,11 +62,11 @@ export async function processExportsAction(): Promise<ReportingActionState> {
     const ctx = await requireDbContext();
     const res = await new ReportingRepository(ctx).processExports();
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Not allowed to process exports" };
+    if (!res.data) return { ok: false, message: await translate("actions.reportingNotAllowedToProcess") };
     revalidatePath("/reports");
-    return { ok: true, message: `Processed ${res.data.processed} export job(s)` };
+    return { ok: true, message: await translate("actions.reportingProcessedJobs", { count: res.data.processed }) };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to process exports" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.reportingProcessFailed") };
   }
 }
 
@@ -80,13 +81,13 @@ export async function getExportCsvAction(jobId: string): Promise<ExportCsvResult
     const res = await new ReportingRepository(ctx).exportResult({ jobId });
     if (!res.ok) return { ok: false, message: res.error.message };
     const job = res.data;
-    if (!job) return { ok: false, message: "Export not found or not allowed" };
+    if (!job) return { ok: false, message: await translate("actions.reportingNotFoundOrNotAllowed") };
     if (job.status !== "ready" || !job.payload) {
-      return { ok: false, message: job.status === "failed" ? (job.error ?? "Export failed") : "Export not ready" };
+      return { ok: false, message: job.status === "failed" ? (job.error ?? (await translate("actions.reportingExportFailed"))) : await translate("actions.reportingNotReady") };
     }
     const stamp = job.completed_at ? new Date(job.completed_at).toISOString().slice(0, 10) : "export";
     return { ok: true, filename: `${job.kind}-${stamp}.csv`, csv: job.payload };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to fetch export" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.reportingFetchFailed") };
   }
 }

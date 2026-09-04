@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { saveMaterialMappingAction, type MaterialActionState } from "@/lib/actions/materials";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -14,6 +15,7 @@ export function MaterialMappingForm({
   units: Array<{ id: string; label: string }>;
   targets: Array<{ id: string; label: string }>;
 }) {
+  const [t, commonT] = [useTranslations("materials"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<MaterialActionState | null, FormData>(
     saveMaterialMappingAction,
     null,
@@ -31,10 +33,10 @@ export function MaterialMappingForm({
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Unit" htmlFor="materialUnitId" required>
+        <Field label={t("unit")} htmlFor="materialUnitId" required>
           <Select id="materialUnitId" name="materialUnitId" required defaultValue="">
             <option value="" disabled>
-              Select unit…
+              {t("selectUnit")}
             </option>
             {units.map((u) => (
               <option key={u.id} value={u.id}>
@@ -43,10 +45,10 @@ export function MaterialMappingForm({
             ))}
           </Select>
         </Field>
-        <Field label="Learning target" htmlFor="targetId" required>
+        <Field label={t("learningTarget")} htmlFor="targetId" required>
           <Select id="targetId" name="targetId" required defaultValue="">
             <option value="" disabled>
-              Select target…
+              {t("selectTarget")}
             </option>
             {targets.map((t) => (
               <option key={t.id} value={t.id}>
@@ -55,23 +57,23 @@ export function MaterialMappingForm({
             ))}
           </Select>
         </Field>
-        <Field label="Scope" htmlFor="scope">
+        <Field label={commonT("scope")} htmlFor="scope">
           <Input id="scope" name="scope" placeholder="reading" />
         </Field>
-        <Field label="Purpose" htmlFor="purpose">
+        <Field label={commonT("purpose")} htmlFor="purpose">
           <Input id="purpose" name="purpose" placeholder="practice" />
         </Field>
-        <Field label="Pages from" htmlFor="pageStart">
+        <Field label={commonT("pagesFrom")} htmlFor="pageStart">
           <Input id="pageStart" name="pageStart" type="number" min={0} />
         </Field>
-        <Field label="Pages to" htmlFor="pageEnd">
+        <Field label={commonT("pagesTo")} htmlFor="pageEnd">
           <Input id="pageEnd" name="pageEnd" type="number" min={0} />
         </Field>
       </div>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
       <div>
         <Button type="submit" disabled={pending}>
-          {pending ? "Proposing…" : "Propose mapping"}
+          {pending ? t("proposing") : t("proposeMapping")}
         </Button>
       </div>
     </form>

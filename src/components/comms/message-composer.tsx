@@ -2,6 +2,7 @@
 
 import { useActionState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { sendMessageAction, type CommsActionState } from "@/lib/actions/comms";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -9,6 +10,7 @@ import { Input, Textarea } from "@/components/ui/input";
 import type { PickOption } from "@/components/reports/report-picker";
 
 export function MessageComposer({ recipients }: { recipients: PickOption[] }) {
+  const [t, commonT] = [useTranslations("messaging"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<CommsActionState | null, FormData>(
     sendMessageAction,
     null,
@@ -26,7 +28,7 @@ export function MessageComposer({ recipients }: { recipients: PickOption[] }) {
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="To" htmlFor="to">
+        <Field label={t("to")} htmlFor="to">
           <select
             id="to"
             name="to"
@@ -42,21 +44,21 @@ export function MessageComposer({ recipients }: { recipients: PickOption[] }) {
           </select>
         </Field>
         <div className="flex flex-col gap-3">
-          <Field label="Subject" htmlFor="subject">
-            <Input id="subject" name="subject" placeholder="Optional subject" />
+          <Field label={t("subject")} htmlFor="subject">
+            <Input id="subject" name="subject" placeholder={t("optionalSubject")} />
           </Field>
-          <Field label="Message" htmlFor="body" required>
-            <Textarea id="body" name="body" rows={5} required placeholder="Write a message…" />
+          <Field label={commonT("message")} htmlFor="body" required>
+            <Textarea id="body" name="body" rows={5} required placeholder={t("writeMessage")} />
           </Field>
         </div>
       </div>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
       <div>
         <Button type="submit" disabled={pending}>
-          {pending ? "Sending…" : "Send message"}
+          {pending ? commonT("sending") : t("sendMessage")}
         </Button>
       </div>
-      <p className="text-xs text-ink-500">Hold Ctrl/Cmd to select multiple recipients.</p>
+      <p className="text-xs text-ink-500">{t("multiRecipientHint")}</p>
     </form>
   );
 }

@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -44,7 +45,7 @@ export async function createClassAction(
     revalidatePath("/classes");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to create class" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.academicCreateClassFailed") };
   }
 }
 
@@ -59,7 +60,7 @@ export async function createSubjectAction(
     revalidatePath("/classes");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to create subject" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.academicCreateSubjectFailed") };
   }
 }
 
@@ -78,7 +79,7 @@ export async function createYearAction(
     revalidatePath("/classes");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to create academic year" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.academicCreateYearFailed") };
   }
 }
 
@@ -98,7 +99,7 @@ export async function createTermAction(
     revalidatePath("/classes");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to create term" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.academicCreateTermFailed") };
   }
 }
 
@@ -117,7 +118,7 @@ export async function assignTeacherAction(
     revalidatePath("/classes/[id]", "page");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to assign teacher" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.academicAssignTeacherFailed") };
   }
 }
 
@@ -135,7 +136,7 @@ export async function removeTeacherAction(
     revalidatePath("/classes/[id]", "page");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to remove teacher" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.academicRemoveTeacherFailed") };
   }
 }
 
@@ -153,7 +154,7 @@ export async function enrolStudentAction(
     revalidatePath("/classes/[id]", "page");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to enrol student" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.academicEnrolStudentFailed") };
   }
 }
 
@@ -171,6 +172,6 @@ export async function setEnrolmentStatusAction(
     revalidatePath("/classes/[id]", "page");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to update enrolment" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.academicUpdateEnrolmentFailed") };
   }
 }

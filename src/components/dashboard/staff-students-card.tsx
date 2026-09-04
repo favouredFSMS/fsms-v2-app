@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requireDbContext, StudentRepository } from "@/lib/db";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -14,6 +15,7 @@ import { Table, TBody, TD, TR } from "@/components/ui/table";
  * One keyset-paginated `fsms.student_search()` round trip, RLS scoped.
  */
 export async function StaffStudentsCard({ schoolId }: { schoolId: string }) {
+  const [t, st] = await Promise.all([getTranslations("dashboard"), getTranslations("status")]);
   const ctx = await requireDbContext();
   const students = await new StudentRepository(ctx).search({ pageSize: 5 });
 
@@ -32,11 +34,10 @@ export async function StaffStudentsCard({ schoolId }: { schoolId: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Students</CardTitle>
+        <CardTitle>{t("students")}</CardTitle>
         <CardDescription>
-          Live list via the Phase 10 data-access layer — one keyset-paginated
+          {t("staffStudentsDesc")}
           <code className="mx-1 rounded bg-surface-sunken px-1 font-mono text-xs">fsms.student_search()</code>
-          round trip, school + visibility scoped by RLS.
         </CardDescription>
       </CardHeader>
       <CardBody className="px-0">
@@ -48,20 +49,25 @@ export async function StaffStudentsCard({ schoolId }: { schoolId: string }) {
                 <TD className="font-mono text-xs text-ink-faint">{s.student_no}</TD>
                 <TD>{s.level_code?.toUpperCase()}</TD>
                 <TD className="text-right">
-                  <Badge variant={s.status === "active" ? "success" : "neutral"}>{s.status}</Badge>
+                  <Badge variant={s.status === "active" ? "success" : "neutral"}>
+                    {s.status && st.has(s.status) ? st(s.status) : s.status}
+                  </Badge>
                 </TD>
               </TR>
             ))}
             <TR>
               <TD colSpan={4} className="px-4 py-3 text-right text-xs text-ink-faint">
-                showing {students.data.items.length} of {students.data.total} · next cursor:{" "}
-                {students.data.nextCursor ? "yes" : "no (last page)"}
+                {t("listFooter", {
+                  shown: students.data.items.length,
+                  total: students.data.total,
+                  cursor: students.data.nextCursor ? t("listCursorYes") : t("listCursorNo"),
+                })}
               </TD>
             </TR>
           </TBody>
         </Table>
         <p className="px-5 pb-2 text-right font-mono text-[10px] text-ink-faint">
-          tenant {schoolId}
+          {t("tenantLabel")} {schoolId}
         </p>
       </CardBody>
     </Card>

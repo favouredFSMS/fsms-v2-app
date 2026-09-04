@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,6 +44,11 @@ export default async function CurriculumPage({
 }: {
   searchParams: Promise<{ student?: string; cursor?: string }>;
 }) {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("curriculum"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   const profile = await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -95,15 +101,13 @@ export default async function CurriculumPage({
   const topicOptions = topics.ok ? topics.data.map((t) => ({ id: t.id, label: localized(t.title) || t.id })) : [];
 
   return (
-    <PageShell title="Curriculum & learning" permission="curriculum">
+    <PageShell title={t("title")} permission="curriculum">
       <div className="grid gap-4">
         {/* ── content spine ─────────────────────────────────────────────── */}
         <Card>
           <CardHeader>
-            <CardTitle>Content spine</CardTitle>
-            <CardDescription>
-              Programme → Unit → Lesson → Objective. The structure everything else attaches to.
-            </CardDescription>
+            <CardTitle>{t("contentSpine")}</CardTitle>
+            <CardDescription>{t("contentSpineDesc")}</CardDescription>
           </CardHeader>
           <CardBody>
             {spine.ok && spine.data && spine.data.programmes.length > 0 ? (
@@ -111,26 +115,30 @@ export default async function CurriculumPage({
                 {spine.data.programmes.map((pr) => (
                   <div key={pr.id} className="rounded-field border border-line bg-surface-sunken p-3">
                     <div className="flex items-center gap-2 font-medium text-ink">
-                      <span>{localized(pr.name) || "Untitled programme"}</span>
+                      <span>{localized(pr.name) || t("untitledProgramme")}</span>
                       {pr.code && <Badge variant="brand">{pr.code}</Badge>}
-                      {pr.standard && <Badge>standard</Badge>}
+                      {pr.standard && <Badge>{t("standard")}</Badge>}
                     </div>
                     <ul className="mt-2 space-y-1 pl-4 text-ink-muted">
                       {pr.units.map((u) => (
                         <li key={u.id}>
                           <span className="font-medium text-ink-soft">
                             {u.no ? `${u.no}. ` : ""}
-                            {localized(u.title) || "Untitled unit"}
+                            {localized(u.title) || t("untitledUnit")}
                           </span>
                           <span className="ml-2 text-xs text-ink-faint">
-                            {u.lessons.length} lesson{u.lessons.length === 1 ? "" : "s"}
+                            {u.lessons.length}{" "}
+                            {u.lessons.length === 1 ? commonT("lesson") : commonT("lessons")}
                           </span>
                           <ul className="mt-0.5 list-inside list-disc pl-3 text-xs">
                             {u.lessons.map((l) => (
                               <li key={l.id}>
                                 {l.no ? `${l.no} ` : ""}
-                                {localized(l.title) || "Untitled lesson"}
-                                <span className="text-ink-faint"> · {l.objective_count} objective(s)</span>
+                                {localized(l.title) || t("untitledLesson")}
+                                <span className="text-ink-faint">
+                                  {" "}· {l.objective_count}{" "}
+                                  {l.objective_count === 1 ? commonT("objective") : commonT("objectives")}
+                                </span>
                               </li>
                             ))}
                           </ul>
@@ -141,7 +149,7 @@ export default async function CurriculumPage({
                 ))}
               </div>
             ) : (
-              <p className="mb-4 text-sm text-ink-muted">No programmes yet.</p>
+              <p className="mb-4 text-sm text-ink-muted">{t("noProgrammes")}</p>
             )}
             {canAuthor && <CurriculumAuthorForm programmes={programmeOptions} />}
           </CardBody>
@@ -151,17 +159,17 @@ export default async function CurriculumPage({
         <div className="grid gap-4 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Curriculum topics</CardTitle>
-              <CardDescription>Published topics are visible to families.</CardDescription>
+              <CardTitle>{t("curriculumTopics")}</CardTitle>
+              <CardDescription>{t("topicsDesc")}</CardDescription>
             </CardHeader>
             <CardBody className="px-0">
               <Table>
                 <THead>
                   <TR>
-                    <TH>Topic</TH>
-                    <TH>Level</TH>
-                    <TH>Section</TH>
-                    <TH>Status</TH>
+                    <TH>{t("topic")}</TH>
+                    <TH>{commonT("level")}</TH>
+                    <TH>{t("section")}</TH>
+                    <TH>{commonT("status")}</TH>
                   </TR>
                 </THead>
                 <TBody>
@@ -173,13 +181,13 @@ export default async function CurriculumPage({
                         <TD>{t.course_section ?? "—"}</TD>
                         <TD>
                           <Badge variant={t.published ? "success" : "warning"}>
-                            {t.published ? "published" : "draft"}
+                            {st(t.published ? "published" : "draft")}
                           </Badge>
                         </TD>
                       </TR>
                     ))
                   ) : (
-                    <TableEmpty colSpan={4}>No topics yet.</TableEmpty>
+                    <TableEmpty colSpan={4}>{t("noTopics")}</TableEmpty>
                   )}
                 </TBody>
               </Table>
@@ -194,16 +202,16 @@ export default async function CurriculumPage({
           <div className="grid gap-4">
             <Card>
               <CardHeader>
-                <CardTitle>Learning targets</CardTitle>
-                <CardDescription>Active targets evidence can be recorded against.</CardDescription>
+                <CardTitle>{t("learningTargets")}</CardTitle>
+                <CardDescription>{t("targetsDesc")}</CardDescription>
               </CardHeader>
               <CardBody className="px-0">
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Level</TH>
-                      <TH>Title</TH>
-                      <TH>Verification</TH>
+                      <TH>{commonT("level")}</TH>
+                      <TH>{commonT("title")}</TH>
+                      <TH>{t("verification")}</TH>
                     </TR>
                   </THead>
                   <TBody>
@@ -216,7 +224,7 @@ export default async function CurriculumPage({
                         </TR>
                       ))
                     ) : (
-                      <TableEmpty colSpan={3}>No targets yet.</TableEmpty>
+                      <TableEmpty colSpan={3}>{t("noTargets")}</TableEmpty>
                     )}
                   </TBody>
                 </Table>
@@ -224,15 +232,15 @@ export default async function CurriculumPage({
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Skills</CardTitle>
-                <CardDescription>Skill codes used to label evidence and materials.</CardDescription>
+                <CardTitle>{t("skills")}</CardTitle>
+                <CardDescription>{t("skillsDesc")}</CardDescription>
               </CardHeader>
               <CardBody className="px-0">
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Code</TH>
-                      <TH>Label</TH>
+                      <TH>{commonT("code")}</TH>
+                      <TH>{commonT("label")}</TH>
                     </TR>
                   </THead>
                   <TBody>
@@ -246,7 +254,7 @@ export default async function CurriculumPage({
                         </TR>
                       ))
                     ) : (
-                      <TableEmpty colSpan={2}>No skills defined yet.</TableEmpty>
+                      <TableEmpty colSpan={2}>{t("noSkills")}</TableEmpty>
                     )}
                   </TBody>
                 </Table>
@@ -258,8 +266,8 @@ export default async function CurriculumPage({
         {/* ── evidence ──────────────────────────────────────────────────── */}
         <Card>
           <CardHeader>
-            <CardTitle>Learning evidence</CardTitle>
-            <CardDescription>Skill → evidence records. Filter by student; only rows you may see are returned.</CardDescription>
+            <CardTitle>{t("learningEvidence")}</CardTitle>
+            <CardDescription>{t("evidenceDesc")}</CardDescription>
           </CardHeader>
           <CardBody>
             {canEvidence && (
@@ -273,7 +281,7 @@ export default async function CurriculumPage({
                 defaultValue={sp.student ?? ""}
                 className="rounded-field border bg-surface px-3 py-2 text-sm text-ink"
               >
-                <option value="">All students</option>
+                <option value="">{t("allStudents")}</option>
                 {students.map((s) => (
                   <option key={s.id} value={s.id}>
                     {s.label}
@@ -284,7 +292,7 @@ export default async function CurriculumPage({
                 type="submit"
                 className="rounded-field bg-brand-600 px-3 py-2 text-sm text-ink-inverse hover:bg-brand-700"
               >
-                Filter
+                {commonT("filter")}
               </button>
             </form>
             <div className="px-0">
@@ -293,13 +301,13 @@ export default async function CurriculumPage({
                   <Table>
                     <THead>
                       <TR>
-                        <TH>When</TH>
-                        <TH>Student</TH>
-                        <TH>Target</TH>
-                        <TH>Source</TH>
-                        <TH>Quality</TH>
-                        <TH>Score</TH>
-                        <TH>Note</TH>
+                        <TH>{t("when")}</TH>
+                        <TH>{commonT("student")}</TH>
+                        <TH>{commonT("target")}</TH>
+                        <TH>{commonT("source")}</TH>
+                        <TH>{t("quality")}</TH>
+                        <TH>{commonT("score")}</TH>
+                        <TH>{commonT("note")}</TH>
                       </TR>
                     </THead>
                     <TBody>
@@ -312,7 +320,9 @@ export default async function CurriculumPage({
                           <TD>{localized(e.target_title) || "—"}</TD>
                           <TD>{e.source}</TD>
                           <TD>
-                            <Badge variant={qualityVariant(e.quality)}>{e.quality ?? "—"}</Badge>
+                            <Badge variant={qualityVariant(e.quality)}>
+                              {e.quality && st.has(e.quality) ? st(e.quality) : (e.quality ?? "—")}
+                            </Badge>
                           </TD>
                           <TD>{e.score ?? "—"}</TD>
                           <TD className="max-w-[16rem] truncate">{e.note ?? "—"}</TD>
@@ -329,7 +339,7 @@ export default async function CurriculumPage({
                   />
                 </>
               ) : (
-                <TableEmpty colSpan={7}>No evidence yet.</TableEmpty>
+                <TableEmpty colSpan={7}>{t("noEvidence")}</TableEmpty>
               )}
             </div>
           </CardBody>
@@ -339,8 +349,8 @@ export default async function CurriculumPage({
         {canProgress && (
           <Card>
             <CardHeader>
-              <CardTitle>Learner progress</CardTitle>
-              <CardDescription>Evidence aggregated per learning target for one student.</CardDescription>
+              <CardTitle>{t("learnerProgress")}</CardTitle>
+              <CardDescription>{t("learnerProgressDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <form method="get" className="flex flex-wrap items-center gap-2 pb-3">
@@ -349,7 +359,7 @@ export default async function CurriculumPage({
                   defaultValue={sp.student ?? ""}
                   className="rounded-field border bg-surface px-3 py-2 text-sm text-ink"
                 >
-                  <option value="">Select student…</option>
+                  <option value="">{t("selectStudent")}</option>
                   {students.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.label}
@@ -360,27 +370,29 @@ export default async function CurriculumPage({
                   type="submit"
                   className="rounded-field bg-brand-600 px-3 py-2 text-sm text-ink-inverse hover:bg-brand-700"
                 >
-                  Show progress
+                  {t("showProgress")}
                 </button>
               </form>
               {progress && progress.ok && progress.data ? (
                 <div className="grid gap-3 text-sm">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-medium text-ink">{progress.data.student?.name ?? "Student"}</span>
+                    <span className="font-medium text-ink">{progress.data.student?.name ?? commonT("student")}</span>
                     <Badge variant="brand">{progress.data.student?.level_code ?? "—"}</Badge>
                     <span className="text-ink-muted">
-                      {progress.data.totals.evidence_count} evidence record(s) · avg{" "}
-                      {progress.data.totals.avg_score ?? "—"}
+                      {t("progressSummary", {
+                        count: progress.data.totals.evidence_count,
+                        score: progress.data.totals.avg_score ?? "—",
+                      })}
                     </span>
                   </div>
                   <Table>
                     <THead>
                       <TR>
-                        <TH>Target</TH>
-                        <TH>Level</TH>
-                        <TH>Records</TH>
-                        <TH>Avg score</TH>
-                        <TH>Last</TH>
+                        <TH>{commonT("target")}</TH>
+                        <TH>{commonT("level")}</TH>
+                        <TH>{t("records")}</TH>
+                        <TH>{t("avgScore")}</TH>
+                        <TH>{t("last")}</TH>
                       </TR>
                     </THead>
                     <TBody>
@@ -397,13 +409,13 @@ export default async function CurriculumPage({
                           </TR>
                         ))
                       ) : (
-                        <TableEmpty colSpan={5}>No evidence for this student yet.</TableEmpty>
+                        <TableEmpty colSpan={5}>{t("noEvidenceForStudent")}</TableEmpty>
                       )}
                     </TBody>
                   </Table>
                 </div>
               ) : (
-                <p className="text-sm text-ink-muted">Select a student to see their progress.</p>
+                <p className="text-sm text-ink-muted">{t("selectStudentHint")}</p>
               )}
             </CardBody>
           </Card>
@@ -412,10 +424,8 @@ export default async function CurriculumPage({
         {/* ── curricula container ───────────────────────────────────────── */}
         <Card>
           <CardHeader>
-            <CardTitle>Curricula</CardTitle>
-            <CardDescription>
-              Imported curriculum documents (draft → published → archived) with version history.
-            </CardDescription>
+            <CardTitle>{t("curricula")}</CardTitle>
+            <CardDescription>{t("curriculaDesc")}</CardDescription>
           </CardHeader>
           <CardBody>
             {canAuthor && (
@@ -428,13 +438,13 @@ export default async function CurriculumPage({
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Title</TH>
-                      <TH>Publisher</TH>
-                      <TH>Programme</TH>
-                      <TH>Versions</TH>
-                      <TH>Status</TH>
-                      <TH>Imported</TH>
-                      <TH>Actions</TH>
+                      <TH>{commonT("title")}</TH>
+                      <TH>{t("publisher")}</TH>
+                      <TH>{t("programme")}</TH>
+                      <TH>{t("versions")}</TH>
+                      <TH>{commonT("status")}</TH>
+                      <TH>{t("imported")}</TH>
+                      <TH>{commonT("actions")}</TH>
                     </TR>
                   </THead>
                   <TBody>
@@ -446,9 +456,11 @@ export default async function CurriculumPage({
                         <TD>{c.versions}</TD>
                         <TD>
                           {c.deleted ? (
-                            <Badge variant="danger">deleted</Badge>
+                            <Badge variant="danger">{t("deleted")}</Badge>
                           ) : (
-                            <Badge variant={statusVariant(c.status)}>{c.status}</Badge>
+                            <Badge variant={statusVariant(c.status)}>
+                              {st.has(c.status) ? st(c.status) : c.status}
+                            </Badge>
                           )}
                         </TD>
                         <TD className="whitespace-nowrap">
@@ -487,7 +499,7 @@ export default async function CurriculumPage({
                   </TBody>
                 </Table>
               ) : (
-                <TableEmpty colSpan={7}>No curricula yet.</TableEmpty>
+                <TableEmpty colSpan={7}>{t("noCurricula")}</TableEmpty>
               )}
             </div>
           </CardBody>

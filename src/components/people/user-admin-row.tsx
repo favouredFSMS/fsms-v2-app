@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { updateUserAction, type PeopleActionState } from "@/lib/actions/people";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/input";
@@ -30,6 +31,7 @@ export function UserAdminRow({
   roles: RoleOption[];
   isSelf: boolean;
 }) {
+  const [st, commonT, peopleT] = [useTranslations("status"), useTranslations("common"), useTranslations("people")];
   const [state, formAction, pending] = useActionState<PeopleActionState | null, FormData>(
     updateUserAction,
     null,
@@ -41,25 +43,25 @@ export function UserAdminRow({
   }, [state?.ok, router]);
 
   if (isSelf) {
-    return <span className="text-xs text-ink-faint">you</span>;
+    return <span className="text-xs text-ink-faint">{peopleT("you")}</span>;
   }
 
   return (
     <form action={formAction} className="flex flex-wrap items-center gap-2">
       <input type="hidden" name="userId" value={userId} />
-      <Select name="status" defaultValue={status} className="w-32" aria-label="Status">
+      <Select name="status" defaultValue={status} className="w-32" aria-label={commonT("status")}>
         {STATUSES.map((s) => (
-          <option key={s} value={s}>{s}</option>
+          <option key={s} value={s}>{st.has(s) ? st(s) : s}</option>
         ))}
       </Select>
-      <Select name="roleKey" defaultValue={roleKey ?? ""} className="w-36" aria-label="Role">
+      <Select name="roleKey" defaultValue={roleKey ?? ""} className="w-36" aria-label={commonT("role")}>
         <option value="">— role —</option>
         {roles.map((r) => (
           <option key={r.key} value={r.key}>{r.label}</option>
         ))}
       </Select>
       <Button type="submit" variant="secondary" size="sm" loading={pending}>
-        Save
+        {commonT("save")}
       </Button>
       {state && !state.ok && (
         <span className="text-xs text-danger-600">{state.message}</span>

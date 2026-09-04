@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { saveAttendanceAction, type AttendanceActionState } from "@/lib/actions/attendance";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
@@ -31,6 +32,7 @@ export function AttendanceSheet({
   date: string;
   students: AttendanceGridRow[];
 }) {
+  const [t, st, commonT] = [useTranslations("attendance"), useTranslations("status"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<AttendanceActionState | null, FormData>(
     saveAttendanceAction,
     null,
@@ -87,17 +89,17 @@ export function AttendanceSheet({
 
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs text-ink-faint">
-          {counts.present} present · {counts.absent} absent · {counts.late} late
+          {counts.present} {t("present")} · {counts.absent} {t("absent")} · {counts.late} {t("late")}
         </span>
         <span className="ml-auto flex gap-2">
           <button type="button" onClick={() => setAll("present")} className="text-xs text-brand-700 hover:underline">
-            All present
+            {t("allPresent")}
           </button>
           <button type="button" onClick={() => setAll("absent")} className="text-xs text-brand-700 hover:underline">
-            All absent
+            {t("allAbsent")}
           </button>
           <button type="button" onClick={() => setAll("late")} className="text-xs text-brand-700 hover:underline">
-            All late
+            {t("allLate")}
           </button>
         </span>
       </div>
@@ -106,10 +108,10 @@ export function AttendanceSheet({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-line text-left text-xs text-ink-muted">
-              <th className="px-3 py-2">Student</th>
-              <th className="px-3 py-2">Status</th>
-              <th className="px-3 py-2">Minutes late</th>
-              <th className="px-3 py-2">Note</th>
+              <th className="px-3 py-2">{commonT("student")}</th>
+              <th className="px-3 py-2">{commonT("status")}</th>
+              <th className="px-3 py-2">{commonT("minutesLate")}</th>
+              <th className="px-3 py-2">{commonT("note")}</th>
             </tr>
           </thead>
           <tbody>
@@ -127,9 +129,9 @@ export function AttendanceSheet({
                       onChange={(e) => patch(s.id, { status: e.target.value as Status })}
                       className="w-auto min-w-28"
                     >
-                      <option value="present">present</option>
-                      <option value="absent">absent</option>
-                      <option value="late">late</option>
+                      <option value="present">{st("present")}</option>
+                      <option value="absent">{st("absent")}</option>
+                      <option value="late">{st("late")}</option>
                     </Select>
                   </td>
                   <td className="px-3 py-2">
@@ -146,7 +148,7 @@ export function AttendanceSheet({
                     <Input
                       value={m.note}
                       onChange={(e) => patch(s.id, { note: e.target.value })}
-                      placeholder="optional"
+                      placeholder={commonT("optional")}
                       className="w-full max-w-52"
                     />
                   </td>
@@ -156,7 +158,7 @@ export function AttendanceSheet({
             {students.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-3 py-8 text-center text-ink-faint">
-                  No active students in this class.
+                  {t("noActiveStudents")}
                 </td>
               </tr>
             )}
@@ -167,11 +169,11 @@ export function AttendanceSheet({
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
       {state?.ok && (
         <p className="text-sm text-success-600">
-          Saved {state.saved} mark{state.saved === 1 ? "" : "s"} for {date}.
+          {t("savedPrefix")} {state.saved} {state.saved === 1 ? t("mark") : t("marks")} · {date}.
         </p>
       )}
       <Button type="submit" loading={pending} className="self-start">
-        Save attendance
+        {t("saveAttendance")}
       </Button>
     </form>
   );

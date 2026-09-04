@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
@@ -12,7 +13,18 @@ export const metadata = { title: "Payments — FSMS V2" };
 
 const MONEY = ["admin1", "admin", "manager", "accountant"];
 
+function statusLabel(st: (k: string) => string, value: string): string {
+  const k = value.toLowerCase();
+  const out = st(k);
+  return out !== k ? out : value;
+}
+
 export default async function FinancePage() {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("finance"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   const profile = await requireUser();
   const ctx = await requireDbContext();
   const repo = new FinanceRepository(ctx);
@@ -36,28 +48,28 @@ export default async function FinancePage() {
   const wallet = walletRes && walletRes.ok ? walletRes.data : [];
 
   return (
-    <PageShell title="Payments" permission="payments">
+    <PageShell title={t("title")} permission="payments">
       <div className="grid gap-4">
         {canClients && (
           <Card>
             <CardHeader>
-              <CardTitle>Student accounts</CardTitle>
-              <CardDescription>Balances, credits and pending payment counts.</CardDescription>
+              <CardTitle>{t("studentAccounts")}</CardTitle>
+              <CardDescription>{t("studentAccountsDesc")}</CardDescription>
             </CardHeader>
             <CardBody className="px-0">
               <Table>
                 <THead>
                   <TR>
-                    <TH>Student</TH>
-                    <TH>Level</TH>
-                    <TH>Balance</TH>
-                    <TH>Credit</TH>
-                    <TH>Pending</TH>
+                    <TH>{commonT("student")}</TH>
+                    <TH>{commonT("level")}</TH>
+                    <TH>{t("balance")}</TH>
+                    <TH>{t("credit")}</TH>
+                    <TH>{t("pending")}</TH>
                   </TR>
                 </THead>
                 <TBody>
                   {clients.length === 0 ? (
-                    <TableEmpty colSpan={5}>No students.</TableEmpty>
+                    <TableEmpty colSpan={5}>{t("noStudents")}</TableEmpty>
                   ) : (
                     clients.map((c) => (
                       <TR key={c.id}>
@@ -78,7 +90,8 @@ export default async function FinancePage() {
         {canRequest && (
           <Card>
             <CardHeader>
-              <CardTitle>Request a payment</CardTitle>
+              <CardTitle>{t("requestPayment")}</CardTitle>
+              <CardDescription>{t("requestPaymentDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <RequestPaymentForm />
@@ -88,25 +101,25 @@ export default async function FinancePage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Payments</CardTitle>
-            <CardDescription>Pending, confirmed and void payments (family sees their own).</CardDescription>
+            <CardTitle>{t("payments")}</CardTitle>
+            <CardDescription>{t("paymentsDesc")}</CardDescription>
           </CardHeader>
           <CardBody className="px-0">
             <Table>
               <THead>
                 <TR>
-                  <TH>Student</TH>
-                  <TH>Amount</TH>
-                  <TH>Type</TH>
-                  <TH>Status</TH>
-                  <TH>Due</TH>
-                  <TH>Proofs</TH>
-                  {isMoney && <TH>Actions</TH>}
+                  <TH>{commonT("student")}</TH>
+                  <TH>{commonT("amount")}</TH>
+                  <TH>{commonT("type")}</TH>
+                  <TH>{commonT("status")}</TH>
+                  <TH>{t("due")}</TH>
+                  <TH>{t("proofs")}</TH>
+                  {isMoney && <TH>{commonT("actions")}</TH>}
                 </TR>
               </THead>
               <TBody>
                 {payments.length === 0 ? (
-                  <TableEmpty colSpan={isMoney ? 7 : 6}>No payments yet.</TableEmpty>
+                  <TableEmpty colSpan={isMoney ? 7 : 6}>{t("noPayments")}</TableEmpty>
                 ) : (
                   payments.map((p) => (
                     <TR key={p.id}>
@@ -117,7 +130,7 @@ export default async function FinancePage() {
                       <TD>{p.pay_type ?? "—"}</TD>
                       <TD>
                         <Badge variant={p.status === "confirmed" ? "success" : p.status === "void" ? "danger" : "neutral"}>
-                          {p.status}
+                          {statusLabel(st, p.status)}
                         </Badge>
                       </TD>
                       <TD>{p.due_date ?? "—"}</TD>
@@ -134,21 +147,21 @@ export default async function FinancePage() {
         {canPricing && (
           <Card>
             <CardHeader>
-              <CardTitle>Pricing</CardTitle>
+              <CardTitle>{t("pricing")}</CardTitle>
             </CardHeader>
             <CardBody className="px-0">
               <Table>
                 <THead>
                   <TR>
-                    <TH>Level</TH>
-                    <TH>Price</TH>
-                    <TH>Currency</TH>
-                    <TH>Active</TH>
+                    <TH>{commonT("level")}</TH>
+                    <TH>{t("price")}</TH>
+                    <TH>{commonT("currency")}</TH>
+                    <TH>{t("active")}</TH>
                   </TR>
                 </THead>
                 <TBody>
                   {pricing.length === 0 ? (
-                    <TableEmpty colSpan={4}>No pricing rows.</TableEmpty>
+                    <TableEmpty colSpan={4}>{t("noPricing")}</TableEmpty>
                   ) : (
                     pricing.map((p) => (
                       <TR key={p.id}>
@@ -156,7 +169,7 @@ export default async function FinancePage() {
                         <TD>{p.price}</TD>
                         <TD>{p.currency ?? "—"}</TD>
                         <TD>
-                          <Badge variant={p.active ? "success" : "neutral"}>{p.active ? "active" : "inactive"}</Badge>
+                          <Badge variant={p.active ? "success" : "neutral"}>{p.active ? t("active") : t("inactive")}</Badge>
                         </TD>
                       </TR>
                     ))
@@ -170,19 +183,19 @@ export default async function FinancePage() {
         {canWallet && (
           <Card>
             <CardHeader>
-              <CardTitle>Teacher wallets</CardTitle>
+              <CardTitle>{t("teacherWallets")}</CardTitle>
             </CardHeader>
             <CardBody className="px-0">
               <Table>
                 <THead>
                   <TR>
-                    <TH>Teacher</TH>
-                    <TH>Total</TH>
+                    <TH>{commonT("teacher")}</TH>
+                    <TH>{t("total")}</TH>
                   </TR>
                 </THead>
                 <TBody>
                   {wallet.length === 0 ? (
-                    <TableEmpty colSpan={2}>No teachers.</TableEmpty>
+                    <TableEmpty colSpan={2}>{t("noTeachers")}</TableEmpty>
                   ) : (
                     wallet.map((w) => (
                       <TR key={w.id}>

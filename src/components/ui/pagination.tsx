@@ -1,7 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/ui/cn";
-import { paginationRange, paginationSummary } from "@/lib/ui/pagination";
+import { paginationRange } from "@/lib/ui/pagination";
 import { Icon } from "./icons";
 
 export interface PaginationProps {
@@ -26,6 +27,7 @@ export function Pagination({
   className,
   showSummary = true,
 }: PaginationProps) {
+  const t = useTranslations("common");
   const pageCount = Math.max(1, Math.ceil(total / pageSize));
   const current = Math.min(Math.max(1, page), pageCount);
   const range = paginationRange(current, pageCount);
@@ -34,11 +36,11 @@ export function Pagination({
   return (
     <nav
       className={cn("flex flex-wrap items-center justify-between gap-3", className)}
-      aria-label="Pagination"
+      aria-label={t("pagination")}
     >
       {showSummary ? (
         <p className="text-xs text-ink-faint">
-          {paginationSummary(current, pageSize, total)}
+          {t("showing", { first: total === 0 ? 0 : (current - 1) * pageSize + 1, last: Math.min(total, current * pageSize), total })}
         </p>
       ) : (
         <span />
@@ -50,7 +52,7 @@ export function Pagination({
           className={pageBtn}
           disabled={current <= 1}
           onClick={() => onPageChange(current - 1)}
-          aria-label="Previous page"
+          aria-label={t("previousPage")}
         >
           <Icon name="chevron-left" size={16} />
         </button>
@@ -66,7 +68,7 @@ export function Pagination({
                 const target = isLeft ? range.previousJump : range.nextJump;
                 if (target) onPageChange(target);
               }}
-              aria-label="Jump pages"
+              aria-label={t("jumpPages")}
             >
               …
             </button>
@@ -91,7 +93,7 @@ export function Pagination({
           className={pageBtn}
           disabled={current >= pageCount}
           onClick={() => onPageChange(current + 1)}
-          aria-label="Next page"
+          aria-label={t("nextPage")}
         >
           <Icon name="chevron-right" size={16} />
         </button>

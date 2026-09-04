@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { sendMessageAction, deleteMessageAction, markThreadReadAction, type CommsActionState } from "@/lib/actions/comms";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
@@ -9,6 +10,7 @@ import { Textarea } from "@/components/ui/input";
 import type { MessageThread } from "@/lib/db";
 
 export function ThreadPanel({ thread, profileId }: { thread: MessageThread; profileId: string }) {
+  const [t, commonT] = [useTranslations("messaging"), useTranslations("common")];
   const [sendState, sendAction, sending] = useActionState<CommsActionState | null, FormData>(
     sendMessageAction,
     null,
@@ -35,7 +37,7 @@ export function ThreadPanel({ thread, profileId }: { thread: MessageThread; prof
   return (
     <div className="flex flex-col gap-3">
       <div className="rounded-lg border border-ink-200 bg-ink-50 px-3 py-2">
-        <div className="text-sm font-medium text-ink-900">{thread.thread?.subject || "(no subject)"}</div>
+        <div className="text-sm font-medium text-ink-900">{thread.thread?.subject || t("noSubject")}</div>
         <div className="text-xs text-ink-500">{names}</div>
       </div>
 
@@ -48,7 +50,7 @@ export function ThreadPanel({ thread, profileId }: { thread: MessageThread; prof
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-ink-700">{m.from_name ?? "Unknown"}</span>
+              <span className="text-xs font-medium text-ink-700">{m.from_name ?? t("unknown")}</span>
               <span className="text-xs text-ink-400">{m.created_at ? new Date(m.created_at).toLocaleString() : ""}</span>
             </div>
             <p className="whitespace-pre-wrap text-sm text-ink-800">{m.body}</p>
@@ -56,7 +58,7 @@ export function ThreadPanel({ thread, profileId }: { thread: MessageThread; prof
               <form action={delAction} className="self-end">
                 <input type="hidden" name="messageId" value={m.id} />
                 <Button type="submit" variant="ghost" size="sm" disabled={deleting}>
-                  Delete
+                  {t("delete")}
                 </Button>
               </form>
             )}
@@ -66,13 +68,13 @@ export function ThreadPanel({ thread, profileId }: { thread: MessageThread; prof
 
       <form ref={replyRef} action={sendAction} className="flex flex-col gap-2">
         <input type="hidden" name="threadId" value={thread.thread?.id ?? ""} />
-        <Textarea name="body" rows={2} required placeholder="Reply…" />
+        <Textarea name="body" rows={2} required placeholder={t("reply") + "…"} />
         {(sendState && !sendState.ok) || (delState && !delState.ok) ? (
           <FieldError>{sendState?.message ?? delState?.message}</FieldError>
         ) : null}
         <div>
           <Button type="submit" disabled={sending}>
-            {sending ? "Sending…" : "Reply"}
+            {sending ? commonT("sending") : t("replyBtn")}
           </Button>
         </div>
       </form>

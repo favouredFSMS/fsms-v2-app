@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { importCurriculumAction, type CurriculumActionState } from "@/lib/actions/curriculum";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -12,6 +13,7 @@ export function CurriculumImportForm({
 }: {
   programmes: Array<{ id: string; label: string }>;
 }) {
+  const [t, commonT] = [useTranslations("curriculum"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<CurriculumActionState | null, FormData>(
     importCurriculumAction,
     null,
@@ -29,7 +31,7 @@ export function CurriculumImportForm({
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Programme (optional)" htmlFor="programmeId" className="sm:col-span-2">
+        <Field label={t("programmeOptional")} htmlFor="programmeId" className="sm:col-span-2">
           <Select id="programmeId" name="programmeId" defaultValue="">
             <option value="">—</option>
             {programmes.map((p) => (
@@ -39,13 +41,13 @@ export function CurriculumImportForm({
             ))}
           </Select>
         </Field>
-        <Field label="Title" htmlFor="title" required>
+        <Field label={commonT("title")} htmlFor="title" required>
           <Input id="title" name="title" required placeholder="Elementary English — 2026 curriculum" />
         </Field>
-        <Field label="Publisher" htmlFor="publisher">
+        <Field label={t("publisher")} htmlFor="publisher">
           <Input id="publisher" name="publisher" placeholder="Head office" />
         </Field>
-        <Field label="Payload (JSON, optional)" htmlFor="payload" className="sm:col-span-2">
+        <Field label={t("payloadJson")} htmlFor="payload" className="sm:col-span-2">
           <Textarea
             id="payload"
             name="payload"
@@ -56,7 +58,7 @@ export function CurriculumImportForm({
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
       <div>
         <Button type="submit" disabled={pending}>
-          {pending ? "Importing…" : "Import curriculum (draft)"}
+          {pending ? t("importing") : t("importDraft")}
         </Button>
       </div>
     </form>

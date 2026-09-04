@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import {
   createContext,
   useCallback,
@@ -46,6 +48,7 @@ const AUTO_DISMISS_MS = 4500;
  * call useToast() anywhere underneath to raise notifications.
  */
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const commonT = useTranslations("common");
   const [items, setItems] = useState<ToastItem[]>([]);
   const nextId = useRef(1);
 
@@ -103,7 +106,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 type="button"
                 onClick={() => remove(t.id)}
                 className="rounded-field p-1 text-ink-faint hover:bg-surface-sunken hover:text-ink focus-ring"
-                aria-label="Dismiss notification"
+                aria-label={commonT("dismissNotification")}
               >
                 <Icon name="close" size={14} />
               </button>

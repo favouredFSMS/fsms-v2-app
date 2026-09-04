@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/ui/cn";
 import { Icon, type IconName } from "./icons";
 import { SkeletonText } from "./skeleton";
@@ -6,12 +9,13 @@ import { Spinner } from "./spinner";
 
 /** Centered loading state for async pages/panels. */
 export function LoadingState({
-  label = "Loading…",
+  label,
   className,
 }: {
   label?: string;
   className?: string;
 }) {
+  const t = useTranslations("states");
   return (
     <div
       className={cn(
@@ -21,7 +25,7 @@ export function LoadingState({
       role="status"
     >
       <Spinner size={28} />
-      <p className="text-sm">{label}</p>
+      <p className="text-sm">{label ?? t("loading")}</p>
     </div>
   );
 }
@@ -70,11 +74,12 @@ export interface ErrorStateProps {
 
 /** Error state with optional retry. */
 export function ErrorState({
-  title = "Something went wrong",
-  description = "The request could not be completed. Please try again.",
+  title,
+  description,
   onRetry,
   className,
 }: ErrorStateProps) {
+  const t = useTranslations("states");
   return (
     <div
       className={cn(
@@ -86,15 +91,15 @@ export function ErrorState({
       <span className="flex size-12 items-center justify-center rounded-full bg-danger-50 text-danger-600">
         <Icon name="danger" size={22} />
       </span>
-      <p className="text-sm font-semibold text-ink-700">{title}</p>
-      <p className="max-w-sm text-sm text-ink-muted">{description}</p>
+      <p className="text-sm font-semibold text-ink-700">{title ?? t("errorTitle")}</p>
+      <p className="max-w-sm text-sm text-ink-muted">{description ?? t("errorDesc")}</p>
       {onRetry && (
         <button
           type="button"
           onClick={onRetry}
           className="mt-2 text-sm font-medium text-brand-600 hover:text-brand-700"
         >
-          Try again
+          {t("tryAgain")}
         </button>
       )}
     </div>

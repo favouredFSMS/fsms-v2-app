@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
@@ -11,6 +12,11 @@ export default async function PayrollPage({
 }: {
   searchParams: Promise<{ month?: string }>;
 }) {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("payroll"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   const sp = await searchParams;
   const ctx = await requireDbContext();
   const repo = new FinanceRepository(ctx);
@@ -21,28 +27,26 @@ export default async function PayrollPage({
   const roster = rosterRes.ok ? rosterRes.data : [];
 
   return (
-    <PageShell title="Payroll" permission="payrollRoster">
+    <PageShell title={t("title")} permission="payrollRoster">
       <div className="grid gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Payroll roster</CardTitle>
-            <CardDescription>
-              Salaries for {month}. Use the salary-history report for a full ledger.
-            </CardDescription>
+            <CardTitle>{t("roster")}</CardTitle>
+            <CardDescription>{t("rosterDesc", { month })}</CardDescription>
           </CardHeader>
           <CardBody className="px-0">
             <Table>
               <THead>
                 <TR>
-                  <TH>Name</TH>
-                  <TH>Role</TH>
-                  <TH>Amount</TH>
-                  <TH>Status</TH>
+                  <TH>{commonT("name")}</TH>
+                  <TH>{commonT("role")}</TH>
+                  <TH>{commonT("amount")}</TH>
+                  <TH>{commonT("status")}</TH>
                 </TR>
               </THead>
               <TBody>
                 {roster.length === 0 ? (
-                  <TableEmpty colSpan={4}>No staff on the roster.</TableEmpty>
+                  <TableEmpty colSpan={4}>{t("noStaff")}</TableEmpty>
                 ) : (
                   roster.map((r) => (
                     <TR key={r.id}>
@@ -52,7 +56,7 @@ export default async function PayrollPage({
                       <TD>
                         {r.salary ? (
                           <Badge variant={r.salary.status === "paid" ? "success" : "neutral"}>
-                            {r.salary.status}
+                            {st.has(r.salary.status) ? st(r.salary.status) : r.salary.status}
                           </Badge>
                         ) : (
                           "—"

@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -45,11 +46,11 @@ export async function saveMaterialAction(
       driveUrl: field(formData, "driveUrl"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Material was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.materialsNotSavedDenied") };
     revalidatePath("/materials");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save material" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.materialsSaveFailed") };
   }
 }
 
@@ -65,11 +66,11 @@ export async function saveMaterialUnitAction(
       title: field(formData, "title"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Unit was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.materialsUnitNotSavedDenied") };
     revalidatePath("/materials");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save unit" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.materialsSaveUnitFailed") };
   }
 }
 
@@ -88,11 +89,11 @@ export async function saveMaterialMappingAction(
       purpose: field(formData, "purpose"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Mapping was not proposed (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.materialsMappingNotProposedDenied") };
     revalidatePath("/materials");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to propose mapping" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.materialsProposeMappingFailed") };
   }
 }
 
@@ -107,11 +108,11 @@ export async function decideMaterialMappingAction(
       decision: field(formData, "decision") as "verified" | "rejected",
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Mapping decision was not applied (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.materialsDecisionNotAppliedDenied") };
     revalidatePath("/materials");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to decide mapping" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.materialsDecideMappingFailed") };
   }
 }
 
@@ -129,11 +130,11 @@ export async function saveMaterialAccessAction(
       assignments: classIds.map((id) => ({ scopeType: "class", scopeId: id })),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Access policy was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.materialsAccessNotSavedDenied") };
     revalidatePath("/materials");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save access policy" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.materialsSaveAccessFailed") };
   }
 }
 
@@ -150,11 +151,11 @@ export async function saveResourceAction(
       kind: field(formData, "kind"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Resource was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.materialsResourceNotSavedDenied") };
     revalidatePath("/materials");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save resource" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.materialsSaveResourceFailed") };
   }
 }
 
@@ -168,11 +169,11 @@ export async function deleteResourceAction(
       resourceId: field(formData, "resourceId"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Resource was not deleted (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.materialsResourceNotDeletedDenied") };
     revalidatePath("/materials");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to delete resource" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.materialsDeleteResourceFailed") };
   }
 }
 
@@ -188,11 +189,11 @@ export async function saveMethodologyAction(
       levelCode: field(formData, "levelCode"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Methodology entry was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.materialsMethodologyNotSavedDenied") };
     revalidatePath("/materials");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save methodology" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.materialsSaveMethodologyFailed") };
   }
 }
 
@@ -206,11 +207,11 @@ export async function deleteMethodologyAction(
       methodologyId: field(formData, "methodologyId"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Methodology entry was not deleted (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.materialsMethodologyNotDeletedDenied") };
     revalidatePath("/materials");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to delete methodology" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.materialsDeleteMethodologyFailed") };
   }
 }
 
@@ -226,11 +227,11 @@ export async function saveTeacherMaterialAction(
       payload: field(formData, "payload"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Teacher material was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.materialsTeacherMaterialNotSavedDenied") };
     revalidatePath("/materials");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save teacher material" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.materialsSaveTeacherMaterialFailed") };
   }
 }
 
@@ -246,10 +247,10 @@ export async function saveMaterialFeedbackAction(
       note: field(formData, "note"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Feedback was not saved (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.materialsFeedbackNotSavedDenied") };
     revalidatePath("/materials");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save feedback" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.materialsSaveFeedbackFailed") };
   }
 }

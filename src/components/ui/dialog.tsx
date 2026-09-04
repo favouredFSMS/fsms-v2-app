@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useEffect, useId, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/ui/cn";
@@ -31,6 +33,7 @@ export function Dialog({
   footer,
   size = "md",
 }: DialogProps) {
+  const t = useTranslations("common");
   const titleId = useId();
   const descId = useId();
 
@@ -85,7 +88,7 @@ export function Dialog({
             type="button"
             onClick={onClose}
             className="rounded-field p-1.5 text-ink-faint hover:bg-surface-sunken hover:text-ink focus-ring"
-            aria-label="Close dialog"
+            aria-label={t("closeDialog")}
           >
             <Icon name="close" size={18} />
           </button>

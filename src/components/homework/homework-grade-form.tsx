@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { gradeHomeworkAction, type HomeworkActionState } from "@/lib/actions/homework";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
@@ -16,6 +17,7 @@ export function HomeworkGradeForm({
   score: string | null;
   feedback: string | null;
 }) {
+  const [st, commonT] = [useTranslations("status"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<HomeworkActionState | null, FormData>(
     gradeHomeworkAction,
     null,
@@ -29,15 +31,15 @@ export function HomeworkGradeForm({
   return (
     <form action={formAction} className="flex flex-wrap items-center gap-2">
       <input type="hidden" name="homeworkId" value={homeworkId} />
-      <Input name="score" defaultValue={score ?? ""} placeholder="Score" className="w-20" />
-      <Input name="feedback" defaultValue={feedback ?? ""} placeholder="Feedback" className="w-40" />
+      <Input name="score" defaultValue={score ?? ""} placeholder={commonT("score")} className="w-20" />
+      <Input name="feedback" defaultValue={feedback ?? ""} placeholder={commonT("feedback")} className="w-40" />
       <Select name="status" defaultValue="graded" className="w-auto min-w-24">
-        <option value="graded">graded</option>
-        <option value="missing">missing</option>
-        <option value="overdue">overdue</option>
-        <option value="assigned">assigned</option>
+        <option value="graded">{st("graded")}</option>
+        <option value="missing">{st("missing")}</option>
+        <option value="overdue">{st("overdue")}</option>
+        <option value="assigned">{st("assigned")}</option>
       </Select>
-      <Button type="submit" loading={pending} size="sm">Save</Button>
+      <Button type="submit" loading={pending} size="sm">{commonT("save")}</Button>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
     </form>
   );

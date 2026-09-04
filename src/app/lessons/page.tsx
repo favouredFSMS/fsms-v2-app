@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +38,11 @@ export default async function LessonsPage({
 }: {
   searchParams: Promise<{ class?: string; cursor?: string }>;
 }) {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("lessons"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   const profile = await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -73,13 +79,13 @@ export default async function LessonsPage({
   }
 
   return (
-    <PageShell title="Lessons" permission="lessonCalendar">
+    <PageShell title={t("title")} permission="lessonCalendar">
       <div className="grid gap-4">
         {canLog && (
           <Card>
             <CardHeader>
-              <CardTitle>Lesson records</CardTitle>
-              <CardDescription>Log a lesson for a class and date. Re-saving the same class/date/lesson updates it.</CardDescription>
+              <CardTitle>{t("history")}</CardTitle>
+              <CardDescription>{t("historyDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <LessonLogForm classes={classes} />
@@ -89,37 +95,37 @@ export default async function LessonsPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Lesson history</CardTitle>
-            <CardDescription>Past lesson records for your classes.</CardDescription>
+            <CardTitle>{t("history")}</CardTitle>
+            <CardDescription>{t("historyDesc")}</CardDescription>
           </CardHeader>
           <CardBody className="px-0">
             <form method="get" className="flex flex-wrap items-center gap-2 px-4 pb-3">
               <select name="class" defaultValue={selectedClassId ?? ""} className="rounded-field border bg-surface px-3 py-2 text-sm text-ink">
-                <option value="">All classes</option>
+                <option value="">{t("allClasses")}</option>
                 {classes.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
               <button type="submit" className="rounded-field bg-brand-600 px-3 py-2 text-sm text-ink-inverse hover:bg-brand-700">
-                Filter
+                {commonT("filter")}
               </button>
             </form>
 
             {logs.ok ? (
               logs.data.items.length === 0 ? (
-                <TableEmpty colSpan={7}>No lesson records yet.</TableEmpty>
+                <TableEmpty colSpan={7}>{t("noLessonRecords")}</TableEmpty>
               ) : (
                 <>
                   <Table>
                     <THead>
                       <TR>
-                        <TH>Date</TH>
-                        <TH>Class</TH>
-                        <TH>Lesson</TH>
-                        <TH>Topic</TH>
-                        <TH>Participation</TH>
-                        <TH>Teacher</TH>
-                        <TH className="text-right">Actions</TH>
+                        <TH>{commonT("date")}</TH>
+                        <TH>{commonT("class")}</TH>
+                        <TH>{commonT("lesson")}</TH>
+                        <TH>{commonT("topic")}</TH>
+                        <TH>{commonT("participation")}</TH>
+                        <TH>{commonT("teacher")}</TH>
+                        <TH className="text-right">{commonT("actions")}</TH>
                       </TR>
                     </THead>
                     <TBody>
@@ -159,8 +165,8 @@ export default async function LessonsPage({
         {canPlan && (
           <Card>
             <CardHeader>
-              <CardTitle>Lesson plans</CardTitle>
-              <CardDescription>Prepare and reuse your lesson plans.</CardDescription>
+              <CardTitle>{t("lessonPlans")}</CardTitle>
+              <CardDescription>{t("lessonPlansDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <LessonPlanForm classes={classes} lessons={lessonOptions} />
@@ -170,10 +176,10 @@ export default async function LessonsPage({
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Class</TH>
-                      <TH>Lesson</TH>
-                      <TH>Teacher</TH>
-                      <TH>Plan</TH>
+                      <TH>{commonT("class")}</TH>
+                      <TH>{commonT("lesson")}</TH>
+                      <TH>{commonT("teacher")}</TH>
+                      <TH>{commonT("plan")}</TH>
                     </TR>
                   </THead>
                   <TBody>
@@ -184,7 +190,7 @@ export default async function LessonsPage({
                         <TD>{p.teacher_name ?? "—"}</TD>
                         <TD className="max-w-md">
                           <div className="whitespace-pre-wrap text-sm">{planText(p.plan)}</div>
-                          {p.source && <div className="text-xs text-ink-faint">source: {p.source}</div>}
+                          {p.source && <div className="text-xs text-ink-faint">{commonT("source")}: {p.source}</div>}
                         </TD>
                       </TR>
                     ))}
@@ -197,8 +203,8 @@ export default async function LessonsPage({
 
         <Card>
           <CardHeader>
-            <CardTitle>Curriculum</CardTitle>
-            <CardDescription>Programmes, units and lessons with their objectives.</CardDescription>
+            <CardTitle>{t("curriculum")}</CardTitle>
+            <CardDescription>{t("curriculumDesc")}</CardDescription>
           </CardHeader>
           <CardBody>
             {spine.ok && spine.data && spine.data.programmes.length > 0 ? (
@@ -221,7 +227,7 @@ export default async function LessonsPage({
                                   {localized(l.title)}
                                 </Link>
                                 <span className="text-xs text-ink-faint">
-                                  {l.objective_count} objective{l.objective_count === 1 ? "" : "s"}
+                                  {l.objective_count} {commonT(l.objective_count === 1 ? "objective" : "objectives")}
                                 </span>
                               </li>
                             ))}
@@ -233,15 +239,15 @@ export default async function LessonsPage({
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-ink-muted">No curriculum loaded yet.</p>
+              <p className="text-sm text-ink-muted">{t("noCurriculum")}</p>
             )}
           </CardBody>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Lesson changes</CardTitle>
-            <CardDescription>Request rescheduling or cancellation, and track decisions.</CardDescription>
+            <CardTitle>{t("lessonChanges")}</CardTitle>
+            <CardDescription>{t("lessonChangesDesc")}</CardDescription>
           </CardHeader>
           <CardBody>
             {canRequest && <LessonChangeRequestForm classes={classes} />}
@@ -251,12 +257,12 @@ export default async function LessonsPage({
               <Table>
                 <THead>
                   <TR>
-                    <TH>Class</TH>
-                    <TH>From</TH>
-                    <TH>To</TH>
-                    <TH>Reason</TH>
-                    <TH>Status</TH>
-                    <TH className="text-right">Decision</TH>
+                    <TH>{commonT("class")}</TH>
+                    <TH>{commonT("from")}</TH>
+                    <TH>{commonT("to")}</TH>
+                    <TH>{commonT("reason")}</TH>
+                    <TH>{commonT("status")}</TH>
+                    <TH className="text-right">{commonT("decision")}</TH>
                   </TR>
                 </THead>
                 <TBody>
@@ -264,12 +270,12 @@ export default async function LessonsPage({
                     <TR key={c.id}>
                       <TD>{c.class_name ?? "—"}</TD>
                       <TD>{c.from_date ?? "—"}</TD>
-                      <TD>{c.to_date ?? <span className="text-ink-faint">cancel</span>}</TD>
+                      <TD>{c.to_date ?? <span className="text-ink-faint">{t("cancel")}</span>}</TD>
                       <TD className="max-w-xs">
                         <div className="text-sm">{c.reason ?? "—"}</div>
-                        <div className="text-xs text-ink-faint">by {c.requested_by_name ?? "—"}</div>
+                        <div className="text-xs text-ink-faint">{commonT("by")} {c.requested_by_name ?? "—"}</div>
                       </TD>
-                      <TD><Badge variant={decisionVariant(c.decision)}>{c.decision ?? "pending"}</Badge></TD>
+                      <TD><Badge variant={decisionVariant(c.decision)}>{c.decision ? statusT(st, c.decision) : statusT(st, "pending")}</Badge></TD>
                       <TD className="text-right">
                         {canDecide && !c.decision ? (
                           <LessonChangeDecideForm changeId={c.id} />
@@ -282,7 +288,7 @@ export default async function LessonsPage({
                 </TBody>
               </Table>
             ) : (
-              <TableEmpty colSpan={6}>No change requests.</TableEmpty>
+              <TableEmpty colSpan={6}>{t("noChangeRequests")}</TableEmpty>
             )}
           </CardBody>
         </Card>
@@ -290,8 +296,8 @@ export default async function LessonsPage({
         {canControl && (
           <Card>
             <CardHeader>
-              <CardTitle>Lesson controls</CardTitle>
-              <CardDescription>Per-class workflow controls (e.g. lessonStatus).</CardDescription>
+              <CardTitle>{t("lessonControls")}</CardTitle>
+              <CardDescription>{t("lessonControlsDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <LessonControlForm classes={classes} />
@@ -301,10 +307,10 @@ export default async function LessonsPage({
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Class</TH>
-                      <TH>Key</TH>
-                      <TH>Value</TH>
-                      <TH>Updated</TH>
+                      <TH>{commonT("class")}</TH>
+                      <TH>{commonT("key")}</TH>
+                      <TH>{commonT("value")}</TH>
+                      <TH>{commonT("updated")}</TH>
                     </TR>
                   </THead>
                   <TBody>
@@ -327,4 +333,10 @@ export default async function LessonsPage({
       </div>
     </PageShell>
   );
+}
+
+function statusT(st: (k: string) => string, value: string): string {
+  const k = value.toLowerCase();
+  const out = st(k);
+  return out !== k ? out : value;
 }

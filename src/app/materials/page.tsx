@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +25,11 @@ export default async function MaterialsPage({
 }: {
   searchParams: Promise<{ material?: string; cursor?: string }>;
 }) {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("materials"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   const profile = await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -65,16 +71,13 @@ export default async function MaterialsPage({
   const mapOptions = mappingOptionData && mappingOptionData.ok ? mappingOptionData.data : null;
 
   return (
-    <PageShell title="Materials & resources" permission="materialCatalog">
+    <PageShell title={t("title")} permission="materialCatalog">
       <div className="grid gap-4">
         {/* ── catalogue ─────────────────────────────────────────────────── */}
         <Card>
           <CardHeader>
-            <CardTitle>Materials catalogue</CardTitle>
-            <CardDescription>
-              Textbooks, workbooks, readers and media. Select a material to manage its units,
-              mappings, access and feedback.
-            </CardDescription>
+            <CardTitle>{t("catalogue")}</CardTitle>
+            <CardDescription>{t("catalogueDesc")}</CardDescription>
           </CardHeader>
           <CardBody className="px-0">
             {canEdit && (
@@ -87,12 +90,12 @@ export default async function MaterialsPage({
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Title</TH>
-                      <TH>Type</TH>
-                      <TH>Level</TH>
-                      <TH>Publisher</TH>
-                      <TH>Units</TH>
-                      <TH>Actions</TH>
+                      <TH>{commonT("title")}</TH>
+                      <TH>{commonT("type")}</TH>
+                      <TH>{commonT("level")}</TH>
+                      <TH>{t("publisher")}</TH>
+                      <TH>{t("units")}</TH>
+                      <TH>{commonT("actions")}</TH>
                     </TR>
                   </THead>
                   <TBody>
@@ -105,7 +108,7 @@ export default async function MaterialsPage({
                         <TD>{m.unit_count}</TD>
                         <TD>
                           <a href={`/materials?material=${m.id}`} className="text-brand-600 hover:underline">
-                            Manage
+                            {t("manage")}
                           </a>
                         </TD>
                       </TR>
@@ -120,7 +123,7 @@ export default async function MaterialsPage({
                 />
               </>
             ) : (
-              <TableEmpty colSpan={6}>No materials yet.</TableEmpty>
+              <TableEmpty colSpan={6}>{t("noMaterials")}</TableEmpty>
             )}
           </CardBody>
         </Card>
@@ -129,22 +132,22 @@ export default async function MaterialsPage({
         {sp.material && selected && selected.material && (
           <Card>
             <CardHeader>
-              <CardTitle>{localized(selected.material.title) || "Material"}</CardTitle>
+              <CardTitle>{localized(selected.material.title) || t("material")}</CardTitle>
               <CardDescription>
-                {selected.material.type} · {selected.material.publisher ?? "—"} · avg rating{" "}
-                {selected.feedback.avg ?? "—"} ({selected.feedback.count} ratings) · used{" "}
+                {selected.material.type} · {selected.material.publisher ?? "—"} · {t("avgRating")}{" "}
+                {selected.feedback.avg ?? "—"} ({selected.feedback.count} {t("ratings")}) · {t("used")}{" "}
                 {selected.usage_count}×
               </CardDescription>
             </CardHeader>
             <CardBody className="grid gap-4">
               <div className="grid gap-4 lg:grid-cols-2">
                 <div>
-                  <h3 className="mb-2 text-sm font-medium text-ink">Units</h3>
+                  <h3 className="mb-2 text-sm font-medium text-ink">{t("units")}</h3>
                   <Table>
                     <THead>
                       <TR>
                         <TH>#</TH>
-                        <TH>Title</TH>
+                        <TH>{commonT("title")}</TH>
                       </TR>
                     </THead>
                     <TBody>
@@ -156,20 +159,20 @@ export default async function MaterialsPage({
                           </TR>
                         ))
                       ) : (
-                        <TableEmpty colSpan={2}>No units yet.</TableEmpty>
+                        <TableEmpty colSpan={2}>{t("noUnits")}</TableEmpty>
                       )}
                     </TBody>
                   </Table>
                 </div>
                 <div>
-                  <h3 className="mb-2 text-sm font-medium text-ink">Mappings (propose → decide)</h3>
+                  <h3 className="mb-2 text-sm font-medium text-ink">{t("mappings")}</h3>
                   <Table>
                     <THead>
                       <TR>
-                        <TH>Unit</TH>
-                        <TH>Target</TH>
-                        <TH>Status</TH>
-                        {canDecide && <TH>Decision</TH>}
+                        <TH>{t("unit")}</TH>
+                        <TH>{t("target")}</TH>
+                        <TH>{commonT("status")}</TH>
+                        {canDecide && <TH>{commonT("decision")}</TH>}
                       </TR>
                     </THead>
                     <TBody>
@@ -180,7 +183,7 @@ export default async function MaterialsPage({
                             <TD className="max-w-[12rem] truncate">{localized(mp.target_title) || "—"}</TD>
                             <TD>
                               <Badge variant={mp.status === "verified" ? "success" : mp.status === "rejected" ? "danger" : "warning"}>
-                                {mp.status}
+                                {st.has(mp.status) ? st(mp.status) : mp.status}
                               </Badge>
                             </TD>
                             {canDecide && (
@@ -196,7 +199,7 @@ export default async function MaterialsPage({
                           </TR>
                         ))
                       ) : (
-                        <TableEmpty colSpan={canDecide ? 4 : 3}>No mappings yet.</TableEmpty>
+                        <TableEmpty colSpan={canDecide ? 4 : 3}>{t("noMappings")}</TableEmpty>
                       )}
                     </TBody>
                   </Table>
@@ -208,11 +211,11 @@ export default async function MaterialsPage({
                   <MaterialMappingForm
                     units={(mapOptions.units ?? []).map((u) => ({
                       id: u.id,
-                      label: `${u.no ? `${u.no}. ` : ""}${localized(u.title) || "Unit"}`,
+                      label: `${u.no ? `${u.no}. ` : ""}${localized(u.title) || t("unit")}`,
                     }))}
-                    targets={(mapOptions.targets ?? []).map((t) => ({
-                      id: t.id,
-                      label: `${localized(t.title) || "Target"} (${t.level_code ?? "?"})`,
+                    targets={(mapOptions.targets ?? []).map((x) => ({
+                      id: x.id,
+                      label: `${localized(x.title) || t("target")} (${x.level_code ?? "?"})`,
                     }))}
                   />
                 </div>
@@ -220,7 +223,7 @@ export default async function MaterialsPage({
 
               {canAccess && (
                 <div className="rounded-field border border-line bg-surface-sunken p-4">
-                  <h3 className="mb-2 text-sm font-medium text-ink">Access policy (classes)</h3>
+                  <h3 className="mb-2 text-sm font-medium text-ink">{t("accessPolicy")}</h3>
                   <MaterialAccessForm
                     materialId={sp.material}
                     classes={classes}
@@ -231,7 +234,7 @@ export default async function MaterialsPage({
 
               {canFeedback && (
                 <div className="rounded-field border border-line bg-surface-sunken p-4">
-                  <h3 className="mb-2 text-sm font-medium text-ink">Rate this material</h3>
+                  <h3 className="mb-2 text-sm font-medium text-ink">{t("rateThis")}</h3>
                   <MaterialFeedbackForm materialId={sp.material} />
                 </div>
               )}
@@ -242,8 +245,8 @@ export default async function MaterialsPage({
         {/* ── resources ─────────────────────────────────────────────────── */}
         <Card>
           <CardHeader>
-            <CardTitle>Resources</CardTitle>
-            <CardDescription>Links and worksheets shared with the school.</CardDescription>
+            <CardTitle>{t("resources")}</CardTitle>
+            <CardDescription>{t("resourcesDesc")}</CardDescription>
           </CardHeader>
           <CardBody className="px-0">
             {canResource && (
@@ -256,11 +259,11 @@ export default async function MaterialsPage({
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Title</TH>
-                      <TH>Kind</TH>
-                      <TH>Link</TH>
-                      <TH>Added by</TH>
-                      {canDeleteResource && <TH>Actions</TH>}
+                      <TH>{commonT("title")}</TH>
+                      <TH>{t("kind")}</TH>
+                      <TH>{t("link")}</TH>
+                      <TH>{t("addedBy")}</TH>
+                      {canDeleteResource && <TH>{commonT("actions")}</TH>}
                     </TR>
                   </THead>
                   <TBody>
@@ -271,7 +274,7 @@ export default async function MaterialsPage({
                         <TD>
                           {r.url ? (
                             <a href={r.url} target="_blank" rel="noreferrer" className="text-brand-600 hover:underline">
-                              open
+                              {commonT("open")}
                             </a>
                           ) : (
                             "—"
@@ -295,7 +298,7 @@ export default async function MaterialsPage({
                 />
               </>
             ) : (
-              <TableEmpty colSpan={canDeleteResource ? 5 : 4}>No resources yet.</TableEmpty>
+              <TableEmpty colSpan={canDeleteResource ? 5 : 4}>{t("noResources")}</TableEmpty>
             )}
           </CardBody>
         </Card>
@@ -304,8 +307,8 @@ export default async function MaterialsPage({
         {canMethodologyView && (
           <Card>
             <CardHeader>
-              <CardTitle>Methodology library</CardTitle>
-              <CardDescription>Office curates, staff read — how to teach, not what.</CardDescription>
+              <CardTitle>{t("methodologyLibrary")}</CardTitle>
+              <CardDescription>{t("methodologyDesc")}</CardDescription>
             </CardHeader>
             <CardBody className="px-0">
               {canMethodology && (
@@ -317,10 +320,10 @@ export default async function MaterialsPage({
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Title</TH>
-                      <TH>Level</TH>
-                      <TH>Body</TH>
-                      {canDeleteMethodology && <TH>Actions</TH>}
+                      <TH>{commonT("title")}</TH>
+                      <TH>{commonT("level")}</TH>
+                      <TH>{t("body")}</TH>
+                      {canDeleteMethodology && <TH>{commonT("actions")}</TH>}
                     </TR>
                   </THead>
                   <TBody>
@@ -339,7 +342,7 @@ export default async function MaterialsPage({
                   </TBody>
                 </Table>
               ) : (
-                <TableEmpty colSpan={canDeleteMethodology ? 4 : 3}>No methodology entries yet.</TableEmpty>
+                <TableEmpty colSpan={canDeleteMethodology ? 4 : 3}>{t("noMethodology")}</TableEmpty>
               )}
             </CardBody>
           </Card>
@@ -349,9 +352,9 @@ export default async function MaterialsPage({
         {canTeacherMatView && (
           <Card>
             <CardHeader>
-              <CardTitle>Teacher materials</CardTitle>
+              <CardTitle>{t("teacherMaterials")}</CardTitle>
               <CardDescription>
-                {profile.role_base === "teacher" ? "Your own materials." : "Teacher-prepared materials (all)."}
+                {profile.role_base === "teacher" ? t("yourMaterials") : t("teacherMaterialsDesc")}
               </CardDescription>
             </CardHeader>
             <CardBody className="px-0">
@@ -364,10 +367,10 @@ export default async function MaterialsPage({
                 <Table>
                   <THead>
                     <TR>
-                      <TH>Title</TH>
-                      <TH>Kind</TH>
-                      <TH>Teacher</TH>
-                      <TH>Created</TH>
+                      <TH>{commonT("title")}</TH>
+                      <TH>{t("kind")}</TH>
+                      <TH>{commonT("teacher")}</TH>
+                      <TH>{commonT("created")}</TH>
                     </TR>
                   </THead>
                   <TBody>
@@ -384,7 +387,7 @@ export default async function MaterialsPage({
                   </TBody>
                 </Table>
               ) : (
-                <TableEmpty colSpan={4}>No teacher materials yet.</TableEmpty>
+                <TableEmpty colSpan={4}>{t("noTeacherMaterials")}</TableEmpty>
               )}
             </CardBody>
           </Card>

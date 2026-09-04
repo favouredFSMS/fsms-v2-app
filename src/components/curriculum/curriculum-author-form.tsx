@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { authorCurriculumAction, type CurriculumActionState } from "@/lib/actions/curriculum";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -12,6 +13,7 @@ export function CurriculumAuthorForm({
 }: {
   programmes: Array<{ id: string; label: string }>;
 }) {
+  const [t, commonT] = [useTranslations("curriculum"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<CurriculumActionState | null, FormData>(
     authorCurriculumAction,
     null,
@@ -29,9 +31,9 @@ export function CurriculumAuthorForm({
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-3">
       <div className="grid gap-3 sm:grid-cols-2">
-        <Field label="Existing programme (optional)" htmlFor="programmeId" className="sm:col-span-2">
+        <Field label={t("existingProgramme")} htmlFor="programmeId" className="sm:col-span-2">
           <Select id="programmeId" name="programmeId" defaultValue="">
-            <option value="">Create a new programme…</option>
+            <option value="">{t("createNewProgramme")}</option>
             {programmes.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.label}
@@ -40,48 +42,48 @@ export function CurriculumAuthorForm({
           </Select>
         </Field>
 
-        <Field label="Programme name" htmlFor="programmeName">
+        <Field label={t("programmeName")} htmlFor="programmeName">
           <Input id="programmeName" name="programmeName" placeholder="Elementary English" />
         </Field>
-        <Field label="Programme code" htmlFor="programmeCode">
+        <Field label={t("programmeCode")} htmlFor="programmeCode">
           <Input id="programmeCode" name="programmeCode" placeholder="EE-1" />
         </Field>
-        <Field label="Programme type" htmlFor="programmeType">
+        <Field label={t("programmeType")} htmlFor="programmeType">
           <Input id="programmeType" name="programmeType" placeholder="course" />
         </Field>
-        <Field label="Standard programme" htmlFor="programmeStandard">
+        <Field label={t("standardProgramme")} htmlFor="programmeStandard">
           <Select id="programmeStandard" name="programmeStandard" defaultValue="false">
-            <option value="false">No</option>
-            <option value="true">Yes</option>
+            <option value="false">{commonT("no")}</option>
+            <option value="true">{commonT("yes")}</option>
           </Select>
         </Field>
 
-        <Field label="Unit title" htmlFor="unitTitle">
+        <Field label={t("unitTitle")} htmlFor="unitTitle">
           <Input id="unitTitle" name="unitTitle" placeholder="Greetings & introductions" />
         </Field>
-        <Field label="Unit code" htmlFor="unitCode">
+        <Field label={t("unitCode")} htmlFor="unitCode">
           <Input id="unitCode" name="unitCode" placeholder="U1" />
         </Field>
-        <Field label="Unit number" htmlFor="unitNo">
+        <Field label={t("unitNumber")} htmlFor="unitNo">
           <Input id="unitNo" name="unitNo" type="number" min={1} />
         </Field>
-        <Field label="Lesson title" htmlFor="lessonTitle">
+        <Field label={t("lessonTitle")} htmlFor="lessonTitle">
           <Input id="lessonTitle" name="lessonTitle" placeholder="Saying hello" />
         </Field>
-        <Field label="Lesson code" htmlFor="lessonCode">
+        <Field label={t("lessonCode")} htmlFor="lessonCode">
           <Input id="lessonCode" name="lessonCode" placeholder="L1" />
         </Field>
-        <Field label="Lesson number" htmlFor="lessonNo">
+        <Field label={t("lessonNumber")} htmlFor="lessonNo">
           <Input id="lessonNo" name="lessonNo" type="number" min={1} />
         </Field>
 
-        <Field label="Objective (CEFR)" htmlFor="objectiveCefr">
+        <Field label={t("objectiveCefr")} htmlFor="objectiveCefr">
           <Input id="objectiveCefr" name="objectiveCefr" placeholder="a2" />
         </Field>
-        <Field label="Objective code" htmlFor="objectiveCode">
+        <Field label={t("objectiveCode")} htmlFor="objectiveCode">
           <Input id="objectiveCode" name="objectiveCode" placeholder="O1" />
         </Field>
-        <Field label="Objective text" htmlFor="objectiveText" className="sm:col-span-2">
+        <Field label={t("objectiveText")} htmlFor="objectiveText" className="sm:col-span-2">
           <Textarea
             id="objectiveText"
             name="objectiveText"
@@ -93,7 +95,7 @@ export function CurriculumAuthorForm({
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
       <div>
         <Button type="submit" disabled={pending}>
-          {pending ? "Authoring…" : "Author spine node"}
+          {pending ? t("authoring") : t("authorSpineNode")}
         </Button>
       </div>
     </form>

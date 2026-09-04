@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
@@ -14,6 +15,7 @@ export default async function ParentsPage({
 }: {
   searchParams: Promise<{ q?: string; cursor?: string }>;
 }) {
+  const [t, commonT] = await Promise.all([getTranslations("parents"), getTranslations("common")]);
   const profile = await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -25,40 +27,38 @@ export default async function ParentsPage({
   const canCreate = profileCan(profile, "saveParent");
 
   return (
-    <PageShell title="Parents" permission="parents">
+    <PageShell title={t("title")} permission="parents">
       <div className="grid gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Parents</CardTitle>
-            <CardDescription>
-              Permission-gated parent list with their linked-child counts.
-            </CardDescription>
+            <CardTitle>{t("title")}</CardTitle>
+            <CardDescription>{t("desc")}</CardDescription>
           </CardHeader>
           <CardBody className="px-0">
             <form method="get" className="flex items-center gap-2 px-4 pb-3">
               <input
                 name="q"
                 defaultValue={sp.q ?? ""}
-                placeholder="Search name / email / phone…"
+                placeholder={t("searchPlaceholder")}
                 className="w-full max-w-xs rounded-field border bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:border-brand-500 focus-ring"
               />
               <button type="submit" className="rounded-field bg-brand-600 px-3 py-2 text-sm text-ink-inverse hover:bg-brand-700">
-                Search
+                {commonT("search")}
               </button>
             </form>
 
             {res.ok ? (
               res.data.items.length === 0 ? (
-                <TableEmpty colSpan={4}>No parents found.</TableEmpty>
+                <TableEmpty colSpan={4}>{t("noParents")}</TableEmpty>
               ) : (
                 <>
                   <Table>
                     <THead>
                       <TR>
-                        <TH>Name</TH>
-                        <TH>Phone</TH>
-                        <TH>Email</TH>
-                        <TH className="text-right">Children</TH>
+                        <TH>{commonT("name")}</TH>
+                        <TH>{commonT("phone")}</TH>
+                        <TH>{commonT("email")}</TH>
+                        <TH className="text-right">{t("children")}</TH>
                       </TR>
                     </THead>
                     <TBody>
@@ -90,8 +90,8 @@ export default async function ParentsPage({
         {canCreate && (
           <Card>
             <CardHeader>
-              <CardTitle>Add parent</CardTitle>
-              <CardDescription>Office action — then link them to students.</CardDescription>
+              <CardTitle>{t("addParent")}</CardTitle>
+              <CardDescription>{t("addParentDesc")}</CardDescription>
             </CardHeader>
             <CardBody>
               <ParentCreateForm />

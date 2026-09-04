@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { linkParentAction, type PeopleActionState } from "@/lib/actions/people";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -19,6 +20,7 @@ export function LinkParentForm({
   studentId: string;
   parents: ParentOption[];
 }) {
+  const [t, commonT] = [useTranslations("parents"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<PeopleActionState | null, FormData>(
     linkParentAction,
     null,
@@ -32,18 +34,18 @@ export function LinkParentForm({
   return (
     <form action={formAction} className="flex flex-wrap items-end gap-3">
       <input type="hidden" name="studentId" value={studentId} />
-      <Field label="Parent" htmlFor="parentId" className="min-w-48">
+      <Field label={commonT("parent")} htmlFor="parentId" className="min-w-48">
         <Select id="parentId" name="parentId" required defaultValue="">
-          <option value="" disabled>Select a parent…</option>
+          <option value="" disabled>{t("selectParent")}</option>
           {parents.map((p) => (
             <option key={p.id} value={p.id}>{p.name}</option>
           ))}
         </Select>
       </Field>
-      <Field label="Relationship" htmlFor="relationship" className="min-w-40">
+      <Field label={commonT("relationship")} htmlFor="relationship" className="min-w-40">
         <Input id="relationship" name="relationship" defaultValue="parent" placeholder="mother / father" />
       </Field>
-      <Button type="submit" loading={pending}>Link</Button>
+      <Button type="submit" loading={pending}>{t("link")}</Button>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
     </form>
   );

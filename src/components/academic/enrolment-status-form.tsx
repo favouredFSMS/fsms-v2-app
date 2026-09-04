@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, type ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { setEnrolmentStatusAction, type AcademicActionState } from "@/lib/actions/academic";
 import { Select } from "@/components/ui/input";
 
@@ -14,6 +15,7 @@ export function EnrolmentStatusForm({
   enrolmentId: string;
   status: string | null;
 }) {
+  const st = useTranslations("status");
   const [state, formAction, pending] = useActionState<AcademicActionState | null, FormData>(
     setEnrolmentStatusAction,
     null,
@@ -37,7 +39,7 @@ export function EnrolmentStatusForm({
         }}
       >
         {STATUSES.map((s) => (
-          <option key={s} value={s}>{s}</option>
+          <option key={s} value={s}>{st.has(s) ? st(s) : s}</option>
         ))}
       </Select>
       {state && !state.ok && <span className="text-xs text-danger-600">{state.message}</span>}

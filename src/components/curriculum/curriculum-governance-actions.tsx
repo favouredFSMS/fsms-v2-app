@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import {
   submitCurriculumReviewAction,
   unpublishCurriculumAction,
@@ -40,38 +41,39 @@ export function CurriculumGovernanceActions({
   canRestore: boolean;
   canPermDelete: boolean;
 }) {
+  const [t, commonT] = [useTranslations("curriculum"), useTranslations("common")];
   return (
     <div className="flex flex-wrap items-center gap-1.5">
       {deleted ? (
         <>
-          {canRestore && <Inline action={restoreCurriculumAction} curriculumId={curriculumId} label="Restore" />}
+          {canRestore && <Inline action={restoreCurriculumAction} curriculumId={curriculumId} label={commonT("restore")} />}
           {canPermDelete && (
             <Inline
               action={permanentlyDeleteCurriculumAction}
               curriculumId={curriculumId}
-              label="Delete forever"
+              label={t("deleteForever")}
               variant="danger"
-              confirm="Permanently delete this curriculum and its versions?"
+              confirm={t("confirmPermDelete")}
             />
           )}
         </>
       ) : (
         <>
           {status === "draft" && canReview && (
-            <Inline action={submitCurriculumReviewAction} curriculumId={curriculumId} label="Submit" variant="secondary" />
+            <Inline action={submitCurriculumReviewAction} curriculumId={curriculumId} label={t("submitReview")} variant="secondary" />
           )}
           {status === "published" && canUnpublish && (
-            <Inline action={unpublishCurriculumAction} curriculumId={curriculumId} label="Unpublish" />
+            <Inline action={unpublishCurriculumAction} curriculumId={curriculumId} label={commonT("unpublish")} />
           )}
           {canDuplicate && (
-            <Inline action={duplicateCurriculumAction} curriculumId={curriculumId} label="Duplicate" />
+            <Inline action={duplicateCurriculumAction} curriculumId={curriculumId} label={commonT("duplicate")} />
           )}
           {canDelete && (
             <Inline
               action={deleteCurriculumAction}
               curriculumId={curriculumId}
-              label="Delete"
-              confirm="Delete (soft) this curriculum?"
+              label={commonT("delete")}
+              confirm={t("confirmSoftDelete")}
             />
           )}
         </>

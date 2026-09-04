@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -32,13 +33,13 @@ export async function assignHomeworkAction(
     const date = field(formData, "date");
     const rawIds = formData.get("studentIds");
     if (!classId || !date || typeof rawIds !== "string") {
-      return { ok: false, message: "Missing class, date or roster" };
+      return { ok: false, message: await translate("actions.homeworkMissingFields") };
     }
     let studentIds: unknown;
     try {
       studentIds = JSON.parse(rawIds);
     } catch {
-      return { ok: false, message: "Roster payload is not valid JSON" };
+      return { ok: false, message: await translate("actions.homeworkRosterInvalidJson") };
     }
 
     const ctx = await requireDbContext();
@@ -51,11 +52,11 @@ export async function assignHomeworkAction(
       studentIds,
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Homework could not be assigned (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.homeworkNotAssignedDenied") };
     revalidatePath("/homework");
     return { ok: true, created: res.data.created };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to assign homework" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.homeworkAssignFailed") };
   }
 }
 
@@ -70,11 +71,11 @@ export async function submitHomeworkAction(
       note: field(formData, "note"),
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Submission was not accepted" };
+    if (!res.data) return { ok: false, message: await translate("actions.homeworkSubmissionNotAccepted") };
     revalidatePath("/homework");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to submit homework" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.homeworkSubmitFailed") };
   }
 }
 
@@ -91,10 +92,10 @@ export async function gradeHomeworkAction(
       status: (field(formData, "status") ?? "graded") as "graded" | "missing" | "overdue" | "assigned",
     });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Grading was not accepted" };
+    if (!res.data) return { ok: false, message: await translate("actions.homeworkGradingNotAccepted") };
     revalidatePath("/homework");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to grade homework" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.homeworkGradeFailed") };
   }
 }

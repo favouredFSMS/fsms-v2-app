@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { getTranslations } from "next-intl/server";
 import { requireUser } from "@/lib/auth/guards";
 import { profileCan } from "@/lib/auth/authorize";
 import { AppShell } from "./app-shell";
@@ -20,11 +21,15 @@ export async function PageShell({
   permission?: string;
   children: ReactNode;
 }) {
+  const [t, rolesT] = await Promise.all([getTranslations("shell"), getTranslations("roles")]);
   const profile = await requireUser();
-  const roleLabel = profile.role_key ?? profile.role_base;
+
+  const roleKey = profile.role_key ?? profile.role_base;
+  const roleLabel = roleKey && rolesT.has(roleKey) ? rolesT(roleKey) : roleKey;
+
   const sections = visibleNavSections(NAV_SECTIONS, (a) => profileCan(profile, a));
   const user = {
-    name: profile.name ?? profile.email ?? "FSMS user",
+    name: profile.name ?? profile.email ?? t("fsmsUser"),
     email: profile.email ?? "",
     roleLabel,
   };
@@ -34,8 +39,8 @@ export async function PageShell({
       <AppShell brand="FSMS V2" title={title} user={user} sections={sections}>
         <EmptyState
           icon="warning"
-          title="Access denied"
-          description={`You need the "${permission}" permission to view this page.`}
+          title={t("accessDenied")}
+          description={t("accessDeniedDesc", { permission })}
         />
       </AppShell>
     );

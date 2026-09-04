@@ -1,4 +1,5 @@
 "use server";
+import { translate } from "@/i18n/server";
 
 import { revalidatePath } from "next/cache";
 import { requireDbContext } from "@/lib/db/context";
@@ -43,11 +44,11 @@ export async function sendMessageAction(
       ? await repo.reply({ threadId, body: body ?? "" })
       : await repo.send({ to, subject: field(formData, "subject"), body: body ?? "" });
     if (!res.ok) return toState(res);
-    if (!res.data) return { ok: false, message: "Message was not sent (denied)" };
+    if (!res.data) return { ok: false, message: await translate("actions.commsNotSentDenied") };
     revalidatePath("/messaging");
     return { ok: true };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to send message" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.commsSendFailed") };
   }
 }
 
@@ -70,9 +71,9 @@ export async function deleteMessageAction(
     const res = await new CommsRepository(ctx).deleteMessage({ messageId: field(formData, "messageId") ?? "" });
     if (!res.ok) return toState(res);
     revalidatePath("/messaging");
-    return { ok: true, message: res.data ? "Message deleted" : "Not deleted (not yours)" };
+    return { ok: true, message: res.data ? await translate("actions.commsMessageDeleted") : await translate("actions.commsNotDeleted") };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to delete message" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.commsDeleteFailed") };
   }
 }
 
@@ -108,8 +109,8 @@ export async function savePrefsAction(
     });
     if (!res.ok) return toState(res);
     revalidatePath("/notifications");
-    return { ok: true, message: "Preferences saved" };
+    return { ok: true, message: await translate("actions.commsPreferencesSaved") };
   } catch (e) {
-    return { ok: false, message: e instanceof Error ? e.message : "Failed to save preferences" };
+    return { ok: false, message: e instanceof Error ? e.message : await translate("actions.commsSavePreferencesFailed") };
   }
 }

@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { requireUser } from "@/lib/auth/guards";
 import { profileCan } from "@/lib/auth/authorize";
 import { isStaff, isFinance, isLeadership } from "@/lib/auth/roles";
@@ -17,10 +18,8 @@ import { StaffStudentsCard } from "@/components/dashboard/staff-students-card";
 
 export const metadata = { title: "Dashboard — FSMS V2" };
 
-// Always render on demand: the dashboard reads the session + per-user summary.
 export const dynamic = "force-dynamic";
 
-/** Map homework/attendance-ish status strings to a badge tone. */
 function statusVariant(status: string | null | undefined) {
   switch (status) {
     case "graded":
@@ -47,9 +46,9 @@ function statusVariant(status: string | null | undefined) {
 }
 
 export default async function DashboardPage() {
+  const [t, st] = await Promise.all([getTranslations("dashboard"), getTranslations("status")]);
   const profile = await requireUser();
 
-  // Phase 11: role-specific dashboard from ONE RPC round trip (no N+1).
   const ctx = await requireDbContext();
   const summary = await new DashboardRepository(ctx).summary();
 
@@ -69,7 +68,7 @@ export default async function DashboardPage() {
   return (
     <AppShell
       brand="FSMS V2"
-      title="Dashboard"
+      title={t("title")}
       user={{
         name: profile.name ?? profile.email ?? "FSMS user",
         email: profile.email ?? "",
@@ -78,11 +77,10 @@ export default async function DashboardPage() {
       sections={sections}
     >
       <div className="grid gap-4">
-        {/* welcome / identity */}
         <Card>
           <CardHeader>
             <CardTitle>
-              Welcome, {profile.name ?? profile.email}
+              {t("welcome", { name: profile.name ?? profile.email ?? "" })}
               <span className="ml-2 align-middle">
                 <Badge variant="brand">{roleLabel}</Badge>
               </span>
@@ -93,26 +91,22 @@ export default async function DashboardPage() {
           </CardHeader>
           <CardBody>
             <dl className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
-              <Row k="School (tenant)" v={profile.school_id} />
-              <Row
-                k="Role"
-                v={`${roleLabel} · rank ${profile.rank} · base ${profile.role_base}`}
-              />
-              <Row k="Status" v={profile.status} />
-              <Row k="UI language (per-user)" v={profile.locale} />
+              <Row k={t("schoolTenant")} v={profile.school_id} />
+              <Row k={t("role")} v={`${roleLabel} · rank ${profile.rank} · base ${profile.role_base}`} />
+              <Row k={t("status")} v={profile.status} />
+              <Row k={t("uiLanguage")} v={profile.locale} />
             </dl>
           </CardBody>
         </Card>
 
-        {/* staff: counts + today's attendance */}
         {s?.counts && (
           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {(
               [
-                ["Students", s.counts.students],
-                ["Teachers", s.counts.teachers],
-                ["Parents", s.counts.parents],
-                ["Classes", s.counts.classes],
+                [t("students"), s.counts.students],
+                [t("teachers"), s.counts.teachers],
+                [t("parents"), s.counts.parents],
+                [t("classes"), s.counts.classes],
               ] as const
             ).map(([label, value]) => (
               <Card key={label}>
@@ -125,13 +119,12 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* teacher: my classes + grading queue */}
         {profile.role_base === "teacher" && (
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>My classes</CardTitle>
-                <CardDescription>Assigned to you this academic year.</CardDescription>
+                <CardTitle>{t("myClasses")}</CardTitle>
+                <CardDescription>{t("myClassesDesc")}</CardDescription>
               </CardHeader>
               <CardBody className="px-0">
                 <Table>
@@ -140,19 +133,19 @@ export default async function DashboardPage() {
                       <TR key={c.id}>
                         <TD className="font-medium">{c.name}</TD>
                         <TD>{c.level_code?.toUpperCase()}</TD>
-                        <TD className="text-right tabular-nums">{c.students} students</TD>
+                        <TD className="text-right tabular-nums">{t("xStudents", { count: c.students })}</TD>
                       </TR>
                     ))}
-                    {!s?.myClasses.length && <TR><TD className="text-ink-faint">No classes assigned yet.</TD></TR>}
+                    {!s?.myClasses.length && <TR><TD className="text-ink-faint">{t("noClassesAssigned")}</TD></TR>}
                   </TBody>
                 </Table>
               </CardBody>
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Grading queue</CardTitle>
+                <CardTitle>{t("gradingQueue")}</CardTitle>
                 <CardDescription>
-                  {s?.gradingQueue?.to_grade ?? 0} submitted homework item(s) awaiting feedback.
+                  {t("gradingQueueDesc", { count: s?.gradingQueue?.to_grade ?? 0 })}
                 </CardDescription>
               </CardHeader>
               <CardBody className="px-0">
@@ -163,12 +156,12 @@ export default async function DashboardPage() {
                         <TD className="font-medium">{h.title}</TD>
                         <TD>{h.student}</TD>
                         <TD className="text-right">
-                          <Badge variant={statusVariant(h.status)}>{h.status}</Badge>
+                          <Badge variant={statusVariant(h.status)}>{h.status && st.has(h.status) ? st(h.status) : h.status}</Badge>
                         </TD>
                       </TR>
                     ))}
                     {!s?.gradingQueue?.recent.length && (
-                      <TR><TD className="text-ink-faint">All caught up 🎉</TD></TR>
+                      <TR><TD className="text-ink-faint">{t("allCaughtUp")}</TD></TR>
                     )}
                   </TBody>
                 </Table>
@@ -177,13 +170,12 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* parent: my children + their homework */}
         {profile.role_base === "parent" && (
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
               <CardHeader>
-                <CardTitle>My children</CardTitle>
-                <CardDescription>Linked students in this school.</CardDescription>
+                <CardTitle>{t("myChildren")}</CardTitle>
+                <CardDescription>{t("myChildrenDesc")}</CardDescription>
               </CardHeader>
               <CardBody className="px-0">
                 <Table>
@@ -196,7 +188,7 @@ export default async function DashboardPage() {
                       </TR>
                     ))}
                     {!s?.myChildren.length && (
-                      <TR><TD className="text-ink-faint">No children linked.</TD></TR>
+                      <TR><TD className="text-ink-faint">{t("noChildrenLinked")}</TD></TR>
                     )}
                   </TBody>
                 </Table>
@@ -204,8 +196,8 @@ export default async function DashboardPage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Recent homework</CardTitle>
-                <CardDescription>Latest items across your children.</CardDescription>
+                <CardTitle>{t("recentHomework")}</CardTitle>
+                <CardDescription>{t("recentHomeworkDesc")}</CardDescription>
               </CardHeader>
               <CardBody className="px-0">
                 <Table>
@@ -215,12 +207,12 @@ export default async function DashboardPage() {
                         <TD className="font-medium">{h.title}</TD>
                         <TD>{h.student}</TD>
                         <TD className="text-right">
-                          <Badge variant={statusVariant(h.status)}>{h.status}</Badge>
+                          <Badge variant={statusVariant(h.status)}>{h.status && st.has(h.status) ? st(h.status) : h.status}</Badge>
                         </TD>
                       </TR>
                     ))}
                     {!s?.childHomework.length && (
-                      <TR><TD className="text-ink-faint">No homework yet.</TD></TR>
+                      <TR><TD className="text-ink-faint">{t("noHomeworkYet")}</TD></TR>
                     )}
                   </TBody>
                 </Table>
@@ -229,13 +221,12 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {/* student: my homework + assessments + progress */}
         {profile.role_base === "student" && (
           <div className="grid gap-4 lg:grid-cols-3">
             <Card>
               <CardHeader>
-                <CardTitle>My homework</CardTitle>
-                <CardDescription>Upcoming and recent items.</CardDescription>
+                <CardTitle>{t("myHomework")}</CardTitle>
+                <CardDescription>{t("myHomeworkDesc")}</CardDescription>
               </CardHeader>
               <CardBody className="px-0">
                 <Table>
@@ -244,12 +235,12 @@ export default async function DashboardPage() {
                       <TR key={h.id}>
                         <TD className="font-medium">{h.title}</TD>
                         <TD className="text-right">
-                          <Badge variant={statusVariant(h.status)}>{h.status}</Badge>
+                          <Badge variant={statusVariant(h.status)}>{h.status && st.has(h.status) ? st(h.status) : h.status}</Badge>
                         </TD>
                       </TR>
                     ))}
                     {!s?.myHomework.length && (
-                      <TR><TD className="text-ink-faint">No homework assigned.</TD></TR>
+                      <TR><TD className="text-ink-faint">{t("noHomeworkAssigned")}</TD></TR>
                     )}
                   </TBody>
                 </Table>
@@ -257,8 +248,8 @@ export default async function DashboardPage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Assessments</CardTitle>
-                <CardDescription>Latest results.</CardDescription>
+                <CardTitle>{t("assessments")}</CardTitle>
+                <CardDescription>{t("assessmentsDesc")}</CardDescription>
               </CardHeader>
               <CardBody className="px-0">
                 <Table>
@@ -272,7 +263,7 @@ export default async function DashboardPage() {
                       </TR>
                     ))}
                     {!s?.myAssessments.length && (
-                      <TR><TD className="text-ink-faint">No assessments yet.</TD></TR>
+                      <TR><TD className="text-ink-faint">{t("noAssessmentsYet")}</TD></TR>
                     )}
                   </TBody>
                 </Table>
@@ -280,32 +271,31 @@ export default async function DashboardPage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>Progress</CardTitle>
-                <CardDescription>Your learning so far.</CardDescription>
+                <CardTitle>{t("progress")}</CardTitle>
+                <CardDescription>{t("progressDesc")}</CardDescription>
               </CardHeader>
               <CardBody>
                 <dl className="grid grid-cols-2 gap-4">
-                  <Stat k="Lessons achieved" v={s?.myProgress?.lessons_achieved} />
-                  <Stat k="Evidence items" v={s?.myProgress?.evidence} />
+                  <Stat k={t("lessonsAchieved")} v={s?.myProgress?.lessons_achieved} />
+                  <Stat k={t("evidenceItems")} v={s?.myProgress?.evidence} />
                 </dl>
               </CardBody>
             </Card>
           </div>
         )}
 
-        {/* staff: live student list (Phase 10 DAL demo) */}
         {isStaff(profile.role_base) && (
           <StaffStudentsCard schoolId={profile.school_id} />
         )}
 
-        {/* authorization sample */}
         <Card>
           <CardHeader>
-            <CardTitle>Authorization</CardTitle>
+            <CardTitle>{t("authorization")}</CardTitle>
             <CardDescription>
-              {profile.permissions.length} permissions resolved server-side
-              {profile.role_base === "admin1" ? " · owner wildcard" : ""} — the
-              database (RLS + fsms.has_perm) remains authoritative.
+              {t("authorizationDesc", {
+                count: profile.permissions.length,
+                owner: profile.role_base === "admin1" ? t("ownerWildcard") : "",
+              })}
             </CardDescription>
           </CardHeader>
           <CardBody className="px-0">
@@ -315,16 +305,18 @@ export default async function DashboardPage() {
                   <TR key={action}>
                     <TD className="font-mono text-xs">{action}</TD>
                     <TD className="text-right">
-                      {allowed ? <Badge variant="success">allowed</Badge> : <Badge variant="danger">denied</Badge>}
+                      {allowed ? <Badge variant="success">{t("allowed")}</Badge> : <Badge variant="danger">{t("denied")}</Badge>}
                     </TD>
                   </TR>
                 ))}
               </TBody>
             </Table>
             <p className="px-5 pt-3 text-xs text-ink-faint">
-              Group flags: staff={String(isStaff(profile.role_base))} · finance=
-              {String(isFinance(profile.role_base))} · leadership=
-              {String(isLeadership(profile.role_base))}
+              {t("groupFlags", {
+                staff: String(isStaff(profile.role_base)),
+                finance: String(isFinance(profile.role_base)),
+                leadership: String(isLeadership(profile.role_base)),
+              })}
             </p>
           </CardBody>
         </Card>

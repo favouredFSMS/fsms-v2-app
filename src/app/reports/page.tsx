@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
@@ -63,6 +64,11 @@ export default async function ReportsPage({
 }: {
   searchParams: Promise<Search>;
 }) {
+  const [t, st, commonT] = await Promise.all([
+    getTranslations("reports"),
+    getTranslations("status"),
+    getTranslations("common"),
+  ]);
   const profile = await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -76,16 +82,16 @@ export default async function ReportsPage({
 
   // ── report menu (permission-gated) ─────────────────────────────────────────
   const menu: { key: string; label: string }[] = [];
-  if (can("studentProgressReport")) menu.push({ key: "student", label: "Student progress" });
-  if (can("learnerProgressOverview")) menu.push({ key: "overview", label: "Learner overview" });
-  if (can("attendanceSheet")) menu.push({ key: "attendance", label: "Attendance" });
-  if (can("performance")) menu.push({ key: "assessment", label: "Assessments" });
-  if (can("report")) menu.push({ key: "class", label: "Class report" });
-  if (can("report") && isStaff) menu.push({ key: "teacher", label: "Teacher report" });
-  if (can("curriculumCoverage")) menu.push({ key: "coverage", label: "Curriculum coverage" });
-  if (can("curriculumAnalytics")) menu.push({ key: "analytics", label: "Curriculum analytics" });
-  if (can("classEarnings")) menu.push({ key: "earnings", label: "Class earnings" });
-  if (can("salaryHistory")) menu.push({ key: "salary", label: "Salary history" });
+  if (can("studentProgressReport")) menu.push({ key: "student", label: t("studentProgress") });
+  if (can("learnerProgressOverview")) menu.push({ key: "overview", label: t("learnerOverview") });
+  if (can("attendanceSheet")) menu.push({ key: "attendance", label: t("attendanceTitle") });
+  if (can("performance")) menu.push({ key: "assessment", label: t("assessmentsTitle") });
+  if (can("report")) menu.push({ key: "class", label: t("classReport") });
+  if (can("report") && isStaff) menu.push({ key: "teacher", label: t("teacherReport") });
+  if (can("curriculumCoverage")) menu.push({ key: "coverage", label: t("curriculumCoverage") });
+  if (can("curriculumAnalytics")) menu.push({ key: "analytics", label: t("curriculumAnalytics") });
+  if (can("classEarnings")) menu.push({ key: "earnings", label: t("classEarnings") });
+  if (can("salaryHistory")) menu.push({ key: "salary", label: t("salaryHistory") });
 
   const selected = sp.report ?? menu[0]?.key ?? "";
 
@@ -122,35 +128,35 @@ export default async function ReportsPage({
       const res = await reporting.studentProgressReport({ studentId: sp.student });
       data = { kind: "student", value: res.ok ? res.data : null };
     } else {
-      data = { kind: "pick", hint: "Choose a student to view their progress report." };
+      data = { kind: "pick", hint: t("hintStudent") };
     }
   } else if (selected === "overview") {
     if (sp.class) {
       const res = await reporting.learnerProgressOverview({ classId: sp.class });
       data = { kind: "overview", value: res.ok ? res.data : null };
     } else {
-      data = { kind: "pick", hint: "Choose a class to view the learner overview." };
+      data = { kind: "pick", hint: t("hintOverview") };
     }
   } else if (selected === "attendance") {
     if (sp.class) {
       const res = await reporting.attendanceReport({ classId: sp.class, from: sp.from, to: sp.to });
       data = { kind: "attendance", value: res.ok ? res.data : null };
     } else {
-      data = { kind: "pick", hint: "Choose a class to view the attendance report." };
+      data = { kind: "pick", hint: t("hintAttendance") };
     }
   } else if (selected === "assessment") {
     if (sp.class) {
       const res = await reporting.assessmentReport({ classId: sp.class, from: sp.from, to: sp.to });
       data = { kind: "assessment", value: res.ok ? res.data : null };
     } else {
-      data = { kind: "pick", hint: "Choose a class to view the assessment report." };
+      data = { kind: "pick", hint: t("hintAssessment") };
     }
   } else if (selected === "class") {
     if (sp.class) {
       const res = await reporting.classReport({ classId: sp.class });
       data = { kind: "class", value: res.ok ? res.data : null };
     } else {
-      data = { kind: "pick", hint: "Choose a class to view the class report." };
+      data = { kind: "pick", hint: t("hintClass") };
     }
   } else if (selected === "teacher") {
     const res = await reporting.teacherReport({ teacherId: sp.teacher });
@@ -160,7 +166,7 @@ export default async function ReportsPage({
       const res = await reporting.curriculumCoverage({ classId: sp.class, from: sp.from, to: sp.to });
       data = { kind: "coverage", value: res.ok ? res.data : null };
     } else {
-      data = { kind: "pick", hint: "Choose a class to view curriculum coverage." };
+      data = { kind: "pick", hint: t("hintCoverage") };
     }
   } else if (selected === "analytics") {
     const res = await reporting.curriculumAnalytics({ level: sp.level });
@@ -176,19 +182,16 @@ export default async function ReportsPage({
   const jobs = exportListRes && exportListRes.ok && exportListRes.data ? exportListRes.data.rows : [];
 
   return (
-    <PageShell title="Reports" permission="report">
+    <PageShell title={t("title")} permission="report">
       <div className="grid gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Reporting</CardTitle>
-            <CardDescription>
-              Progress, academic, attendance, assessment, class, teacher and administrative reports.
-              Heavy CSV exports run asynchronously and never block normal use.
-            </CardDescription>
+            <CardTitle>{t("reporting")}</CardTitle>
+            <CardDescription>{t("reportingDesc")}</CardDescription>
           </CardHeader>
           <CardBody>
             {menu.length === 0 ? (
-              <EmptyState icon="warning" title="No reports available" description="Your role has no reporting permissions." />
+              <EmptyState icon="warning" title={t("noReports")} description={t("noReportsDesc")} />
             ) : (
               <ReportPicker
                 reports={menu}
@@ -214,20 +217,35 @@ export default async function ReportsPage({
           </CardBody>
         </Card>
 
-        <ReportBody data={data} />
+        <ReportBody data={data} t={t} st={st} commonT={commonT} />
         {isStaff && <ExportPanel canProcess={isOffice} classes={classes} teachers={teachers} jobs={jobs} />}
       </div>
     </PageShell>
   );
 }
 
-function ReportBody({ data }: { data: ReportValue | null }) {
+type AnyT = {
+  (key: string, values?: Record<string, string | number | Date>): string;
+  has(key: string): boolean;
+};
+
+function ReportBody({
+  data,
+  t,
+  st,
+  commonT,
+}: {
+  data: ReportValue | null;
+  t: AnyT;
+  st: AnyT;
+  commonT: AnyT;
+}) {
   if (!data) return null;
   if (data.kind === "pick") {
     return (
       <Card>
         <CardBody>
-          <EmptyState icon="info" title="Select a target" description={data.hint} />
+          <EmptyState icon="info" title={t("selectTarget")} description={data.hint} />
         </CardBody>
       </Card>
     );
@@ -236,32 +254,32 @@ function ReportBody({ data }: { data: ReportValue | null }) {
     return (
       <Card>
         <CardBody>
-          <EmptyState icon="warning" title="Not available" description="You do not have access to this report, or it has no data." />
+          <EmptyState icon="warning" title={t("notAvailable")} description={t("notAvailableDesc")} />
         </CardBody>
       </Card>
     );
   }
   switch (data.kind) {
     case "student":
-      return <StudentReportCard report={data.value} />;
+      return <StudentReportCard report={data.value} t={t} commonT={commonT} />;
     case "overview":
-      return <OverviewCard report={data.value} />;
+      return <OverviewCard report={data.value} t={t} commonT={commonT} />;
     case "attendance":
-      return <AttendanceCard report={data.value} />;
+      return <AttendanceCard report={data.value} t={t} commonT={commonT} />;
     case "assessment":
-      return <AssessmentCard report={data.value} />;
+      return <AssessmentCard report={data.value} t={t} commonT={commonT} />;
     case "class":
-      return <ClassReportCard report={data.value} />;
+      return <ClassReportCard report={data.value} t={t} commonT={commonT} />;
     case "teacher":
-      return <TeacherReportCard report={data.value} />;
+      return <TeacherReportCard report={data.value} t={t} commonT={commonT} />;
     case "coverage":
-      return <CoverageCard report={data.value} />;
+      return <CoverageCard report={data.value} t={t} commonT={commonT} />;
     case "analytics":
-      return <AnalyticsCard report={data.value} />;
+      return <AnalyticsCard report={data.value} t={t} commonT={commonT} />;
     case "earnings":
-      return <EarningsCard report={data.value} />;
+      return <EarningsCard report={data.value} t={t} commonT={commonT} />;
     case "salary":
-      return <SalaryCard report={data.value} />;
+      return <SalaryCard report={data.value} t={t} st={st} commonT={commonT} />;
     default:
       return null;
   }
@@ -276,27 +294,37 @@ function Stat({ label, value }: { label: string; value: string }) {
   );
 }
 
-function StudentReportCard({ report }: { report: StudentProgressReport }) {
+function StudentReportCard({
+  report,
+  t,
+  commonT,
+}: {
+  report: StudentProgressReport;
+  t: AnyT;
+  commonT: AnyT;
+}) {
   const s = report.student;
   return (
     <div className="grid gap-4">
       <Card>
         <CardHeader>
-          <CardTitle>Student progress — {s?.name ?? "?"}</CardTitle>
+          <CardTitle>
+            {t("studentProgress")} — {s?.name ?? "?"}
+          </CardTitle>
           <CardDescription>
-            {[s?.student_no, s?.level_code, s?.academic_status].filter(Boolean).join(" · ") || "No details"}
+            {[s?.student_no, s?.level_code, s?.academic_status].filter(Boolean).join(" · ") || t("noDetails")}
           </CardDescription>
         </CardHeader>
         <CardBody>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            <Stat label="Present" value={num(report.attendance?.present)} />
-            <Stat label="Late" value={num(report.attendance?.late)} />
-            <Stat label="Absent" value={num(report.attendance?.absent)} />
-            <Stat label="Attendance rate" value={pct(report.attendance?.rate)} />
-            <Stat label="Assessments" value={num(report.assessments?.count)} />
-            <Stat label="Average score" value={num(report.assessments?.avg_score)} />
-            <Stat label="Evidence" value={num(report.evidence?.count)} />
-            <Stat label="Collected" value={num(report.balance?.collected)} />
+            <Stat label={t("present")} value={num(report.attendance?.present)} />
+            <Stat label={t("late")} value={num(report.attendance?.late)} />
+            <Stat label={t("absent")} value={num(report.attendance?.absent)} />
+            <Stat label={t("attendanceRate")} value={pct(report.attendance?.rate)} />
+            <Stat label={t("assessmentsTitle")} value={num(report.assessments?.count)} />
+            <Stat label={t("averageScore")} value={num(report.assessments?.avg_score)} />
+            <Stat label={t("evidenceCount")} value={num(report.evidence?.count)} />
+            <Stat label={t("collected")} value={num(report.balance?.collected)} />
           </div>
         </CardBody>
       </Card>
@@ -304,27 +332,27 @@ function StudentReportCard({ report }: { report: StudentProgressReport }) {
       {report.evidence_by_target.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Evidence by learning target</CardTitle>
+            <CardTitle>{t("evidenceByTarget")}</CardTitle>
           </CardHeader>
           <CardBody className="px-0">
             <Table>
               <THead>
                 <TR>
-                  <TH>Target</TH>
-                  <TH>Level</TH>
-                  <TH>Entries</TH>
-                  <TH>Average</TH>
-                  <TH>Last</TH>
+                  <TH>{commonT("target")}</TH>
+                  <TH>{commonT("level")}</TH>
+                  <TH>{t("entries")}</TH>
+                  <TH>{t("average")}</TH>
+                  <TH>{t("last")}</TH>
                 </TR>
               </THead>
               <TBody>
-                {report.evidence_by_target.map((t) => (
-                  <TR key={t.target_id}>
-                    <TD>{t.target_title ?? t.target_id}</TD>
-                    <TD>{t.level_code ?? "—"}</TD>
-                    <TD>{t.count}</TD>
-                    <TD>{num(t.avg_score)}</TD>
-                    <TD>{t.last_at ?? "—"}</TD>
+                {report.evidence_by_target.map((r) => (
+                  <TR key={r.target_id}>
+                    <TD>{r.target_title ?? r.target_id}</TD>
+                    <TD>{r.level_code ?? "—"}</TD>
+                    <TD>{r.count}</TD>
+                    <TD>{num(r.avg_score)}</TD>
+                    <TD>{r.last_at ?? "—"}</TD>
                   </TR>
                 ))}
               </TBody>
@@ -336,16 +364,16 @@ function StudentReportCard({ report }: { report: StudentProgressReport }) {
       {report.level_history.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle>Level history</CardTitle>
+            <CardTitle>{t("levelHistory")}</CardTitle>
           </CardHeader>
           <CardBody className="px-0">
             <Table>
               <THead>
                 <TR>
-                  <TH>Level</TH>
-                  <TH>Started</TH>
-                  <TH>Completed</TH>
-                  <TH>Status</TH>
+                  <TH>{commonT("level")}</TH>
+                  <TH>{t("started")}</TH>
+                  <TH>{t("completed")}</TH>
+                  <TH>{commonT("status")}</TH>
                 </TR>
               </THead>
               <TBody>
@@ -366,29 +394,39 @@ function StudentReportCard({ report }: { report: StudentProgressReport }) {
   );
 }
 
-function OverviewCard({ report }: { report: LearnerProgressOverview }) {
+function OverviewCard({
+  report,
+  t,
+  commonT,
+}: {
+  report: LearnerProgressOverview;
+  t: AnyT;
+  commonT: AnyT;
+}) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Learner overview — {report.class?.name ?? "?"}</CardTitle>
-        <CardDescription>Academic progress per enrolled student.</CardDescription>
+        <CardTitle>
+          {t("learnerOverview")} — {report.class?.name ?? "?"}
+        </CardTitle>
+        <CardDescription>{t("learnerOverviewDesc")}</CardDescription>
       </CardHeader>
       <CardBody className="px-0">
         <Table>
           <THead>
             <TR>
-              <TH>Student</TH>
-              <TH>Level</TH>
-              <TH>Status</TH>
-              <TH>Evidence</TH>
-              <TH>Evidence avg</TH>
-              <TH>Attendance</TH>
-              <TH>Assessment avg</TH>
+              <TH>{commonT("student")}</TH>
+              <TH>{commonT("level")}</TH>
+              <TH>{commonT("status")}</TH>
+              <TH>{t("evidenceCount")}</TH>
+              <TH>{t("evidenceAvg")}</TH>
+              <TH>{t("attendanceAvg")}</TH>
+              <TH>{t("assessmentAvg")}</TH>
             </TR>
           </THead>
           <TBody>
             {report.students.length === 0 ? (
-              <TableEmpty colSpan={7}>No enrolled students.</TableEmpty>
+              <TableEmpty colSpan={7}>{t("noEnrolled")}</TableEmpty>
             ) : (
               report.students.map((s) => (
                 <TR key={s.id}>
@@ -409,30 +447,40 @@ function OverviewCard({ report }: { report: LearnerProgressOverview }) {
   );
 }
 
-function AttendanceCard({ report }: { report: AttendanceReport }) {
+function AttendanceCard({
+  report,
+  t,
+  commonT,
+}: {
+  report: AttendanceReport;
+  t: AnyT;
+  commonT: AnyT;
+}) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Attendance — {report.class?.name ?? "?"}</CardTitle>
+        <CardTitle>
+          {t("attendanceTitle")} — {report.class?.name ?? "?"}
+        </CardTitle>
         <CardDescription>
-          {report.range.from ?? "start"} → {report.range.to ?? "today"}
+          {report.range.from ?? t("start")} → {report.range.to ?? t("today")}
         </CardDescription>
       </CardHeader>
       <CardBody className="px-0">
         <Table>
           <THead>
             <TR>
-              <TH>Student</TH>
-              <TH>Present</TH>
-              <TH>Late</TH>
-              <TH>Absent</TH>
-              <TH>Total</TH>
-              <TH>Rate</TH>
+              <TH>{commonT("student")}</TH>
+              <TH>{t("present")}</TH>
+              <TH>{t("late")}</TH>
+              <TH>{t("absent")}</TH>
+              <TH>{t("total")}</TH>
+              <TH>{t("rate")}</TH>
             </TR>
           </THead>
           <TBody>
             {report.students.length === 0 ? (
-              <TableEmpty colSpan={6}>No attendance recorded.</TableEmpty>
+              <TableEmpty colSpan={6}>{t("noAttendance")}</TableEmpty>
             ) : (
               report.students.map((s) => (
                 <TR key={s.id}>
@@ -452,26 +500,36 @@ function AttendanceCard({ report }: { report: AttendanceReport }) {
   );
 }
 
-function AssessmentCard({ report }: { report: AssessmentReport }) {
+function AssessmentCard({
+  report,
+  t,
+  commonT,
+}: {
+  report: AssessmentReport;
+  t: AnyT;
+  commonT: AnyT;
+}) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Assessments — {report.class?.name ?? "?"}</CardTitle>
+        <CardTitle>
+          {t("assessmentsTitle")} — {report.class?.name ?? "?"}
+        </CardTitle>
       </CardHeader>
       <CardBody className="px-0">
         <Table>
           <THead>
             <TR>
-              <TH>Student</TH>
-              <TH>Count</TH>
-              <TH>Average</TH>
-              <TH>Best</TH>
-              <TH>Latest</TH>
+              <TH>{commonT("student")}</TH>
+              <TH>{t("count")}</TH>
+              <TH>{t("average")}</TH>
+              <TH>{t("best")}</TH>
+              <TH>{t("latest")}</TH>
             </TR>
           </THead>
           <TBody>
             {report.students.length === 0 ? (
-              <TableEmpty colSpan={5}>No assessments recorded.</TableEmpty>
+              <TableEmpty colSpan={5}>{t("noAssessments")}</TableEmpty>
             ) : (
               report.students.map((s) => (
                 <TR key={s.id}>
@@ -490,12 +548,22 @@ function AssessmentCard({ report }: { report: AssessmentReport }) {
   );
 }
 
-function ClassReportCard({ report }: { report: ClassReport }) {
+function ClassReportCard({
+  report,
+  t,
+  commonT,
+}: {
+  report: ClassReport;
+  t: AnyT;
+  commonT: AnyT;
+}) {
   const c = report.class;
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Class report — {c?.name ?? "?"}</CardTitle>
+        <CardTitle>
+          {t("classReport")} — {c?.name ?? "?"}
+        </CardTitle>
         <CardDescription>
           {[c?.level_code, c?.status, c?.days, c?.start_time ? `${c.start_time}–${c.end_time}` : null]
             .filter(Boolean)
@@ -504,24 +572,24 @@ function ClassReportCard({ report }: { report: ClassReport }) {
       </CardHeader>
       <CardBody>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat label="Enrolment" value={num(report.enrolment)} />
-          <Stat label="Attendance rate" value={pct(report.attendance_rate)} />
-          <Stat label="Assessment avg" value={num(report.assessment_avg)} />
-          <Stat label="Lessons taught" value={num(report.lessons_taught)} />
-          <Stat label="Collected" value={num(report.balance?.collected)} />
-          <Stat label="Pending" value={num(report.balance?.pending)} />
-          <Stat label="Fee" value={c?.fee != null ? `${c.fee} ${c.fee_currency ?? ""}`.trim() : "—"} />
+          <Stat label={t("enrolment")} value={num(report.enrolment)} />
+          <Stat label={t("attendanceRate")} value={pct(report.attendance_rate)} />
+          <Stat label={t("assessmentAvg")} value={num(report.assessment_avg)} />
+          <Stat label={t("lessonsTaught")} value={num(report.lessons_taught)} />
+          <Stat label={t("collected")} value={num(report.balance?.collected)} />
+          <Stat label={t("pending")} value={num(report.balance?.pending)} />
+          <Stat label={commonT("fee")} value={c?.fee != null ? `${c.fee} ${c.fee_currency ?? ""}`.trim() : "—"} />
         </div>
         <div className="mt-4">
-          <div className="text-sm font-medium text-ink-700">Teachers</div>
+          <div className="text-sm font-medium text-ink-700">{commonT("teachers")}</div>
           {report.teachers.length === 0 ? (
-            <p className="text-sm text-ink-500">No teachers assigned.</p>
+            <p className="text-sm text-ink-500">{t("noTeachersAssigned")}</p>
           ) : (
             <div className="mt-1 flex flex-wrap gap-2">
-              {report.teachers.map((t) => (
-                <Badge key={t.id} variant={t.primary ? "brand" : "neutral"}>
-                  {t.name}
-                  {t.primary ? " · primary" : ""}
+              {report.teachers.map((r) => (
+                <Badge key={r.id} variant={r.primary ? "brand" : "neutral"}>
+                  {r.name}
+                  {r.primary ? ` · ${t("primary")}` : ""}
                 </Badge>
               ))}
             </div>
@@ -532,46 +600,56 @@ function ClassReportCard({ report }: { report: ClassReport }) {
   );
 }
 
-function TeacherReportCard({ report }: { report: TeacherReport }) {
-  const t = report.teacher;
+function TeacherReportCard({
+  report,
+  t,
+  commonT,
+}: {
+  report: TeacherReport;
+  t: AnyT;
+  commonT: AnyT;
+}) {
+  const r = report.teacher;
   return (
     <div className="grid gap-4">
       <Card>
         <CardHeader>
-          <CardTitle>Teacher report — {t?.name ?? "?"}</CardTitle>
-          <CardDescription>{t?.email ?? ""}</CardDescription>
+          <CardTitle>
+            {t("teacherReport")} — {r?.name ?? "?"}
+          </CardTitle>
+          <CardDescription>{r?.email ?? ""}</CardDescription>
         </CardHeader>
         <CardBody>
           <div className="grid gap-2 sm:grid-cols-3">
-            <Stat label="Classes" value={num(report.classes.length)} />
-            <Stat label="Attendance days taken" value={num(report.attendance_taken)} />
-            <Stat label="Salary total" value={num(report.salary?.total)} />
+            <Stat label={commonT("classes")} value={num(report.classes.length)} />
+            <Stat label={t("attendanceDaysTaken")} value={num(report.attendance_taken)} />
+            <Stat label={t("salaryTotal")} value={num(report.salary?.total)} />
           </div>
         </CardBody>
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Classes</CardTitle>
+          <CardTitle>{commonT("classes")}</CardTitle>
         </CardHeader>
         <CardBody className="px-0">
           <Table>
             <THead>
               <TR>
-                <TH>Class</TH>
-                <TH>Role</TH>
-                <TH>Enrolment</TH>
-                <TH>Attendance</TH>
-                <TH>Lessons</TH>
+                <TH>{commonT("class")}</TH>
+                <TH>{commonT("role")}</TH>
+                <TH>{t("enrolment")}</TH>
+                <TH>{t("attendanceAvg")}</TH>
+                <TH>{commonT("lessons")}</TH>
               </TR>
             </THead>
             <TBody>
               {report.classes.length === 0 ? (
-                <TableEmpty colSpan={5}>No classes assigned.</TableEmpty>
+                <TableEmpty colSpan={5}>{t("noClassesAssigned")}</TableEmpty>
               ) : (
                 report.classes.map((c) => (
                   <TR key={c.id}>
                     <TD>{c.name}</TD>
-                    <TD>{c.primary ? "Primary" : "Assistant"}</TD>
+                    <TD>{c.primary ? t("primary") : t("assistant")}</TD>
                     <TD>{c.enrolment}</TD>
                     <TD>{pct(c.attendance_rate)}</TD>
                     <TD>{c.lessons_taught}</TD>
@@ -586,34 +664,42 @@ function TeacherReportCard({ report }: { report: TeacherReport }) {
   );
 }
 
-function CoverageCard({ report }: { report: CurriculumCoverage }) {
+function CoverageCard({
+  report,
+  t,
+  commonT,
+}: {
+  report: CurriculumCoverage;
+  t: AnyT;
+  commonT: AnyT;
+}) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Curriculum coverage — {report.class?.name ?? "?"}</CardTitle>
-        <CardDescription>
-          Planned units vs lessons taught.
-        </CardDescription>
+        <CardTitle>
+          {t("curriculumCoverage")} — {report.class?.name ?? "?"}
+        </CardTitle>
+        <CardDescription>{t("coverageDesc")}</CardDescription>
       </CardHeader>
       <CardBody>
         <div className="grid gap-2 sm:grid-cols-2">
-          <Stat label="Planned units" value={num(report.planned)} />
-          <Stat label="Lessons taught" value={num(report.taught_count)} />
+          <Stat label={t("plannedUnits")} value={num(report.planned)} />
+          <Stat label={t("lessonsTaught")} value={num(report.taught_count)} />
         </div>
       </CardBody>
       <CardBody className="px-0">
         <Table>
           <THead>
             <TR>
-              <TH>Date</TH>
-              <TH>Lesson</TH>
-              <TH>Topic</TH>
-              <TH>Teacher</TH>
+              <TH>{commonT("date")}</TH>
+              <TH>{commonT("lesson")}</TH>
+              <TH>{commonT("topic")}</TH>
+              <TH>{commonT("teacher")}</TH>
             </TR>
           </THead>
           <TBody>
             {report.taught.length === 0 ? (
-              <TableEmpty colSpan={4}>No lessons logged yet.</TableEmpty>
+              <TableEmpty colSpan={4}>{t("noLessonsLogged")}</TableEmpty>
             ) : (
               report.taught.map((l, i) => (
                 <TR key={i}>
@@ -631,34 +717,42 @@ function CoverageCard({ report }: { report: CurriculumCoverage }) {
   );
 }
 
-function AnalyticsCard({ report }: { report: CurriculumAnalytics }) {
+function AnalyticsCard({
+  report,
+  t,
+  commonT,
+}: {
+  report: CurriculumAnalytics;
+  t: AnyT;
+  commonT: AnyT;
+}) {
   const groupRows = (rows: { level_code: string | null; count: number; [k: string]: unknown }[] | null) => rows ?? [];
   return (
     <div className="grid gap-4">
       <Card>
         <CardHeader>
-          <CardTitle>Curriculum analytics</CardTitle>
+          <CardTitle>{t("curriculumAnalytics")}</CardTitle>
           <CardDescription>
-            Programmes: {report.programmes} · Lessons: {report.lessons}
+            {t("analyticsDesc", { programmes: report.programmes, lessons: report.lessons })}
           </CardDescription>
         </CardHeader>
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Learning targets by level</CardTitle>
+          <CardTitle>{t("targetsByLevel")}</CardTitle>
         </CardHeader>
         <CardBody className="px-0">
           <Table>
             <THead>
               <TR>
-                <TH>Level</TH>
-                <TH>Targets</TH>
-                <TH>Human-verified</TH>
+                <TH>{commonT("level")}</TH>
+                <TH>{t("targets")}</TH>
+                <TH>{t("humanVerified")}</TH>
               </TR>
             </THead>
             <TBody>
               {groupRows(report.targets as never).length === 0 ? (
-                <TableEmpty colSpan={3}>No targets.</TableEmpty>
+                <TableEmpty colSpan={3}>{t("noTargets")}</TableEmpty>
               ) : (
                 groupRows(report.targets as never).map((r, i) => (
                   <TR key={i}>
@@ -674,20 +768,20 @@ function AnalyticsCard({ report }: { report: CurriculumAnalytics }) {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Evidence by level</CardTitle>
+          <CardTitle>{t("evidenceByLevel")}</CardTitle>
         </CardHeader>
         <CardBody className="px-0">
           <Table>
             <THead>
               <TR>
-                <TH>Level</TH>
-                <TH>Entries</TH>
-                <TH>Average</TH>
+                <TH>{commonT("level")}</TH>
+                <TH>{t("entries")}</TH>
+                <TH>{t("average")}</TH>
               </TR>
             </THead>
             <TBody>
               {groupRows(report.evidence as never).length === 0 ? (
-                <TableEmpty colSpan={3}>No evidence.</TableEmpty>
+                <TableEmpty colSpan={3}>{t("noEvidence")}</TableEmpty>
               ) : (
                 groupRows(report.evidence as never).map((r, i) => (
                   <TR key={i}>
@@ -705,28 +799,36 @@ function AnalyticsCard({ report }: { report: CurriculumAnalytics }) {
   );
 }
 
-function EarningsCard({ report }: { report: ClassEarnings }) {
+function EarningsCard({
+  report,
+  t,
+  commonT,
+}: {
+  report: ClassEarnings;
+  t: AnyT;
+  commonT: AnyT;
+}) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Class earnings</CardTitle>
-        <CardDescription>Expected vs collected vs pending revenue per class.</CardDescription>
+        <CardTitle>{t("classEarnings")}</CardTitle>
+        <CardDescription>{t("classEarningsDesc")}</CardDescription>
       </CardHeader>
       <CardBody className="px-0">
         <Table>
           <THead>
             <TR>
-              <TH>Class</TH>
-              <TH>Students</TH>
-              <TH>Fee</TH>
-              <TH>Expected</TH>
-              <TH>Collected</TH>
-              <TH>Pending</TH>
+              <TH>{commonT("class")}</TH>
+              <TH>{commonT("students")}</TH>
+              <TH>{commonT("fee")}</TH>
+              <TH>{t("expected")}</TH>
+              <TH>{t("collected")}</TH>
+              <TH>{t("pending")}</TH>
             </TR>
           </THead>
           <TBody>
             {report.rows.length === 0 ? (
-              <TableEmpty colSpan={6}>No active classes.</TableEmpty>
+              <TableEmpty colSpan={6}>{t("noActiveClasses")}</TableEmpty>
             ) : (
               report.rows.map((r) => (
                 <TR key={r.id}>
@@ -746,27 +848,37 @@ function EarningsCard({ report }: { report: ClassEarnings }) {
   );
 }
 
-function SalaryCard({ report }: { report: SalaryHistory }) {
+function SalaryCard({
+  report,
+  t,
+  st,
+  commonT,
+}: {
+  report: SalaryHistory;
+  t: AnyT;
+  st: AnyT;
+  commonT: AnyT;
+}) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Salary history</CardTitle>
-        <CardDescription>Total: {num(report.total)}</CardDescription>
+        <CardTitle>{t("salaryHistory")}</CardTitle>
+        <CardDescription>{t("salaryTotalLabel", { total: num(report.total) })}</CardDescription>
       </CardHeader>
       <CardBody className="px-0">
         <Table>
           <THead>
             <TR>
-              <TH>User</TH>
-              <TH>Month</TH>
-              <TH>Amount</TH>
-              <TH>Currency</TH>
-              <TH>Status</TH>
+              <TH>{t("user")}</TH>
+              <TH>{commonT("month")}</TH>
+              <TH>{commonT("amount")}</TH>
+              <TH>{commonT("currency")}</TH>
+              <TH>{commonT("status")}</TH>
             </TR>
           </THead>
           <TBody>
             {report.rows.length === 0 ? (
-              <TableEmpty colSpan={5}>No salary records.</TableEmpty>
+              <TableEmpty colSpan={5}>{t("noSalaryRecords")}</TableEmpty>
             ) : (
               report.rows.map((r) => (
                 <TR key={r.id}>
@@ -775,7 +887,9 @@ function SalaryCard({ report }: { report: SalaryHistory }) {
                   <TD>{num(r.amount)}</TD>
                   <TD>{r.currency ?? "—"}</TD>
                   <TD>
-                    <Badge variant={r.status === "paid" ? "success" : "neutral"}>{r.status ?? "—"}</Badge>
+                    <Badge variant={r.status === "paid" ? "success" : "neutral"}>
+                      {r.status && st.has(r.status) ? st(r.status) : (r.status ?? "—")}
+                    </Badge>
                   </TD>
                 </TR>
               ))

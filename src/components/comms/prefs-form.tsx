@@ -2,12 +2,14 @@
 
 import { useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { savePrefsAction, type CommsActionState } from "@/lib/actions/comms";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 import type { NotificationPrefs } from "@/lib/db";
 
 export function PrefsForm({ prefs }: { prefs: NotificationPrefs | null }) {
+  const [t, commonT] = [useTranslations("notifications"), useTranslations("common")];
   const [state, formAction, pending] = useActionState<CommsActionState | null, FormData>(savePrefsAction, null);
   const router = useRouter();
 
@@ -19,20 +21,19 @@ export function PrefsForm({ prefs }: { prefs: NotificationPrefs | null }) {
     <form action={formAction} className="flex flex-col gap-3">
       <label className="flex items-center gap-2 text-sm text-ink-700">
         <input type="checkbox" name="inAppEnabled" defaultChecked={prefs?.in_app_enabled ?? true} />
-        In-app notifications
+        {t("inAppNotifications")}
       </label>
       <label className="flex items-center gap-2 text-sm text-ink-700">
         <input type="checkbox" name="emailEnabled" defaultChecked={prefs?.email_enabled ?? true} />
-        Email notifications
+        {t("emailNotifications")}
       </label>
       <p className="text-xs text-ink-500">
-        Notification language: {prefs?.notify_lang ?? "not set (defaults to your account language)"}. Email
-        delivery is sent in this language when a provider is configured.
+        {t("notifyLangNote", { lang: prefs?.notify_lang ?? commonT("none") })}
       </p>
       {state && !state.ok && <FieldError>{state.message}</FieldError>}
       <div>
         <Button type="submit" disabled={pending}>
-          {pending ? "Saving…" : "Save preferences"}
+          {pending ? commonT("saving") : t("savePreferences")}
         </Button>
       </div>
     </form>

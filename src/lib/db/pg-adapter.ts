@@ -193,6 +193,8 @@ const RPC_ARG_ORDER: Record<string, string[]> = {
   delete_salary: ["p_salary"],
   request_salary: ["p_month", "p_amount"],
   salary_request_state: ["p_month"],
+  set_profile_locale: ["p_locale"],
+  set_profile_notify_lang: ["p_lang"],
 };
 
 export class PgAdapter implements DbAdapter {

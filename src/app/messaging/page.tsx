@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,7 @@ export default async function MessagingPage({
 }: {
   searchParams: Promise<{ thread?: string }>;
 }) {
+  const t = await getTranslations("messaging");
   const profile = await requireUser();
   const sp = await searchParams;
   const ctx = await requireDbContext();
@@ -31,16 +33,16 @@ export default async function MessagingPage({
   const unread = unreadRes.ok && unreadRes.data ? unreadRes.data.unread : 0;
 
   return (
-    <PageShell title="Messaging" permission="messageConversations">
+    <PageShell title={t("title")} permission="messageConversations">
       <div className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-1">
           <CardHeader>
-            <CardTitle>Conversations</CardTitle>
-            <CardDescription>{unread} unread</CardDescription>
+            <CardTitle>{t("conversations")}</CardTitle>
+            <CardDescription>{unread} {t("unread")}</CardDescription>
           </CardHeader>
           <CardBody className="px-0">
             {conversationsList.length === 0 ? (
-              <p className="px-4 py-8 text-center text-sm text-ink-500">No conversations yet.</p>
+              <p className="px-4 py-8 text-center text-sm text-ink-500">{t("noThreads")}</p>
             ) : (
               <ul className="divide-y divide-ink-100">
                 {conversationsList.map((c) => (
@@ -67,7 +69,7 @@ export default async function MessagingPage({
         <div className="flex flex-col gap-4 lg:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>New message</CardTitle>
+              <CardTitle>{t("newMessage")}</CardTitle>
             </CardHeader>
             <CardBody>
               <MessageComposer recipients={recipientsList.map((r) => ({ id: r.id, name: r.name ?? r.id }))} />
@@ -77,7 +79,7 @@ export default async function MessagingPage({
           {thread ? (
             <Card>
               <CardHeader>
-                <CardTitle>Thread</CardTitle>
+                <CardTitle>{t("thread")}</CardTitle>
               </CardHeader>
               <CardBody>
                 <ThreadPanel thread={thread} profileId={profile.id} />
@@ -86,7 +88,7 @@ export default async function MessagingPage({
           ) : (
             <Card>
               <CardBody>
-                <p className="py-8 text-center text-sm text-ink-500">Select a conversation to read and reply.</p>
+                <p className="py-8 text-center text-sm text-ink-500">{t("selectToRead")}</p>
               </CardBody>
             </Card>
           )}

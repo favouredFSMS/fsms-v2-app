@@ -1,22 +1,24 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { resetPasswordAction } from "@/lib/auth/actions";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
 export function ResetForm() {
+  const t = useTranslations("auth");
   const [state, formAction, pending] = useActionState(resetPasswordAction, null);
 
   if (state?.ok) {
     return (
       <div className="flex flex-col gap-4">
         <div className="rounded-field bg-success-50 px-3 py-2.5 text-sm text-success-700">
-          Password updated. Sign in with your new password.
+          {t("passwordUpdated")}
         </div>
         <ButtonLink href="/login" className="w-full">
-          Sign in
+          {t("signIn")}
         </ButtonLink>
       </div>
     );
@@ -24,7 +26,7 @@ export function ResetForm() {
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
-      <Field label="New password" htmlFor="password">
+      <Field label={t("newPassword")} htmlFor="password">
         <Input
           id="password"
           name="password"
@@ -32,11 +34,11 @@ export function ResetForm() {
           autoComplete="new-password"
           minLength={8}
           required
-          placeholder="At least 8 characters"
+          placeholder={t("atLeast8")}
         />
       </Field>
 
-      <Field label="Confirm new password" htmlFor="confirm">
+      <Field label={t("confirmNewPassword")} htmlFor="confirm">
         <Input
           id="confirm"
           name="confirm"
@@ -44,14 +46,14 @@ export function ResetForm() {
           autoComplete="new-password"
           minLength={8}
           required
-          placeholder="Repeat the password"
+          placeholder={t("repeatPassword")}
         />
       </Field>
 
       {state?.error && <FieldError>{state.error}</FieldError>}
 
       <Button type="submit" loading={pending} className="w-full">
-        {pending ? "Saving…" : "Set password"}
+        {pending ? t("saving") : t("setPassword")}
       </Button>
     </form>
   );

@@ -45,8 +45,10 @@ export function AppShell({ brand, title, user, sections, children }: AppShellPro
 
       {/* content column */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <Header title={title} user={user} onMenuToggle={() => setMobileOpen((v) => !v)} />
-        <main className={cn("flex-1 p-4 sm:p-6")}>{children}</main>
+        <div className="pt-safe">
+          <Header title={title} user={user} onMenuToggle={() => setMobileOpen((v) => !v)} />
+        </div>
+        <main className={cn("flex-1 p-4 pb-safe sm:p-6")}>{children}</main>
       </div>
     </div>
   );

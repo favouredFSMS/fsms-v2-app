@@ -82,8 +82,10 @@ export const config = {
   matcher: [
     /*
      * Run on everything except Next internals and static assets, so session
-     * refresh and protection cover the whole app.
+     * refresh and protection cover the whole app. PWA assets (sw.js,
+     * offline.html, manifest, icons) are public so installability and offline
+     * fallback work regardless of session state.
      */
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|sw\\.js|offline\\.html|manifest\\.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };

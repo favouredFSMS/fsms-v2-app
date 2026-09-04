@@ -8,7 +8,7 @@ export const metadata = { title: "Sign in — FSMS V2" };
 export default async function LoginPage() {
   const t = await getTranslations("auth");
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-10">
+    <main className="flex min-h-screen flex-col items-center justify-center px-4 pt-safe pb-safe py-10">
       <div className="mb-6 flex items-center gap-3">
         <span className="flex size-10 items-center justify-center rounded-card bg-brand-600 text-ink-inverse">
           <Icon name="students" size={22} />

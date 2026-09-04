@@ -11,5 +11,7 @@ export * from "./pagination";
 export * from "./batch";
 export * from "./validate";
 export * from "./loader";
-export { StudentRepository, type StudentSummary } from "./repos/students";
+export { StudentRepository, type StudentSummary, type StudentDetail } from "./repos/students";
 export { DashboardRepository, type DashboardSummary } from "./repos/dashboard";
+export { ParentRepository, type ParentSummary } from "./repos/parents";
+export { UserRepository, type UserSummary } from "./repos/users";

@@ -41,6 +41,53 @@ interface StudentSearchRpcResult {
   next_cursor: string | null;
 }
 
+export interface StudentDetailParent {
+  id: string;
+  name: string | null;
+  relationship: string | null;
+  phone: string | null;
+  email: string | null;
+}
+
+export interface StudentDetailClass {
+  id: string;
+  name: string | null;
+  level_code: string | null;
+  primary_teacher: string | null;
+}
+
+export interface StudentDetailSummary {
+  attendance_present: number;
+  attendance_late: number;
+  attendance_absent: number;
+  homework_total: number;
+  homework_graded: number;
+  assessments: number;
+  evidence: number;
+}
+
+export interface StudentDetail {
+  student: {
+    id: string;
+    name: string | null;
+    student_no: string | null;
+    legacy_id: string | null;
+    level_code: string | null;
+    status: string | null;
+    gender: string | null;
+    dob: string | null;
+    phone: string | null;
+    email: string | null;
+    address: string | null;
+    joined_at: string | null;
+    learner_type: string | null;
+    notes: string | null;
+  } | null;
+  parents: StudentDetailParent[];
+  classes: StudentDetailClass[];
+  summary: StudentDetailSummary;
+}
+
 export class StudentRepository extends Repository {
   /** School+visibility-scoped, searchable, keyset-paginated listing. */
   async search(input: unknown): Promise<ServiceResult<Page<StudentSummary>>> {
@@ -82,6 +129,16 @@ export class StudentRepository extends Repository {
       columns: "id, name, student_no, level_code, status",
       where: [{ op: "eq", column: "id", value: id }],
     });
+  }
+
+  /** Aggregated student profile (student + parents + classes + summary). */
+  async detail(id: string): Promise<ServiceResult<StudentDetail | null>> {
+    if (!id) return ok(null);
+    const { data, error } = await this.ctx.db.rpc<StudentDetail | null>("student_detail", {
+      p_student: id,
+    });
+    if (error) return fail(error);
+    return ok(data ?? null);
   }
 
   /** Create a student in the caller's school (RBAC + RLS enforced). */

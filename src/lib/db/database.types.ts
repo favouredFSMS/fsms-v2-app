@@ -3842,6 +3842,10 @@ export type Database = {
   };
   fsms: {
     Functions: {
+      assign_user_role: {
+        Args: { p_user: string; p_role_key: string };
+        Returns: Json;
+      };
       can_see_class: {
         Args: { p_class: string };
         Returns: Json;
@@ -3906,12 +3910,28 @@ export type Database = {
         Args: Record<string, never>;
         Returns: Json;
       };
+      parent_search: {
+        Args: { p_search?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
       role_rank: {
         Args: Record<string, never>;
         Returns: Json;
       };
+      set_user_status: {
+        Args: { p_user: string; p_status: string };
+        Returns: Json;
+      };
+      student_detail: {
+        Args: { p_student: string };
+        Returns: Json;
+      };
       student_search: {
         Args: { p_search?: string; p_level?: string; p_status?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      user_search: {
+        Args: { p_search?: string; p_role?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
       };
     };

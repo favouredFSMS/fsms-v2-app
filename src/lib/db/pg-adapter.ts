@@ -32,6 +32,11 @@ function ident(name: string, kind: string): string {
 const RPC_ARG_ORDER: Record<string, string[]> = {
   student_search: ["p_search", "p_level", "p_status", "p_page_size", "p_cursor"],
   dashboard_summary: [],
+  parent_search: ["p_search", "p_page_size", "p_cursor"],
+  user_search: ["p_search", "p_role", "p_page_size", "p_cursor"],
+  student_detail: ["p_student"],
+  set_user_status: ["p_user", "p_status"],
+  assign_user_role: ["p_user", "p_role_key"],
 };
 
 export class PgAdapter implements DbAdapter {

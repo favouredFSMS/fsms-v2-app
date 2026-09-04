@@ -1182,6 +1182,7 @@
     "uploadSaved": "文件已上传",
     "uploadNotDeletedDenied": "文件未删除（无权限）",
     "uploadDeleted": "文件已删除",
-    "uploadDeleteFailed": "删除文件失败"
+    "uploadDeleteFailed": "删除文件失败",
+    "uploadTypeBlocked": "不允许此文件类型"
   }
 }

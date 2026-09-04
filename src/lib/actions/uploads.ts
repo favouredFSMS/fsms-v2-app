@@ -23,6 +23,16 @@ export type UploadActionState = { ok: boolean; message?: string };
 /** Hard cap per file (20 MB) — matches the bucket policy expectation. */
 const MAX_BYTES = 20 * 1024 * 1024;
 
+/**
+ * Active-content types rejected at upload (Phase 28 hardening): HTML/JS/SVG can
+ * execute when served, so they are never accepted even though legitimate docs
+ * and images are. Storage policies should mirror this server-side.
+ */
+const BLOCKED_MIME = new RegExp(
+  "(?:text\\/html|application\\/(?:xhtml\\+xml|javascript|ecmascript)|text\\/javascript|image\\/svg\\+xml)",
+  "i",
+);
+
 export async function uploadFileAction(
   _prev: UploadActionState | null,
   formData: FormData,
@@ -37,6 +47,9 @@ export async function uploadFileAction(
   }
   if (file.size > MAX_BYTES) {
     return { ok: false, message: await translate("actions.uploadTooLarge") };
+  }
+  if (file.type && BLOCKED_MIME.test(file.type)) {
+    return { ok: false, message: await translate("actions.uploadTypeBlocked") };
   }
   if (!isStorageEnabled()) {
     return { ok: false, message: await translate("actions.storageNotConfigured") };

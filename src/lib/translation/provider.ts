@@ -23,7 +23,9 @@ export interface TranslationProvider {
 
 /** No provider configured: dynamic content is returned untranslated. */
 export class NoopTranslationProvider implements TranslationProvider {
-  async translate(_text: string, _targetLocale: AppLocale): Promise<null> {
+  async translate(text: string, targetLocale: AppLocale): Promise<null> {
+    void text;
+    void targetLocale;
     return null;
   }
 }

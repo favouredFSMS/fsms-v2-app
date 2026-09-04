@@ -1182,6 +1182,7 @@
     "uploadSaved": "File uploaded",
     "uploadNotDeletedDenied": "File was not deleted (denied)",
     "uploadDeleted": "File deleted",
-    "uploadDeleteFailed": "Failed to delete file"
+    "uploadDeleteFailed": "Failed to delete file",
+    "uploadTypeBlocked": "This file type is not allowed"
   }
 }

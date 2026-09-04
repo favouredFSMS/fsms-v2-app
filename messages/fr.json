@@ -1182,6 +1182,7 @@
     "uploadSaved": "Fichier téléversé",
     "uploadNotDeletedDenied": "Fichier non supprimé (refusé)",
     "uploadDeleted": "Fichier supprimé",
-    "uploadDeleteFailed": "Impossible de supprimer le fichier"
+    "uploadDeleteFailed": "Impossible de supprimer le fichier",
+    "uploadTypeBlocked": "Ce type de fichier n'est pas autorisé"
   }
 }

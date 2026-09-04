@@ -1182,6 +1182,7 @@
     "uploadSaved": "Файл загружен",
     "uploadNotDeletedDenied": "Файл не удалён (доступ запрещён)",
     "uploadDeleted": "Файл удалён",
-    "uploadDeleteFailed": "Не удалось удалить файл"
+    "uploadDeleteFailed": "Не удалось удалить файл",
+    "uploadTypeBlocked": "Этот тип файла запрещён"
   }
 }

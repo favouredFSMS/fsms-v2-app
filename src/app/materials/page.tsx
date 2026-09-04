@@ -17,6 +17,7 @@ import { MethodologyForm } from "@/components/materials/methodology-form";
 import { MethodologyDeleteButton } from "@/components/materials/methodology-delete-button";
 import { TeacherMaterialForm } from "@/components/materials/teacher-material-form";
 import { MaterialFeedbackForm } from "@/components/materials/material-feedback-form";
+import { FileUploadForm } from "@/components/materials/file-upload-form";
 
 export const metadata = { title: "Materials — FSMS V2" };
 
@@ -47,6 +48,7 @@ export default async function MaterialsPage({
   const canTeacherMatView = profileCan(profile, "searchTeachingMaterials");
   const canTeacherMat = profileCan(profile, "saveTeacherMaterial");
   const canFeedback = profileCan(profile, "saveMaterialFeedback");
+  const canUpload = profileCan(profile, "uploadLessonFile");
 
   const [catalog, detail, classesRes, mappingsRes, resources, methodologyRes, teacherMaterials] =
     await Promise.all([
@@ -389,6 +391,19 @@ export default async function MaterialsPage({
               ) : (
                 <TableEmpty colSpan={4}>{t("noTeacherMaterials")}</TableEmpty>
               )}
+            </CardBody>
+          </Card>
+        )}
+
+        {/* ── file uploads (F20.1: Drive → Supabase Storage) ──────────────── */}
+        {canUpload && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("uploadFiles")}</CardTitle>
+              <CardDescription>{t("uploadFilesDesc")}</CardDescription>
+            </CardHeader>
+            <CardBody>
+              <FileUploadForm />
             </CardBody>
           </Card>
         )}

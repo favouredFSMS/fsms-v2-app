@@ -216,7 +216,9 @@
     "passwordMin": "密码至少需要 8 个字符。",
     "passwordMismatch": "两次输入的密码不一致。",
     "recoveryNeedsSupabase": "密码找回需要已配置的 Supabase 项目（O1：邮箱找回）。本地开发请使用演示密码。",
-    "brand": "FAVOURED 学生管理系统"
+    "brand": "FAVOURED 学生管理系统",
+    "googleSignIn": "使用 Google 登录",
+    "orContinue": "或"
   },
   "roles": {
     "admin1": "所有者",
@@ -692,7 +694,20 @@
     "reader": "读本",
     "media": "媒体",
     "other": "其他",
-    "driveUrl": "网盘链接"
+    "driveUrl": "网盘链接",
+    "uploadFiles": "文件",
+    "uploadFilesDesc": "上传文件到安全的云存储（取代 Google Drive）。",
+    "uploadPurpose": "用途",
+    "uploadRecord": "关联记录 ID（可选）",
+    "uploadChoose": "选择文件",
+    "uploadSubmit": "上传",
+    "uploading": "上传中…",
+    "purposeLessons": "课程文件",
+    "purposeHomework": "作业",
+    "purposeMaterials": "材料",
+    "purposeBadges": "徽章",
+    "purposeAvatars": "头像",
+    "purposeGeneral": "通用"
   },
   "ai": {
     "title": "AI",
@@ -1159,6 +1174,14 @@
     "paymentConfirmed": "付款已确认",
     "paymentCancelled": "付款已取消",
     "paymentReverted": "付款已退回",
-    "paymentMarkedPaid": "付款已标记为已付"
+    "paymentMarkedPaid": "付款已标记为已付",
+    "uploadMissingFile": "请选择要上传的文件",
+    "uploadTooLarge": "文件过大（最大 20 MB）",
+    "storageNotConfigured": "文件存储未配置（需要 Supabase Storage）",
+    "uploadFailed": "上传失败",
+    "uploadSaved": "文件已上传",
+    "uploadNotDeletedDenied": "文件未删除（无权限）",
+    "uploadDeleted": "文件已删除",
+    "uploadDeleteFailed": "删除文件失败"
   }
 }

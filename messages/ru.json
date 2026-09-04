@@ -216,7 +216,9 @@
     "passwordMin": "Пароль должен содержать не менее 8 символов.",
     "passwordMismatch": "Пароли не совпадают.",
     "recoveryNeedsSupabase": "Для восстановления пароля нужен настроенный проект Supabase (O1: восстановление по email). В локальной разработке используйте демо-пароли.",
-    "brand": "FAVOURED — система управления учениками"
+    "brand": "FAVOURED — система управления учениками",
+    "googleSignIn": "Войти через Google",
+    "orContinue": "или"
   },
   "roles": {
     "admin1": "Владелец",
@@ -692,7 +694,20 @@
     "reader": "Книга для чтения",
     "media": "Медиа",
     "other": "Другое",
-    "driveUrl": "Ссылка Drive"
+    "driveUrl": "Ссылка Drive",
+    "uploadFiles": "Файлы",
+    "uploadFilesDesc": "Загрузка файлов в защищённое облачное хранилище (заменяет Google Drive).",
+    "uploadPurpose": "Назначение",
+    "uploadRecord": "ID связанной записи (необязательно)",
+    "uploadChoose": "Выберите файл",
+    "uploadSubmit": "Загрузить",
+    "uploading": "Загрузка…",
+    "purposeLessons": "Файлы уроков",
+    "purposeHomework": "Домашние задания",
+    "purposeMaterials": "Материалы",
+    "purposeBadges": "Значки",
+    "purposeAvatars": "Аватары",
+    "purposeGeneral": "Общее"
   },
   "ai": {
     "title": "ИИ",
@@ -1159,6 +1174,14 @@
     "paymentConfirmed": "Платёж подтверждён",
     "paymentCancelled": "Платёж отменён",
     "paymentReverted": "Платёж возвращён",
-    "paymentMarkedPaid": "Платёж отмечен как оплаченный"
+    "paymentMarkedPaid": "Платёж отмечен как оплаченный",
+    "uploadMissingFile": "Выберите файл для загрузки",
+    "uploadTooLarge": "Файл слишком большой (макс. 20 МБ)",
+    "storageNotConfigured": "Хранилище файлов не настроено (требуется Supabase Storage)",
+    "uploadFailed": "Не удалось загрузить файл",
+    "uploadSaved": "Файл загружен",
+    "uploadNotDeletedDenied": "Файл не удалён (доступ запрещён)",
+    "uploadDeleted": "Файл удалён",
+    "uploadDeleteFailed": "Не удалось удалить файл"
   }
 }

@@ -216,7 +216,9 @@
     "passwordMin": "Password must be at least 8 characters.",
     "passwordMismatch": "Passwords do not match.",
     "recoveryNeedsSupabase": "Password recovery needs a provisioned Supabase project (O1: email recovery). In local dev, use the seeded demo passwords.",
-    "brand": "FAVOURED Student Management System"
+    "brand": "FAVOURED Student Management System",
+    "googleSignIn": "Continue with Google",
+    "orContinue": "or"
   },
   "roles": {
     "admin1": "Owner",
@@ -692,7 +694,20 @@
     "reader": "Reader",
     "media": "Media",
     "other": "Other",
-    "driveUrl": "Drive URL"
+    "driveUrl": "Drive URL",
+    "uploadFiles": "Files",
+    "uploadFilesDesc": "Upload files to secure cloud storage (replaces Google Drive).",
+    "uploadPurpose": "Purpose",
+    "uploadRecord": "Related record id (optional)",
+    "uploadChoose": "Choose a file",
+    "uploadSubmit": "Upload",
+    "uploading": "Uploading…",
+    "purposeLessons": "Lesson files",
+    "purposeHomework": "Homework",
+    "purposeMaterials": "Materials",
+    "purposeBadges": "Badges",
+    "purposeAvatars": "Avatars",
+    "purposeGeneral": "General"
   },
   "ai": {
     "title": "AI",
@@ -1159,6 +1174,14 @@
     "paymentConfirmed": "Payment confirmed",
     "paymentCancelled": "Payment cancelled",
     "paymentReverted": "Payment reverted",
-    "paymentMarkedPaid": "Payment marked as paid"
+    "paymentMarkedPaid": "Payment marked as paid",
+    "uploadMissingFile": "Choose a file to upload",
+    "uploadTooLarge": "File is too large (max 20 MB)",
+    "storageNotConfigured": "File storage is not configured (Supabase Storage required)",
+    "uploadFailed": "Upload failed",
+    "uploadSaved": "File uploaded",
+    "uploadNotDeletedDenied": "File was not deleted (denied)",
+    "uploadDeleted": "File deleted",
+    "uploadDeleteFailed": "Failed to delete file"
   }
 }

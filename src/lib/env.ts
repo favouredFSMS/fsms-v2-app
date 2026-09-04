@@ -70,6 +70,11 @@ export const env = {
     return read("GOOGLE_TRANSLATE_API_KEY");
   },
 
+  /** Supabase Storage bucket for uploaded files (F20.1). SERVER-SIDE ONLY. */
+  get storageBucket(): string {
+    return read("STORAGE_BUCKET", false, "fsms-files");
+  },
+
   /** Canonical app URL (O4) — used in email/notification links. */
   get appUrl(): string {
     return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";

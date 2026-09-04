@@ -107,3 +107,23 @@ export async function resetPasswordAction(
   if (error) return { error: error.message };
   return { ok: true };
 }
+
+/**
+ * Google OAuth sign-in (F1.1, Phase 26). Supabase GoTrue issues the consent
+ * URL; we then redirect the browser to Google. Local harness has no Google, so
+ * it fails closed to the login page with a flag.
+ */
+export async function googleLoginAction(): Promise<void> {
+  if (isLocalAuthEnabled()) {
+    redirect("/login?error=google-unavailable");
+  }
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${env.appUrl}/auth/callback` },
+  });
+  if (error || !data?.url) {
+    redirect("/login?error=google");
+  }
+  redirect(data.url);
+}

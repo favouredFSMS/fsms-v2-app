@@ -2566,6 +2566,7 @@ export type Database = {
       kind: string | null;
       status: Enums["payment_status"];
       created_at: string;
+      payment_id: string | null;
         };
         Insert: {
       id?: string;
@@ -2579,6 +2580,7 @@ export type Database = {
       kind?: string | null;
       status?: Enums["payment_status"];
       created_at?: string;
+      payment_id?: string | null;
         };
         Update: {
       id?: string;
@@ -2592,6 +2594,7 @@ export type Database = {
       kind?: string | null;
       status?: Enums["payment_status"];
       created_at?: string;
+      payment_id?: string | null;
         };
         Relationships: [];
       };
@@ -3492,6 +3495,87 @@ export type Database = {
         };
         Relationships: [];
       };
+      student_credits: {
+        Row: {
+      id: string;
+      school_id: string;
+      legacy_id: string | null;
+      student_id: string;
+      amount: number;
+      note: string | null;
+      created_by: string | null;
+      created_at: string;
+        };
+        Insert: {
+      id?: string;
+      school_id: string;
+      legacy_id?: string | null;
+      student_id: string;
+      amount?: number;
+      note?: string | null;
+      created_by?: string | null;
+      created_at?: string;
+        };
+        Update: {
+      id?: string;
+      school_id?: string;
+      legacy_id?: string | null;
+      student_id?: string;
+      amount?: number;
+      note?: string | null;
+      created_by?: string | null;
+      created_at?: string;
+        };
+        Relationships: [];
+      };
+      student_discounts: {
+        Row: {
+      id: string;
+      school_id: string;
+      legacy_id: string | null;
+      student_id: string;
+      name: string | null;
+      percent: number | null;
+      amount: number | null;
+      reason: string | null;
+      active: boolean;
+      created_by: string | null;
+      created_at: string;
+      removed_at: string | null;
+      removed_by: string | null;
+        };
+        Insert: {
+      id?: string;
+      school_id: string;
+      legacy_id?: string | null;
+      student_id: string;
+      name?: string | null;
+      percent?: number | null;
+      amount?: number | null;
+      reason?: string | null;
+      active?: boolean;
+      created_by?: string | null;
+      created_at?: string;
+      removed_at?: string | null;
+      removed_by?: string | null;
+        };
+        Update: {
+      id?: string;
+      school_id?: string;
+      legacy_id?: string | null;
+      student_id?: string;
+      name?: string | null;
+      percent?: number | null;
+      amount?: number | null;
+      reason?: string | null;
+      active?: boolean;
+      created_by?: string | null;
+      created_at?: string;
+      removed_at?: string | null;
+      removed_by?: string | null;
+        };
+        Relationships: [];
+      };
       student_parents: {
         Row: {
       student_id: string;
@@ -3966,6 +4050,33 @@ export type Database = {
         };
         Relationships: [];
       };
+      wallet_cheers: {
+        Row: {
+      id: string;
+      school_id: string;
+      user_id: string;
+      month: string;
+      cheered_by: string | null;
+      created_at: string;
+        };
+        Insert: {
+      id?: string;
+      school_id: string;
+      user_id: string;
+      month: string;
+      cheered_by?: string | null;
+      created_at?: string;
+        };
+        Update: {
+      id?: string;
+      school_id?: string;
+      user_id?: string;
+      month?: string;
+      cheered_by?: string | null;
+      created_at?: string;
+        };
+        Relationships: [];
+      };
       wallet_ledger: {
         Row: {
       id: string;
@@ -4064,6 +4175,10 @@ export type Database = {
   };
   fsms: {
     Functions: {
+      _append_ledger: {
+        Args: { p_payment: string };
+        Returns: Json;
+      };
       _csv_assessment: {
         Args: { p: Json };
         Returns: Json;
@@ -4192,6 +4307,10 @@ export type Database = {
         Args: { p_student: string };
         Returns: Json;
       };
+      cancel_payment: {
+        Args: { p_payment: string };
+        Returns: Json;
+      };
       class_detail: {
         Args: { p_class: string };
         Returns: Json;
@@ -4208,6 +4327,10 @@ export type Database = {
         Args: { p_search?: string; p_level?: string; p_status?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
       };
+      confirm_payment: {
+        Args: { p_payment: string };
+        Returns: Json;
+      };
       create_academic_year: {
         Args: { p_name: string; p_starts_on?: string; p_ends_on?: string };
         Returns: Json;
@@ -4222,6 +4345,10 @@ export type Database = {
       };
       create_term: {
         Args: { p_year: string; p_name: string; p_starts_on?: string; p_ends_on?: string };
+        Returns: Json;
+      };
+      credit_audit: {
+        Args: { p_student: string };
         Returns: Json;
       };
       current_profile: {
@@ -4288,8 +4415,24 @@ export type Database = {
         Args: { p_resource: string };
         Returns: Json;
       };
+      delete_salary: {
+        Args: { p_salary: string };
+        Returns: Json;
+      };
+      discount_history: {
+        Args: { p_student: string };
+        Returns: Json;
+      };
+      dismiss_wallet_cheer: {
+        Args: { p_month: string };
+        Returns: Json;
+      };
       duplicate_curriculum: {
         Args: { p_curriculum: string; p_title?: string };
+        Returns: Json;
+      };
+      edit_payment: {
+        Args: { p_payment: string; p_amount?: number; p_due_date?: string; p_pay_type?: string };
         Returns: Json;
       };
       enrol_student: {
@@ -4408,6 +4551,10 @@ export type Database = {
         Args: { p_notif: string };
         Returns: Json;
       };
+      mark_paid: {
+        Args: { p_payment: string };
+        Returns: Json;
+      };
       material_access_admin: {
         Args: { p_material: string };
         Returns: Json;
@@ -4476,8 +4623,32 @@ export type Database = {
         Args: { p_search?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
       };
+      payment_clients: {
+        Args: { p_search?: string; p_page_size?: number };
+        Returns: Json;
+      };
+      payment_proof: {
+        Args: { p_payment: string };
+        Returns: Json;
+      };
+      payments_list: {
+        Args: { p_student?: string; p_status?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      payroll_roster: {
+        Args: { p_month?: string };
+        Returns: Json;
+      };
       permanently_delete_curriculum: {
         Args: { p_curriculum: string };
+        Returns: Json;
+      };
+      pricing_list: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      pricing_save: {
+        Args: { p_id?: string; p_name?: Json; p_level_code?: string; p_price?: number; p_currency?: string; p_active?: boolean };
         Returns: Json;
       };
       publish_curriculum: {
@@ -4486,6 +4657,10 @@ export type Database = {
       };
       record_assessment_test: {
         Args: { p_test: string; p_marks: Json };
+        Returns: Json;
+      };
+      remove_discount: {
+        Args: { p_discount: string };
         Returns: Json;
       };
       remove_teacher: {
@@ -4512,6 +4687,18 @@ export type Database = {
         Args: { p_job: string };
         Returns: Json;
       };
+      request_early_payment: {
+        Args: { p_student: string; p_class: string };
+        Returns: Json;
+      };
+      request_payment: {
+        Args: { p_student: string; p_amount: number; p_due_date?: string; p_pay_type?: string };
+        Returns: Json;
+      };
+      request_salary: {
+        Args: { p_month: string; p_amount: number };
+        Returns: Json;
+      };
       resources: {
         Args: { p_search?: string; p_kind?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
@@ -4520,12 +4707,20 @@ export type Database = {
         Args: { p_curriculum: string };
         Returns: Json;
       };
+      revert_payment: {
+        Args: { p_payment: string };
+        Returns: Json;
+      };
       role_rank: {
         Args: Record<string, never>;
         Returns: Json;
       };
       salary_history: {
         Args: { p_user?: string; p_month?: string };
+        Returns: Json;
+      };
+      salary_request_state: {
+        Args: { p_month: string };
         Returns: Json;
       };
       save_assessment: {
@@ -4546,6 +4741,10 @@ export type Database = {
       };
       save_curriculum_topic: {
         Args: { p_id?: string; p_title?: string; p_level_code?: string; p_course_section?: string; p_published?: boolean };
+        Returns: Json;
+      };
+      save_discount: {
+        Args: { p_student: string; p_name?: string; p_percent?: number; p_amount?: number; p_reason?: string };
         Returns: Json;
       };
       save_evidence: {
@@ -4616,6 +4815,10 @@ export type Database = {
         Args: { p_id?: string; p_title?: string; p_url?: string; p_file_path?: string; p_kind?: string };
         Returns: Json;
       };
+      save_salary: {
+        Args: { p_user: string; p_month: string; p_amount: number; p_currency?: string };
+        Returns: Json;
+      };
       save_teacher_material: {
         Args: { p_id?: string; p_title?: string; p_kind?: string; p_payload?: Json };
         Returns: Json;
@@ -4626,6 +4829,10 @@ export type Database = {
       };
       save_upload: {
         Args: { p_storage_path: string; p_bucket: string; p_mime?: string; p_size_bytes?: number; p_original_name?: string };
+        Returns: Json;
+      };
+      save_wallet: {
+        Args: { p_user: string; p_month: string; p_amount: number; p_kind?: string };
         Returns: Json;
       };
       seen_page: {
@@ -4640,6 +4847,14 @@ export type Database = {
         Args: { p_enrolment: string; p_status: string };
         Returns: Json;
       };
+      set_payroll: {
+        Args: { p_month: string; p_rows: Json };
+        Returns: Json;
+      };
+      set_student_credit: {
+        Args: { p_student: string; p_amount: number; p_note?: string };
+        Returns: Json;
+      };
       set_user_status: {
         Args: { p_user: string; p_status: string };
         Returns: Json;
@@ -4649,6 +4864,10 @@ export type Database = {
         Returns: Json;
       };
       student_detail: {
+        Args: { p_student: string };
+        Returns: Json;
+      };
+      student_pricing: {
         Args: { p_student: string };
         Returns: Json;
       };
@@ -4666,6 +4885,10 @@ export type Database = {
       };
       submit_homework: {
         Args: { p_homework: string; p_note: string };
+        Returns: Json;
+      };
+      submit_proof: {
+        Args: { p_payment: string; p_file_path: string };
         Returns: Json;
       };
       teacher_materials: {
@@ -4686,6 +4909,18 @@ export type Database = {
       };
       user_search: {
         Args: { p_search?: string; p_role?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      wallet: {
+        Args: { p_user?: string; p_month?: string };
+        Returns: Json;
+      };
+      wallet_admin: {
+        Args: { p_month?: string };
+        Returns: Json;
+      };
+      wallet_cheer: {
+        Args: { p_user: string; p_month: string };
         Returns: Json;
       };
     };

@@ -120,3 +120,15 @@ export {
   type NotificationPrefs,
   type ActivityItem,
 } from "./repos/comms";
+export {
+  FinanceRepository,
+  type PricingRow,
+  type StudentPricing,
+  type StudentDiscount,
+  type PaymentRow,
+  type PaymentClientRow,
+  type WalletRow,
+  type WalletResult,
+  type PayrollRow,
+  type CreditAudit,
+} from "./repos/finance";

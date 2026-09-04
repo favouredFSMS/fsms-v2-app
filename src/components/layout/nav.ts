@@ -62,8 +62,9 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     title: "Finances",
     items: [
-      { href: "/payments", label: "Payments", icon: "payments", permission: "payments" },
-      { href: "/payroll", label: "Payroll", icon: "payroll", permission: "payroll" },
+      // canonical "finance" lands in Phase 23; payments is the family+staff gate
+      { href: "/finance", label: "Payments", icon: "payments", permission: "payments" },
+      { href: "/payroll", label: "Payroll", icon: "payroll", permission: "payrollRoster" },
     ],
   },
   {

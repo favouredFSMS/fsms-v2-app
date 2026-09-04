@@ -52,3 +52,15 @@ export {
   type AssessmentTestDetail,
   type AssessmentPerformance,
 } from "./repos/assessments";
+export {
+  CurriculumRepository,
+  type SpineNode,
+  type SkillItem,
+  type LearningTarget,
+  type CurriculumTopic,
+  type EvidenceItem,
+  type ProgressTarget,
+  type LearnerProgress,
+  type CurriculumItem,
+  type CurriculumAssignment,
+} from "./repos/curriculum";

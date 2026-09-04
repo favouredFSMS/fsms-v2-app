@@ -3850,6 +3850,10 @@ export type Database = {
         Args: { p_test: string };
         Returns: Json;
       };
+      archive_curriculum: {
+        Args: { p_curriculum: string };
+        Returns: Json;
+      };
       assessment_list: {
         Args: { p_student?: string; p_class?: string; p_from?: string; p_to?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
@@ -3864,6 +3868,10 @@ export type Database = {
       };
       assessment_tests: {
         Args: { p_student?: string; p_status?: string };
+        Returns: Json;
+      };
+      assign_curriculum: {
+        Args: { p_curriculum: string; p_class: string };
         Returns: Json;
       };
       assign_teacher: {
@@ -3934,6 +3942,14 @@ export type Database = {
         Args: Record<string, never>;
         Returns: Json;
       };
+      curriculum_list: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      curriculum_topics_list: {
+        Args: { p_level?: string };
+        Returns: Json;
+      };
       dashboard_summary: {
         Args: Record<string, never>;
         Returns: Json;
@@ -3942,8 +3958,16 @@ export type Database = {
         Args: { p_change: string; p_decision: string };
         Returns: Json;
       };
+      delete_curriculum: {
+        Args: { p_curriculum: string };
+        Returns: Json;
+      };
       delete_lesson_log: {
         Args: { p_log: string };
+        Returns: Json;
+      };
+      duplicate_curriculum: {
+        Args: { p_curriculum: string; p_title?: string };
         Returns: Json;
       };
       enrol_student: {
@@ -3952,6 +3976,10 @@ export type Database = {
       };
       ensure_builtin_roles: {
         Args: { p_school: string };
+        Returns: Json;
+      };
+      evidence_list: {
+        Args: { p_student?: string; p_from?: string; p_to?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
       };
       grade_homework: {
@@ -3972,6 +4000,10 @@ export type Database = {
       };
       homework_notify: {
         Args: { p_user_ids: string[]; p_kind: string; p_payload: Json };
+        Returns: Json;
+      };
+      import_curriculum: {
+        Args: { p_programme: string; p_title: string; p_publisher?: string; p_payload?: Json };
         Returns: Json;
       };
       is_finance: {
@@ -3996,6 +4028,14 @@ export type Database = {
       };
       is_superuser: {
         Args: Record<string, never>;
+        Returns: Json;
+      };
+      learner_progress: {
+        Args: { p_student: string };
+        Returns: Json;
+      };
+      learning_targets_list: {
+        Args: { p_level?: string };
         Returns: Json;
       };
       lesson_change_list: {
@@ -4034,12 +4074,24 @@ export type Database = {
         Args: { p_search?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
       };
+      permanently_delete_curriculum: {
+        Args: { p_curriculum: string };
+        Returns: Json;
+      };
+      publish_curriculum: {
+        Args: { p_curriculum: string };
+        Returns: Json;
+      };
       record_assessment_test: {
         Args: { p_test: string; p_marks: Json };
         Returns: Json;
       };
       remove_teacher: {
         Args: { p_class: string; p_user: string };
+        Returns: Json;
+      };
+      restore_curriculum: {
+        Args: { p_curriculum: string };
         Returns: Json;
       };
       role_rank: {
@@ -4058,8 +4110,24 @@ export type Database = {
         Args: { p_class: string; p_date: string; p_marks: Json };
         Returns: Json;
       };
+      save_curriculum: {
+        Args: { p_curriculum: string; p_title?: string; p_publisher?: string };
+        Returns: Json;
+      };
+      save_curriculum_topic: {
+        Args: { p_id?: string; p_title?: string; p_level_code?: string; p_course_section?: string; p_published?: boolean };
+        Returns: Json;
+      };
+      save_evidence: {
+        Args: { p_student: string; p_target: string; p_topic?: string; p_lesson?: string; p_score?: number; p_rating?: string; p_quality?: string; p_note?: string };
+        Returns: Json;
+      };
       save_homework: {
         Args: { p_class: string; p_date: string; p_marks: Json };
+        Returns: Json;
+      };
+      save_lesson: {
+        Args: { p_id?: string; p_unit?: string; p_title?: string; p_code?: string; p_no?: number };
         Returns: Json;
       };
       save_lesson_control: {
@@ -4074,12 +4142,28 @@ export type Database = {
         Args: { p_class: string; p_lesson: string; p_plan: Json; p_source?: string };
         Returns: Json;
       };
+      save_objective: {
+        Args: { p_id?: string; p_lesson?: string; p_text?: string; p_code?: string; p_cefr?: string };
+        Returns: Json;
+      };
+      save_programme: {
+        Args: { p_id?: string; p_name?: string; p_code?: string; p_type?: string; p_standard?: boolean };
+        Returns: Json;
+      };
+      save_unit: {
+        Args: { p_id?: string; p_programme?: string; p_title?: string; p_code?: string; p_no?: number };
+        Returns: Json;
+      };
       set_enrolment_status: {
         Args: { p_enrolment: string; p_status: string };
         Returns: Json;
       };
       set_user_status: {
         Args: { p_user: string; p_status: string };
+        Returns: Json;
+      };
+      skills_list: {
+        Args: Record<string, never>;
         Returns: Json;
       };
       student_detail: {
@@ -4090,8 +4174,16 @@ export type Database = {
         Args: { p_search?: string; p_level?: string; p_status?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
       };
+      submit_curriculum_review: {
+        Args: { p_curriculum: string };
+        Returns: Json;
+      };
       submit_homework: {
         Args: { p_homework: string; p_note: string };
+        Returns: Json;
+      };
+      unpublish_curriculum: {
+        Args: { p_curriculum: string };
         Returns: Json;
       };
       user_search: {

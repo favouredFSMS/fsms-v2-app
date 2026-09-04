@@ -31,6 +31,7 @@ function ident(name: string, kind: string): string {
 /** Known RPCs and their positional argument order (named → positional map). */
 const RPC_ARG_ORDER: Record<string, string[]> = {
   student_search: ["p_search", "p_level", "p_status", "p_page_size", "p_cursor"],
+  dashboard_summary: [],
 };
 
 export class PgAdapter implements DbAdapter {

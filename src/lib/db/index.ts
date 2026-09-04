@@ -12,3 +12,4 @@ export * from "./batch";
 export * from "./validate";
 export * from "./loader";
 export { StudentRepository, type StudentSummary } from "./repos/students";
+export { DashboardRepository, type DashboardSummary } from "./repos/dashboard";

@@ -3866,6 +3866,10 @@ export type Database = {
         Args: Record<string, never>;
         Returns: Json;
       };
+      dashboard_summary: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
       ensure_builtin_roles: {
         Args: { p_school: string };
         Returns: Json;

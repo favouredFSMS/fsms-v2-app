@@ -1,16 +1,19 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { env } from "@/lib/env";
 
 /**
- * FSMS V2 — Supabase client factory (server variant).
+ * FSMS V2 — Supabase client factories (server).
  *
- * Uses the SERVICE-ROLE key: bypasses RLS, so callers are responsible for
- * authorization checks. This client must only be used in server-side modules
- * (Route Handlers, Server Actions, background jobs). For user-scoped queries,
- * prefer the authenticated browser client or a user-context client.
+ *  - getServerClient(): SERVICE-ROLE client — bypasses RLS. Server-only,
+ *    callers must perform their own authorization checks.
+ *  - createSupabaseServerClient(): cookie/session-scoped client (Supabase SSR).
+ *    All user-facing queries go through this so RLS applies as the signed-in
+ *    user.
  */
 
-let client: SupabaseClient | null = null;
+let serviceClient: SupabaseClient | null = null;
 
 export function getServerClient(): SupabaseClient {
   if (!env.supabaseUrl || !env.supabaseServiceRoleKey) {
@@ -18,10 +21,32 @@ export function getServerClient(): SupabaseClient {
       "Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local.",
     );
   }
-  if (!client) {
-    client = createClient(env.supabaseUrl, env.supabaseServiceRoleKey, {
+  if (!serviceClient) {
+    serviceClient = createClient(env.supabaseUrl, env.supabaseServiceRoleKey, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
   }
-  return client;
+  return serviceClient;
+}
+
+/** Cookie-scoped client for the current request (App Router / Server Components). */
+export async function createSupabaseServerClient(): Promise<SupabaseClient> {
+  const cookieStore = await cookies();
+  return createServerClient(env.supabaseUrl, env.supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(cookiesToSet) {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options as CookieOptions),
+          );
+        } catch {
+          // Called from a Server Component — the middleware refreshes sessions,
+          // so it is safe to ignore here.
+        }
+      },
+    },
+  });
 }

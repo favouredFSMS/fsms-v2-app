@@ -64,3 +64,16 @@ export {
   type CurriculumItem,
   type CurriculumAssignment,
 } from "./repos/curriculum";
+export {
+  MaterialRepository,
+  type MaterialSummary,
+  type MaterialUnit,
+  type MaterialMapping,
+  type MaterialDetail,
+  type MappingOption,
+  type MaterialAccessView,
+  type ResourceItem,
+  type UploadItem,
+  type MethodologyItem,
+  type TeacherMaterialItem,
+} from "./repos/materials";

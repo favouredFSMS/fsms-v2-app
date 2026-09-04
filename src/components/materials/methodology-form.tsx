@@ -1,0 +1,46 @@
+"use client";
+
+import { useActionState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { saveMethodologyAction, type MaterialActionState } from "@/lib/actions/materials";
+import { Button } from "@/components/ui/button";
+import { Field, FieldError } from "@/components/ui/field";
+import { Input, Textarea } from "@/components/ui/input";
+
+export function MethodologyForm() {
+  const [state, formAction, pending] = useActionState<MaterialActionState | null, FormData>(
+    saveMethodologyAction,
+    null,
+  );
+  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (state?.ok) {
+      formRef.current?.reset();
+      router.refresh();
+    }
+  }, [state?.ok, router]);
+
+  return (
+    <form ref={formRef} action={formAction} className="flex flex-col gap-3">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Title" htmlFor="title" required>
+          <Input id="title" name="title" required placeholder="Teaching greetings" />
+        </Field>
+        <Field label="Level" htmlFor="levelCode">
+          <Input id="levelCode" name="levelCode" placeholder="a2" />
+        </Field>
+        <Field label="Body" htmlFor="body" className="sm:col-span-2">
+          <Textarea id="body" name="body" placeholder="How to teach this…" />
+        </Field>
+      </div>
+      {state && !state.ok && <FieldError>{state.message}</FieldError>}
+      <div>
+        <Button type="submit" disabled={pending}>
+          {pending ? "Saving…" : "Add methodology"}
+        </Button>
+      </div>
+    </form>
+  );
+}

@@ -3958,12 +3958,24 @@ export type Database = {
         Args: { p_change: string; p_decision: string };
         Returns: Json;
       };
+      decide_material_mapping: {
+        Args: { p_mapping: string; p_decision: string };
+        Returns: Json;
+      };
       delete_curriculum: {
         Args: { p_curriculum: string };
         Returns: Json;
       };
       delete_lesson_log: {
         Args: { p_log: string };
+        Returns: Json;
+      };
+      delete_methodology: {
+        Args: { p_methodology: string };
+        Returns: Json;
+      };
+      delete_resource: {
+        Args: { p_resource: string };
         Returns: Json;
       };
       duplicate_curriculum: {
@@ -4066,6 +4078,30 @@ export type Database = {
         Args: { p_programme?: string };
         Returns: Json;
       };
+      material_access_admin: {
+        Args: { p_material: string };
+        Returns: Json;
+      };
+      material_catalog: {
+        Args: { p_type?: string; p_level?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      material_detail: {
+        Args: { p_material: string };
+        Returns: Json;
+      };
+      material_mapping_options: {
+        Args: { p_material: string };
+        Returns: Json;
+      };
+      material_mappings: {
+        Args: { p_material?: string; p_status?: string };
+        Returns: Json;
+      };
+      methodology: {
+        Args: { p_level?: string };
+        Returns: Json;
+      };
       my_attendance: {
         Args: { p_student: string };
         Returns: Json;
@@ -4088,6 +4124,10 @@ export type Database = {
       };
       remove_teacher: {
         Args: { p_class: string; p_user: string };
+        Returns: Json;
+      };
+      resources: {
+        Args: { p_search?: string; p_kind?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
       };
       restore_curriculum: {
@@ -4142,6 +4182,34 @@ export type Database = {
         Args: { p_class: string; p_lesson: string; p_plan: Json; p_source?: string };
         Returns: Json;
       };
+      save_material: {
+        Args: { p_id?: string; p_title?: string; p_type?: string; p_level_code?: string; p_publisher?: string; p_isbn?: string; p_drive_url?: string };
+        Returns: Json;
+      };
+      save_material_access: {
+        Args: { p_material: string; p_assignments: Json };
+        Returns: Json;
+      };
+      save_material_feedback: {
+        Args: { p_material: string; p_rating: number; p_note?: string };
+        Returns: Json;
+      };
+      save_material_lesson: {
+        Args: { p_material: string; p_lesson: string };
+        Returns: Json;
+      };
+      save_material_mapping: {
+        Args: { p_id?: string; p_material_unit?: string; p_target?: string; p_scope?: string; p_page_start?: number; p_page_end?: number; p_purpose?: string };
+        Returns: Json;
+      };
+      save_material_unit: {
+        Args: { p_id?: string; p_material?: string; p_no?: number; p_title?: string };
+        Returns: Json;
+      };
+      save_methodology: {
+        Args: { p_id?: string; p_title?: string; p_body?: string; p_level_code?: string };
+        Returns: Json;
+      };
       save_objective: {
         Args: { p_id?: string; p_lesson?: string; p_text?: string; p_code?: string; p_cefr?: string };
         Returns: Json;
@@ -4150,8 +4218,20 @@ export type Database = {
         Args: { p_id?: string; p_name?: string; p_code?: string; p_type?: string; p_standard?: boolean };
         Returns: Json;
       };
+      save_resource: {
+        Args: { p_id?: string; p_title?: string; p_url?: string; p_file_path?: string; p_kind?: string };
+        Returns: Json;
+      };
+      save_teacher_material: {
+        Args: { p_id?: string; p_title?: string; p_kind?: string; p_payload?: Json };
+        Returns: Json;
+      };
       save_unit: {
         Args: { p_id?: string; p_programme?: string; p_title?: string; p_code?: string; p_no?: number };
+        Returns: Json;
+      };
+      save_upload: {
+        Args: { p_storage_path: string; p_bucket: string; p_mime?: string; p_size_bytes?: number; p_original_name?: string };
         Returns: Json;
       };
       set_enrolment_status: {
@@ -4182,8 +4262,16 @@ export type Database = {
         Args: { p_homework: string; p_note: string };
         Returns: Json;
       };
+      teacher_materials: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
       unpublish_curriculum: {
         Args: { p_curriculum: string };
+        Returns: Json;
+      };
+      uploads_list: {
+        Args: { p_page_size?: number; p_cursor?: string };
         Returns: Json;
       };
       user_search: {

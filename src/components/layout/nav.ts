@@ -53,7 +53,8 @@ export const NAV_SECTIONS: NavSection[] = [
       { href: "/lessons", label: "Lessons", icon: "lessons", permission: "lessonCalendar" },
       { href: "/assessments", label: "Assessments", icon: "assessments", permission: "assessments" },
       { href: "/curriculum", label: "Curriculum", icon: "curriculum", permission: "curriculum" },
-      { href: "/materials", label: "Materials", icon: "materials", permission: "materials" },
+      // canonical "materials" lands in Phase 19; materialCatalog is the current gate
+      { href: "/materials", label: "Materials", icon: "materials", permission: "materialCatalog" },
     ],
   },
   {

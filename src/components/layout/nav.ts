@@ -81,8 +81,10 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     title: "Administration",
     items: [
-      // canonical "reports" lands in Phase 20 (fail-closed to admin1 until then)
-      { href: "/reports", label: "Reports", icon: "reports", permission: "reports" },
+      // canonical "reports" lands in Phase 20; the base `report` action is granted
+      // to every role, and each report re-checks its own finer permission inside
+      // its SECURITY DEFINER RPC.
+      { href: "/reports", label: "Reports", icon: "reports", permission: "report" },
       { href: "/roles", label: "Roles", icon: "roles", permission: "roles" },
       { href: "/settings", label: "Settings", icon: "settings", permission: "settings" },
       { href: "/admin", label: "Admin", icon: "admin", permission: "admin" },

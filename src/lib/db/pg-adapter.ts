@@ -122,6 +122,20 @@ const RPC_ARG_ORDER: Record<string, string[]> = {
   teacher_materials: [],
   save_material_lesson: ["p_material", "p_lesson"],
   save_material_feedback: ["p_material", "p_rating", "p_note"],
+  student_progress_report: ["p_student"],
+  learner_progress_overview: ["p_class"],
+  attendance_report: ["p_class", "p_from", "p_to"],
+  assessment_report: ["p_class", "p_from", "p_to"],
+  class_report: ["p_class"],
+  teacher_report: ["p_teacher"],
+  curriculum_coverage: ["p_class", "p_from", "p_to"],
+  curriculum_analytics: ["p_level"],
+  class_earnings: ["p_from", "p_to"],
+  salary_history: ["p_user", "p_month"],
+  report_export_request: ["p_kind", "p_params"],
+  report_export_process: [],
+  report_export_list: [],
+  report_export_result: ["p_job"],
 };
 
 export class PgAdapter implements DbAdapter {

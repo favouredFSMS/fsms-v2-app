@@ -2928,6 +2928,45 @@ export type Database = {
         };
         Relationships: [];
       };
+      report_exports: {
+        Row: {
+      id: string;
+      school_id: string;
+      requested_by: string | null;
+      kind: string;
+      params: Json;
+      status: string;
+      payload: string | null;
+      error: string | null;
+      created_at: string;
+      completed_at: string | null;
+        };
+        Insert: {
+      id?: string;
+      school_id: string;
+      requested_by?: string | null;
+      kind: string;
+      params?: Json;
+      status?: string;
+      payload?: string | null;
+      error?: string | null;
+      created_at?: string;
+      completed_at?: string | null;
+        };
+        Update: {
+      id?: string;
+      school_id?: string;
+      requested_by?: string | null;
+      kind?: string;
+      params?: Json;
+      status?: string;
+      payload?: string | null;
+      error?: string | null;
+      created_at?: string;
+      completed_at?: string | null;
+        };
+        Relationships: [];
+      };
       resources: {
         Row: {
       id: string;
@@ -3842,6 +3881,26 @@ export type Database = {
   };
   fsms: {
     Functions: {
+      _csv_assessment: {
+        Args: { p: Json };
+        Returns: Json;
+      };
+      _csv_attendance: {
+        Args: { p: Json };
+        Returns: Json;
+      };
+      _csv_class_earnings: {
+        Args: { p: Json };
+        Returns: Json;
+      };
+      _csv_learner_progress: {
+        Args: { p: Json };
+        Returns: Json;
+      };
+      _csv_salary: {
+        Args: { p: Json };
+        Returns: Json;
+      };
       academic_structure: {
         Args: Record<string, never>;
         Returns: Json;
@@ -3860,6 +3919,10 @@ export type Database = {
       };
       assessment_performance: {
         Args: { p_student?: string; p_from?: string; p_to?: string };
+        Returns: Json;
+      };
+      assessment_report: {
+        Args: { p_class: string; p_from?: string; p_to?: string };
         Returns: Json;
       };
       assessment_test_detail: {
@@ -3890,6 +3953,10 @@ export type Database = {
         Args: { p_class?: string; p_student?: string; p_from?: string; p_to?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
       };
+      attendance_report: {
+        Args: { p_class: string; p_from?: string; p_to?: string };
+        Returns: Json;
+      };
       attendance_stats: {
         Args: { p_class: string; p_from?: string; p_to?: string };
         Returns: Json;
@@ -3903,6 +3970,14 @@ export type Database = {
         Returns: Json;
       };
       class_detail: {
+        Args: { p_class: string };
+        Returns: Json;
+      };
+      class_earnings: {
+        Args: { p_from?: string; p_to?: string };
+        Returns: Json;
+      };
+      class_report: {
         Args: { p_class: string };
         Returns: Json;
       };
@@ -3940,6 +4015,14 @@ export type Database = {
       };
       current_school_id: {
         Args: Record<string, never>;
+        Returns: Json;
+      };
+      curriculum_analytics: {
+        Args: { p_level?: string };
+        Returns: Json;
+      };
+      curriculum_coverage: {
+        Args: { p_class: string; p_from?: string; p_to?: string };
         Returns: Json;
       };
       curriculum_list: {
@@ -4046,6 +4129,10 @@ export type Database = {
         Args: { p_student: string };
         Returns: Json;
       };
+      learner_progress_overview: {
+        Args: { p_class: string };
+        Returns: Json;
+      };
       learning_targets_list: {
         Args: { p_level?: string };
         Returns: Json;
@@ -4126,6 +4213,22 @@ export type Database = {
         Args: { p_class: string; p_user: string };
         Returns: Json;
       };
+      report_export_list: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      report_export_process: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      report_export_request: {
+        Args: { p_kind: string; p_params?: Json };
+        Returns: Json;
+      };
+      report_export_result: {
+        Args: { p_job: string };
+        Returns: Json;
+      };
       resources: {
         Args: { p_search?: string; p_kind?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
@@ -4136,6 +4239,10 @@ export type Database = {
       };
       role_rank: {
         Args: Record<string, never>;
+        Returns: Json;
+      };
+      salary_history: {
+        Args: { p_user?: string; p_month?: string };
         Returns: Json;
       };
       save_assessment: {
@@ -4250,6 +4357,10 @@ export type Database = {
         Args: { p_student: string };
         Returns: Json;
       };
+      student_progress_report: {
+        Args: { p_student: string };
+        Returns: Json;
+      };
       student_search: {
         Args: { p_search?: string; p_level?: string; p_status?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
@@ -4264,6 +4375,10 @@ export type Database = {
       };
       teacher_materials: {
         Args: Record<string, never>;
+        Returns: Json;
+      };
+      teacher_report: {
+        Args: { p_teacher?: string };
         Returns: Json;
       };
       unpublish_curriculum: {

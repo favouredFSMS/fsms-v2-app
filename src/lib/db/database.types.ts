@@ -3926,12 +3926,24 @@ export type Database = {
         Args: { p_school: string };
         Returns: Json;
       };
+      grade_homework: {
+        Args: { p_homework: string; p_score?: string; p_feedback?: string; p_status?: string };
+        Returns: Json;
+      };
       has_perm: {
         Args: { p_action: string };
         Returns: Json;
       };
       has_role: {
         Args: { p_key: string };
+        Returns: Json;
+      };
+      homework_list: {
+        Args: { p_class?: string; p_student?: string; p_status?: string; p_from?: string; p_to?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      homework_notify: {
+        Args: { p_user_ids: string[]; p_kind: string; p_payload: Json };
         Returns: Json;
       };
       is_finance: {
@@ -3978,6 +3990,10 @@ export type Database = {
         Args: { p_class: string; p_date: string; p_marks: Json };
         Returns: Json;
       };
+      save_homework: {
+        Args: { p_class: string; p_date: string; p_marks: Json };
+        Returns: Json;
+      };
       set_enrolment_status: {
         Args: { p_enrolment: string; p_status: string };
         Returns: Json;
@@ -3992,6 +4008,10 @@ export type Database = {
       };
       student_search: {
         Args: { p_search?: string; p_level?: string; p_status?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      submit_homework: {
+        Args: { p_homework: string; p_note: string };
         Returns: Json;
       };
       user_search: {

@@ -53,6 +53,10 @@ const RPC_ARG_ORDER: Record<string, string[]> = {
   attendance_history: ["p_class", "p_student", "p_from", "p_to", "p_page_size", "p_cursor"],
   attendance_stats: ["p_class", "p_from", "p_to"],
   my_attendance: ["p_student"],
+  save_homework: ["p_class", "p_date", "p_marks"],
+  homework_list: ["p_class", "p_student", "p_status", "p_from", "p_to", "p_page_size", "p_cursor"],
+  submit_homework: ["p_homework", "p_note"],
+  grade_homework: ["p_homework", "p_score", "p_feedback", "p_status"],
 };
 
 export class PgAdapter implements DbAdapter {

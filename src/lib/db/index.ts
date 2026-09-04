@@ -29,3 +29,4 @@ export {
   type AttendanceStats,
   type MyAttendance,
 } from "./repos/attendance";
+export { HomeworkRepository, type HomeworkItem } from "./repos/homework";

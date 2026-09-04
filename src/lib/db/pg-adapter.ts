@@ -37,6 +37,17 @@ const RPC_ARG_ORDER: Record<string, string[]> = {
   student_detail: ["p_student"],
   set_user_status: ["p_user", "p_status"],
   assign_user_role: ["p_user", "p_role_key"],
+  academic_structure: [],
+  class_search: ["p_search", "p_level", "p_status", "p_page_size", "p_cursor"],
+  class_detail: ["p_class"],
+  create_academic_year: ["p_name", "p_starts_on", "p_ends_on"],
+  create_term: ["p_year", "p_name", "p_starts_on", "p_ends_on"],
+  create_subject: ["p_name"],
+  create_class: ["p_name", "p_level_code", "p_class_type", "p_learner_type", "p_room", "p_academic_year", "p_term"],
+  assign_teacher: ["p_class", "p_user", "p_primary"],
+  remove_teacher: ["p_class", "p_user"],
+  enrol_student: ["p_student", "p_class"],
+  set_enrolment_status: ["p_enrolment", "p_status"],
 };
 
 export class PgAdapter implements DbAdapter {

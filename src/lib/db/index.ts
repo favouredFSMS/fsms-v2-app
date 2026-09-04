@@ -15,3 +15,10 @@ export { StudentRepository, type StudentSummary, type StudentDetail } from "./re
 export { DashboardRepository, type DashboardSummary } from "./repos/dashboard";
 export { ParentRepository, type ParentSummary } from "./repos/parents";
 export { UserRepository, type UserSummary } from "./repos/users";
+export {
+  ClassRepository,
+  type ClassSummary,
+  type ClassDetail,
+  type ClassTeacher,
+} from "./repos/classes";
+export { AcademicRepository, type AcademicStructure } from "./repos/academic";

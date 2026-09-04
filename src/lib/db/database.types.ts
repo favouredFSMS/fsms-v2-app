@@ -3842,6 +3842,14 @@ export type Database = {
   };
   fsms: {
     Functions: {
+      academic_structure: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      assign_teacher: {
+        Args: { p_class: string; p_user: string; p_primary?: boolean };
+        Returns: Json;
+      };
       assign_user_role: {
         Args: { p_user: string; p_role_key: string };
         Returns: Json;
@@ -3852,6 +3860,30 @@ export type Database = {
       };
       can_see_student: {
         Args: { p_student: string };
+        Returns: Json;
+      };
+      class_detail: {
+        Args: { p_class: string };
+        Returns: Json;
+      };
+      class_search: {
+        Args: { p_search?: string; p_level?: string; p_status?: string; p_page_size?: number; p_cursor?: string };
+        Returns: Json;
+      };
+      create_academic_year: {
+        Args: { p_name: string; p_starts_on?: string; p_ends_on?: string };
+        Returns: Json;
+      };
+      create_class: {
+        Args: { p_name: string; p_level_code?: string; p_class_type?: string; p_learner_type?: string; p_room?: string; p_academic_year?: string; p_term?: string };
+        Returns: Json;
+      };
+      create_subject: {
+        Args: { p_name: string };
+        Returns: Json;
+      };
+      create_term: {
+        Args: { p_year: string; p_name: string; p_starts_on?: string; p_ends_on?: string };
         Returns: Json;
       };
       current_profile: {
@@ -3872,6 +3904,10 @@ export type Database = {
       };
       dashboard_summary: {
         Args: Record<string, never>;
+        Returns: Json;
+      };
+      enrol_student: {
+        Args: { p_student: string; p_class: string };
         Returns: Json;
       };
       ensure_builtin_roles: {
@@ -3914,8 +3950,16 @@ export type Database = {
         Args: { p_search?: string; p_page_size?: number; p_cursor?: string };
         Returns: Json;
       };
+      remove_teacher: {
+        Args: { p_class: string; p_user: string };
+        Returns: Json;
+      };
       role_rank: {
         Args: Record<string, never>;
+        Returns: Json;
+      };
+      set_enrolment_status: {
+        Args: { p_enrolment: string; p_status: string };
         Returns: Json;
       };
       set_user_status: {

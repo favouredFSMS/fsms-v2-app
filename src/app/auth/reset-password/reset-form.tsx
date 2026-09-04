@@ -2,62 +2,57 @@
 
 import { useActionState } from "react";
 import { resetPasswordAction } from "@/lib/auth/actions";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { Field, FieldError } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
 export function ResetForm() {
   const [state, formAction, pending] = useActionState(resetPasswordAction, null);
 
   if (state?.ok) {
     return (
-      <p style={{ color: "#15803d", maxWidth: 360 }}>
-        Password updated. <a href="/login">Sign in</a> with your new password.
-      </p>
+      <div className="flex flex-col gap-4">
+        <div className="rounded-field bg-success-50 px-3 py-2.5 text-sm text-success-700">
+          Password updated. Sign in with your new password.
+        </div>
+        <ButtonLink href="/login" className="w-full">
+          Sign in
+        </ButtonLink>
+      </div>
     );
   }
 
   return (
-    <form action={formAction} style={formStyle}>
-      <label style={labelStyle}>
-        New password
-        <input name="password" type="password" autoComplete="new-password" required style={inputStyle} />
-      </label>
-      <label style={labelStyle}>
-        Confirm new password
-        <input name="confirm" type="password" autoComplete="new-password" required style={inputStyle} />
-      </label>
-      {state?.error && <p style={errorStyle}>{state.error}</p>}
-      <button type="submit" disabled={pending} style={buttonStyle}>
+    <form action={formAction} className="flex flex-col gap-4">
+      <Field label="New password" htmlFor="password">
+        <Input
+          id="password"
+          name="password"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          required
+          placeholder="At least 8 characters"
+        />
+      </Field>
+
+      <Field label="Confirm new password" htmlFor="confirm">
+        <Input
+          id="confirm"
+          name="confirm"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          required
+          placeholder="Repeat the password"
+        />
+      </Field>
+
+      {state?.error && <FieldError>{state.error}</FieldError>}
+
+      <Button type="submit" loading={pending} className="w-full">
         {pending ? "Saving…" : "Set password"}
-      </button>
+      </Button>
     </form>
   );
 }
-
-const formStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.9rem",
-  maxWidth: 360,
-};
-const labelStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.35rem",
-  fontSize: "0.9rem",
-  color: "#334155",
-};
-const inputStyle: React.CSSProperties = {
-  padding: "0.55rem 0.7rem",
-  borderRadius: 8,
-  border: "1px solid #cbd5e1",
-  fontSize: "1rem",
-};
-const buttonStyle: React.CSSProperties = {
-  padding: "0.6rem 1rem",
-  borderRadius: 8,
-  border: "none",
-  background: "#0f172a",
-  color: "#fff",
-  fontSize: "1rem",
-  cursor: "pointer",
-};
-const errorStyle: React.CSSProperties = { color: "#dc2626", fontSize: "0.9rem", margin: 0 };

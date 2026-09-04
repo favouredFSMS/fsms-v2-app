@@ -1,48 +1,51 @@
 import { SCHOOL_TIMEZONE, schoolDateTime } from "@/lib/clock";
+import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
+import { Card, CardBody, CardDescription, CardTitle } from "@/components/ui/card";
+import { Icon } from "@/components/ui/icons";
 
 export default function Home() {
   return (
-    <main style={{ fontFamily: "system-ui, sans-serif", padding: "2.5rem", maxWidth: 720, margin: "0 auto" }}>
-      <h1 style={{ fontSize: "2rem", margin: "0 0 0.25rem" }}>FSMS V2</h1>
-      <p style={{ color: "#475569", margin: "0 0 1.5rem" }}>
-        FAVOURED Student Management System — V2 (Next.js + Supabase).
-      </p>
+    <main className="mx-auto w-full max-w-2xl px-4 py-10">
+      <div className="mb-6 flex items-center gap-3">
+        <span className="flex size-11 items-center justify-center rounded-card bg-brand-600 text-ink-inverse">
+          <Icon name="students" size={24} />
+        </span>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-ink">FSMS V2</h1>
+          <p className="text-sm text-ink-muted">
+            FAVOURED Student Management System — Next.js + Supabase
+          </p>
+        </div>
+      </div>
 
-      <section style={card}>
-        <h2 style={h2}>Authentication (Phase 8)</h2>
-        <ul style={{ margin: 0, paddingLeft: "1.25rem", lineHeight: 1.7 }}>
-          <li>
-            <a href="/login" style={{ color: "#2563eb" }}>
-              Sign in
-            </a>{" "}
-            — login, logout, password recovery
-          </li>
-          <li>
-            <a href="/dashboard" style={{ color: "#2563eb" }}>
-              Dashboard
-            </a>{" "}
-            — protected: resolves your role, school, permissions server-side
-          </li>
-          <li>School timezone: {SCHOOL_TIMEZONE} · now: {schoolDateTime()}</li>
-        </ul>
-      </section>
+      <div className="grid gap-4">
+        <Card>
+          <CardBody>
+            <CardTitle className="mb-1">Authentication</CardTitle>
+            <CardDescription className="mb-3">
+              Login, logout and password recovery are live (Phase 8). Production
+              auth is Supabase; local development uses a seeded dev harness.
+            </CardDescription>
+            <div className="flex flex-wrap gap-2">
+              <ButtonLink href="/login">Sign in</ButtonLink>
+              <ButtonLink href="/design-system" variant="secondary">
+                Design system
+              </ButtonLink>
+            </div>
+          </CardBody>
+        </Card>
 
-      <section style={card}>
-        <h2 style={h2}>Note</h2>
-        <p style={{ margin: 0, lineHeight: 1.7 }}>
-          Local development uses the dev auth harness (seeded demo accounts). Production
-          authentication is Supabase Auth — configured entirely via environment variables,
-          never committed.
-        </p>
-      </section>
+        <Card>
+          <CardBody className="flex items-center gap-3">
+            <Icon name="calendar" size={18} className="text-ink-faint" />
+            <p className="text-sm text-ink-muted">
+              School timezone: <Badge variant="neutral">{SCHOOL_TIMEZONE}</Badge>{" "}
+              · now: {schoolDateTime()}
+            </p>
+          </CardBody>
+        </Card>
+      </div>
     </main>
   );
 }
-
-const card: React.CSSProperties = {
-  border: "1px solid #e2e8f0",
-  borderRadius: 8,
-  padding: "1rem 1.25rem",
-  marginBottom: "1rem",
-};
-const h2: React.CSSProperties = { fontSize: "1.1rem", margin: "0 0 0.5rem" };

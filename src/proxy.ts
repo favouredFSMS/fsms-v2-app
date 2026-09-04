@@ -20,6 +20,7 @@ const PUBLIC_PATHS = [
   "/auth/callback",
   "/auth/confirm",
   "/auth/reset-password",
+  "/design-system",
 ];
 
 const isPublicPath = (pathname: string) =>

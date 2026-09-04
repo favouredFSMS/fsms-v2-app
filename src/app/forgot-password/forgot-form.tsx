@@ -2,62 +2,53 @@
 
 import { useActionState } from "react";
 import { forgotPasswordAction } from "@/lib/auth/actions";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { Field, FieldError } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 export function ForgotForm() {
   const [state, formAction, pending] = useActionState(forgotPasswordAction, null);
 
   if (state?.ok) {
     return (
-      <p style={{ color: "#15803d", maxWidth: 360 }}>
-        If an account exists for that address, a recovery link has been sent. Check your inbox.
-      </p>
+      <div className="flex flex-col gap-4">
+        <div className="rounded-field bg-success-50 px-3 py-2.5 text-sm text-success-700">
+          If an account exists for that address, a recovery link has been sent.
+          Check your inbox.
+        </div>
+        <ButtonLink href="/login" variant="secondary" className="w-full">
+          Back to sign in
+        </ButtonLink>
+      </div>
     );
   }
 
   return (
-    <form action={formAction} style={formStyle}>
-      <label style={labelStyle}>
-        Email
-        <input name="email" type="email" autoComplete="email" required style={inputStyle} />
-      </label>
-      {state?.error && <p style={errorStyle}>{state.error}</p>}
-      <button type="submit" disabled={pending} style={buttonStyle}>
+    <form action={formAction} className="flex flex-col gap-4">
+      <Field label="Email" htmlFor="email" hint="We never reveal whether an address is registered.">
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          placeholder="you@school.org"
+        />
+      </Field>
+
+      {state?.error && <FieldError>{state.error}</FieldError>}
+
+      <Button type="submit" loading={pending} className="w-full">
         {pending ? "Sending…" : "Send recovery link"}
-      </button>
-      <a href="/login" style={linkStyle}>
-        Back to sign in
-      </a>
+      </Button>
+
+      <div className="flex items-center justify-between">
+        <a href="/login" className="text-sm text-brand-600 hover:text-brand-700">
+          Back to sign in
+        </a>
+        <Badge variant="neutral">O1 · email recovery</Badge>
+      </div>
     </form>
   );
 }
-
-const formStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.9rem",
-  maxWidth: 360,
-};
-const labelStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.35rem",
-  fontSize: "0.9rem",
-  color: "#334155",
-};
-const inputStyle: React.CSSProperties = {
-  padding: "0.55rem 0.7rem",
-  borderRadius: 8,
-  border: "1px solid #cbd5e1",
-  fontSize: "1rem",
-};
-const buttonStyle: React.CSSProperties = {
-  padding: "0.6rem 1rem",
-  borderRadius: 8,
-  border: "none",
-  background: "#0f172a",
-  color: "#fff",
-  fontSize: "1rem",
-  cursor: "pointer",
-};
-const errorStyle: React.CSSProperties = { color: "#dc2626", fontSize: "0.9rem", margin: 0 };
-const linkStyle: React.CSSProperties = { color: "#2563eb", fontSize: "0.9rem" };

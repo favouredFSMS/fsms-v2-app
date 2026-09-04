@@ -1,12 +1,25 @@
 import { requireUser } from "@/lib/auth/guards";
-import { logoutAction } from "@/lib/auth/actions";
 import { profileCan } from "@/lib/auth/authorize";
 import { isStaff, isFinance, isLeadership } from "@/lib/auth/roles";
+import { AppShell } from "@/components/layout/app-shell";
+import { NAV_SECTIONS, visibleNavSections } from "@/components/layout/nav";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardBody,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Table, TBody, TD, TR } from "@/components/ui/table";
 
 export const metadata = { title: "Dashboard — FSMS V2" };
 
 export default async function DashboardPage() {
   const profile = await requireUser();
+
+  const roleLabel = profile.role_key ?? profile.role_base;
+  const sections = visibleNavSections(NAV_SECTIONS, (a) => profileCan(profile, a));
 
   const sample = [
     ["dashboard", profileCan(profile, "dashboard")],
@@ -17,82 +30,85 @@ export default async function DashboardPage() {
   ] as const;
 
   return (
-    <main style={{ maxWidth: 760, margin: "0 auto", padding: "3rem 1.5rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div>
-          <h1 style={{ margin: 0 }}>Welcome, {profile.name ?? profile.email}</h1>
-          <p style={{ color: "#64748b", margin: "0.25rem 0 0" }}>{profile.email}</p>
-        </div>
-        <form action={logoutAction}>
-          <button type="submit" style={btn}>Sign out</button>
-        </form>
+    <AppShell
+      brand="FSMS V2"
+      title="Dashboard"
+      user={{
+        name: profile.name ?? profile.email ?? "FSMS user",
+        email: profile.email ?? "",
+        roleLabel,
+      }}
+      sections={sections}
+    >
+      <div className="grid gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              Welcome, {profile.name ?? profile.email}
+              <span className="ml-2 align-middle">
+                <Badge variant="brand">{roleLabel}</Badge>
+              </span>
+            </CardTitle>
+            <CardDescription>{profile.email}</CardDescription>
+          </CardHeader>
+          <CardBody>
+            <dl className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
+              <Row k="User id" v={profile.id} />
+              <Row k="School (tenant)" v={profile.school_id} />
+              <Row
+                k="Role"
+                v={`${roleLabel} · rank ${profile.rank} · base ${profile.role_base}`}
+              />
+              <Row k="Status" v={profile.status} />
+              <Row k="UI language (per-user)" v={profile.locale} />
+              <Row k="Email language (per-user)" v={profile.notify_lang} />
+            </dl>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Authorization</CardTitle>
+            <CardDescription>
+              {profile.permissions.length} permissions resolved server-side
+              {profile.role_base === "admin1" ? " · owner wildcard" : ""} — the
+              database (RLS + fsms.has_perm) remains authoritative.
+            </CardDescription>
+          </CardHeader>
+          <CardBody className="px-0">
+            <Table>
+              <TBody>
+                {sample.map(([action, allowed]) => (
+                  <TR key={action}>
+                    <TD className="font-mono text-xs">{action}</TD>
+                    <TD className="text-right">
+                      {allowed ? (
+                        <Badge variant="success">allowed</Badge>
+                      ) : (
+                        <Badge variant="danger">denied</Badge>
+                      )}
+                    </TD>
+                  </TR>
+                ))}
+              </TBody>
+            </Table>
+            <p className="px-5 pt-3 text-xs text-ink-faint">
+              Group flags: staff={String(isStaff(profile.role_base))} · finance=
+              {String(isFinance(profile.role_base))} · leadership=
+              {String(isLeadership(profile.role_base))}
+            </p>
+          </CardBody>
+        </Card>
       </div>
-
-      <section style={card}>
-        <h2 style={h2}>Session &amp; identity</h2>
-        <dl style={dl}>
-          <Row k="User id" v={profile.id} />
-          <Row k="School (tenant)" v={profile.school_id} />
-          <Row k="Role" v={`${profile.role_key ?? profile.role_base} (base: ${profile.role_base}, rank ${profile.rank})`} />
-          <Row k="Status" v={profile.status} />
-          <Row k="UI language (per-user)" v={profile.locale} />
-          <Row k="Email language (per-user)" v={profile.notify_lang} />
-        </dl>
-      </section>
-
-      <section style={card}>
-        <h2 style={h2}>Authorization (resolved server-side)</h2>
-        <p style={{ margin: "0 0 0.5rem", color: "#475569" }}>
-          {profile.permissions.length} permissions {profile.role_base === "admin1" ? "(owner wildcard)" : ""}
-        </p>
-        <table style={{ borderCollapse: "collapse", width: "100%" }}>
-          <tbody>
-            {sample.map(([action, allowed]) => (
-              <tr key={action} style={{ borderBottom: "1px solid #e2e8f0" }}>
-                <td style={{ padding: "0.35rem 0", fontFamily: "monospace", fontSize: "0.9rem" }}>{action}</td>
-                <td style={{ padding: "0.35rem 0", textAlign: "right" }}>
-                  {allowed ? <span style={{ color: "#15803d" }}>allowed</span> : <span style={{ color: "#b91c1c" }}>denied</span>}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <p style={{ color: "#64748b", fontSize: "0.85rem", marginTop: "0.75rem" }}>
-          Coarse group flags: staff={String(isStaff(profile.role_base))} · finance=
-          {String(isFinance(profile.role_base))} · leadership={String(isLeadership(profile.role_base))}
-        </p>
-      </section>
-
-      <p style={{ color: "#94a3b8", fontSize: "0.8rem" }}>
-        Phase 8 — Authentication &amp; Authorization. Authoritative enforcement lives in the
-        database (RLS + <code>fsms.has_perm</code>); this page only reflects it.
-      </p>
-    </main>
+    </AppShell>
   );
 }
 
 function Row({ k, v }: { k: string; v: string }) {
   return (
-    <div style={{ display: "flex", gap: "0.75rem", padding: "0.3rem 0" }}>
-      <dt style={{ color: "#64748b", width: 180, flexShrink: 0 }}>{k}</dt>
-      <dd style={{ margin: 0, fontFamily: "monospace", fontSize: "0.85rem", wordBreak: "break-all" }}>{v}</dd>
+    <div className="flex min-w-0 gap-3 py-0.5">
+      <dt className="w-44 shrink-0 text-sm text-ink-muted">{k}</dt>
+      <dd className="min-w-0 font-mono text-xs break-all text-ink">{v}</dd>
     </div>
   );
 }
-
-const card: React.CSSProperties = {
-  border: "1px solid #e2e8f0",
-  borderRadius: 8,
-  padding: "1rem 1.25rem",
-  marginBottom: "1rem",
-};
-const h2: React.CSSProperties = { fontSize: "1.05rem", margin: "0 0 0.75rem" };
-const dl: React.CSSProperties = { margin: 0 };
-const btn: React.CSSProperties = {
-  padding: "0.5rem 0.9rem",
-  borderRadius: 8,
-  border: "1px solid #cbd5e1",
-  background: "#fff",
-  cursor: "pointer",
-  fontSize: "0.9rem",
-};

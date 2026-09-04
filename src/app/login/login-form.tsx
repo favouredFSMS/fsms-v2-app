@@ -2,72 +2,49 @@
 
 import { useActionState } from "react";
 import { loginAction } from "@/lib/auth/actions";
+import { Button } from "@/components/ui/button";
+import { Field, FieldError } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, null);
 
   return (
-    <form action={formAction} style={formStyle}>
-      <label style={labelStyle}>
-        Email
-        <input name="email" type="email" autoComplete="email" required style={inputStyle} />
-      </label>
-      <label style={labelStyle}>
-        Password
-        <input
+    <form action={formAction} className="flex flex-col gap-4">
+      <Field label="Email" htmlFor="email">
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          required
+          placeholder="you@school.org"
+        />
+      </Field>
+
+      <Field label="Password" htmlFor="password">
+        <Input
+          id="password"
           name="password"
           type="password"
           autoComplete="current-password"
           required
-          style={inputStyle}
+          placeholder="••••••••"
         />
-      </label>
+      </Field>
 
-      {state?.error && <p style={errorStyle}>{state.error}</p>}
+      {state?.error && <FieldError>{state.error}</FieldError>}
 
-      <button type="submit" disabled={pending} style={buttonStyle}>
+      <Button type="submit" loading={pending} className="w-full">
         {pending ? "Signing in…" : "Sign in"}
-      </button>
+      </Button>
 
-      <a href="/forgot-password" style={linkStyle}>
+      <a
+        href="/forgot-password"
+        className="text-center text-sm text-brand-600 hover:text-brand-700"
+      >
         Forgot password?
       </a>
     </form>
   );
 }
-
-const formStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.9rem",
-  maxWidth: 360,
-};
-
-const labelStyle: React.CSSProperties = {
-  display: "flex",
-  flexDirection: "column",
-  gap: "0.35rem",
-  fontSize: "0.9rem",
-  color: "#334155",
-};
-
-const inputStyle: React.CSSProperties = {
-  padding: "0.55rem 0.7rem",
-  borderRadius: 8,
-  border: "1px solid #cbd5e1",
-  fontSize: "1rem",
-};
-
-const buttonStyle: React.CSSProperties = {
-  padding: "0.6rem 1rem",
-  borderRadius: 8,
-  border: "none",
-  background: "#0f172a",
-  color: "#fff",
-  fontSize: "1rem",
-  cursor: "pointer",
-};
-
-const errorStyle: React.CSSProperties = { color: "#dc2626", fontSize: "0.9rem", margin: 0 };
-
-const linkStyle: React.CSSProperties = { color: "#2563eb", fontSize: "0.9rem" };

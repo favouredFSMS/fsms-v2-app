@@ -216,7 +216,7 @@
     "passwordMin": "Le mot de passe doit contenir au moins 8 caractères.",
     "passwordMismatch": "Les mots de passe ne correspondent pas.",
     "recoveryNeedsSupabase": "La récupération de mot de passe nécessite un projet Supabase provisionné (O1 : récupération par e-mail). En développement local, utilisez les mots de passe de démonstration.",
-    "brand": "FAVOURED — gestion des élèves",
+    "brand": "FAVOURED — Système de gestion scolaire",
     "googleSignIn": "Continuer avec Google",
     "orContinue": "ou"
   },
@@ -231,7 +231,7 @@
     "student": "Élève"
   },
   "home": {
-    "tagline": "FAVOURED — Système de gestion des élèves : Next.js + Supabase",
+    "tagline": "FAVOURED — Système de gestion scolaire : Next.js + Supabase",
     "authentication": "Authentification",
     "authenticationDesc": "Connexion, déconnexion et récupération de mot de passe sont actives (Phase 8). En production : Supabase ; en local : environnement de démo.",
     "signIn": "Se connecter",

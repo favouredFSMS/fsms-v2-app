@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/ui/cn";
 import { Icon } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/logo";
 import type { NavSection } from "./nav";
 
 export interface SidebarProps {
@@ -20,9 +21,7 @@ export function Sidebar({ sections, brand, onNavigate }: SidebarProps) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-14 shrink-0 items-center gap-2.5 border-b border-line px-4">
-        <span className="flex size-7 items-center justify-center rounded-field bg-brand-600 text-ink-inverse">
-          <Icon name="students" size={16} />
-        </span>
+        <Logo size={28} className="rounded-md" />
         <span className="truncate text-sm font-bold tracking-tight text-ink">
           {brand}
         </span>

@@ -9,7 +9,7 @@ import type { MetadataRoute } from "next";
  */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "FAVOURED Student Management System",
+    name: "Favoured School Management System",
     short_name: "FSMS",
     description: "School administration: students, classes, curriculum, finance and reporting.",
     id: "/dashboard",

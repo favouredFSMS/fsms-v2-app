@@ -216,7 +216,7 @@
     "passwordMin": "密码至少需要 8 个字符。",
     "passwordMismatch": "两次输入的密码不一致。",
     "recoveryNeedsSupabase": "密码找回需要已配置的 Supabase 项目（O1：邮箱找回）。本地开发请使用演示密码。",
-    "brand": "FAVOURED 学生管理系统",
+    "brand": "FAVOURED 学校管理系统",
     "googleSignIn": "使用 Google 登录",
     "orContinue": "或"
   },
@@ -231,7 +231,7 @@
     "student": "学生"
   },
   "home": {
-    "tagline": "FAVOURED 学生管理系统 — Next.js + Supabase",
+    "tagline": "FAVOURED 学校管理系统 — Next.js + Supabase",
     "authentication": "身份验证",
     "authenticationDesc": "登录、退出与密码找回已可用（阶段 8）。生产环境使用 Supabase；本地开发使用种子演示环境。",
     "signIn": "登录",

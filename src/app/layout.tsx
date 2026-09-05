@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "FSMS V2",
-  description: "FAVOURED Student Management System — V2 (Next.js + Supabase)",
-  applicationName: "FAVOURED Student Management System",
+  description: "Favoured School Management System — V2 (Next.js + Supabase)",
+  applicationName: "Favoured School Management System",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,

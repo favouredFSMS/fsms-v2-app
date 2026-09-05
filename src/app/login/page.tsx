@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { LoginForm } from "./login-form";
 import { Card, CardBody } from "@/components/ui/card";
-import { Icon } from "@/components/ui/icons";
+import { Logo } from "@/components/ui/logo";
 import { env } from "@/lib/env";
 
 export const metadata = { title: "Sign in — FSMS V2" };
@@ -29,9 +29,7 @@ export default async function LoginPage(props: {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-4 pt-safe pb-safe py-10">
       <div className="mb-6 flex items-center gap-3">
-        <span className="flex size-10 items-center justify-center rounded-card bg-brand-600 text-ink-inverse">
-          <Icon name="students" size={22} />
-        </span>
+        <Logo size={44} className="rounded-xl shadow-md" />
         <div>
           <h1 className="text-xl font-bold tracking-tight text-ink">FSMS V2</h1>
           <p className="text-sm text-ink-muted">{t("brand")}</p>

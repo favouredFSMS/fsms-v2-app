@@ -216,7 +216,7 @@
     "passwordMin": "Password must be at least 8 characters.",
     "passwordMismatch": "Passwords do not match.",
     "recoveryNeedsSupabase": "Password recovery needs a provisioned Supabase project (O1: email recovery). In local dev, use the seeded demo passwords.",
-    "brand": "FAVOURED Student Management System",
+    "brand": "Favoured School Management System",
     "googleSignIn": "Continue with Google",
     "orContinue": "or"
   },
@@ -231,7 +231,7 @@
     "student": "Student"
   },
   "home": {
-    "tagline": "FAVOURED Student Management System — Next.js + Supabase",
+    "tagline": "Favoured School Management System — Next.js + Supabase",
     "authentication": "Authentication",
     "authenticationDesc": "Login, logout and password recovery are live (Phase 8). Production auth is Supabase; local development uses a seeded dev harness.",
     "signIn": "Sign in",

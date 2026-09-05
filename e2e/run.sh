@@ -22,7 +22,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-base=( "e2e/auth.spec.ts" "e2e/admin.spec.ts" "e2e/teacher.spec.ts" )
+base=( "e2e/auth.spec.ts" "e2e/admin.spec.ts" "e2e/teacher.spec.ts" "e2e/role-workflows.spec.ts" )
 uat=( "e2e/uat-admin.spec.ts" "e2e/uat-teacher.spec.ts" "e2e/uat-teacher2.spec.ts" \
       "e2e/uat-parent.spec.ts" "e2e/uat-student.spec.ts" "e2e/uat-i18n.spec.ts" \
       "e2e/uat-mobile.spec.ts" )

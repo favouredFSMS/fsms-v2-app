@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
+import { Table, TBody, TD, TH, THead, TR, TableEmptyRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { requireDbContext, FinanceRepository } from "@/lib/db";
 
@@ -46,7 +46,7 @@ export default async function PayrollPage({
               </THead>
               <TBody>
                 {roster.length === 0 ? (
-                  <TableEmpty colSpan={4}>{t("noStaff")}</TableEmpty>
+                  <TableEmptyRow colSpan={4}>{t("noStaff")}</TableEmptyRow>
                 ) : (
                   roster.map((r) => (
                     <TR key={r.id}>

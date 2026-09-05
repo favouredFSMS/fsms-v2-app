@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
+import { Table, TBody, TD, TH, THead, TR, TableEmptyRow } from "@/components/ui/table";
 import { requireUser } from "@/lib/auth/guards";
 import { profileCan } from "@/lib/auth/authorize";
 import { requireDbContext, SettingsRepository } from "@/lib/db";
@@ -93,7 +93,7 @@ export default async function SettingsPage() {
               </THead>
               <TBody>
                 {list.rows.length === 0 ? (
-                  <TableEmpty colSpan={canEdit ? 5 : 4}>{t("noSettings")}</TableEmpty>
+                  <TableEmptyRow colSpan={canEdit ? 5 : 4}>{t("noSettings")}</TableEmptyRow>
                 ) : (
                   list.rows.map((r) => (
                     <TR key={r.key}>

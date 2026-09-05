@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
+import { Table, TBody, TD, TH, THead, TR, TableEmptyRow } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/states";
 import { requireDbContext, ClassRepository, StudentRepository, UserRepository } from "@/lib/db";
 import { requireUser } from "@/lib/auth/guards";
@@ -111,7 +111,7 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ id
                       </TD>
                     </TR>
                   ))}
-                  {d.teachers.length === 0 && <TableEmpty colSpan={3}>{t("noTeachersAssigned")}</TableEmpty>}
+                  {d.teachers.length === 0 && <TableEmptyRow colSpan={3}>{t("noTeachersAssigned")}</TableEmptyRow>}
                 </TBody>
               </Table>
             </CardBody>
@@ -152,7 +152,7 @@ export default async function ClassDetailPage({ params }: { params: Promise<{ id
                       </TD>
                     </TR>
                   ))}
-                  {d.students.length === 0 && <TableEmpty colSpan={3}>{t("noStudentsEnrolled")}</TableEmpty>}
+                  {d.students.length === 0 && <TableEmptyRow colSpan={3}>{t("noStudentsEnrolled")}</TableEmptyRow>}
                 </TBody>
               </Table>
             </CardBody>

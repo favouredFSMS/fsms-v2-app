@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TBody, TD, TR, TableEmpty } from "@/components/ui/table";
+import { Table, TBody, TD, TR, TableEmptyRow } from "@/components/ui/table";
 import { EmptyState } from "@/components/ui/states";
 import { requireDbContext, StudentRepository, ParentRepository } from "@/lib/db";
 import { requireUser } from "@/lib/auth/guards";
@@ -98,7 +98,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                       <TD className="text-right text-xs text-ink-faint">{c.primary_teacher}</TD>
                     </TR>
                   ))}
-                  {d.classes.length === 0 && <TableEmpty colSpan={3}>{t("notEnrolled")}</TableEmpty>}
+                  {d.classes.length === 0 && <TableEmptyRow colSpan={3}>{t("notEnrolled")}</TableEmptyRow>}
                 </TBody>
               </Table>
             </CardBody>
@@ -121,7 +121,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                       </TD>
                     </TR>
                   ))}
-                  {d.parents.length === 0 && <TableEmpty colSpan={3}>{t("noParentsLinked")}</TableEmpty>}
+                  {d.parents.length === 0 && <TableEmptyRow colSpan={3}>{t("noParentsLinked")}</TableEmptyRow>}
                 </TBody>
               </Table>
             </CardBody>

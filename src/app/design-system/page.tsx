@@ -32,7 +32,6 @@ import {
   Spinner,
   Switch,
   Table,
-  TableEmpty,
   TableSkeleton,
   TBody,
   TD,
@@ -42,6 +41,7 @@ import {
   TR,
   ToastProvider,
   useToast,
+  TableEmptyRow,
 } from "@/components/ui";
 
 const SWATCHES: Array<{ name: string; token: string; hex: string }> = [
@@ -254,9 +254,9 @@ export default function DesignSystemPage() {
                       <TD className="text-right">{r.badges}</TD>
                     </TR>
                   ))}
-                  <TableEmpty colSpan={4}>
+                  <TableEmptyRow colSpan={4}>
                     <span className="text-sm text-ink-faint">End of list</span>
-                  </TableEmpty>
+                  </TableEmptyRow>
                 </TBody>
               </Table>
             </CardBody>

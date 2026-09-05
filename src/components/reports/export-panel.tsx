@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Field, FieldError } from "@/components/ui/field";
 import { Select, Input } from "@/components/ui/input";
-import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
+import { Table, TBody, TD, TH, THead, TR, TableEmptyRow } from "@/components/ui/table";
 import type { ReportExportJob } from "@/lib/db";
 import type { PickOption } from "./report-picker";
 
@@ -169,7 +169,7 @@ export function ExportPanel({
         </THead>
         <TBody>
           {jobs.length === 0 ? (
-            <TableEmpty colSpan={6}>{t("noExportJobs")}</TableEmpty>
+            <TableEmptyRow colSpan={6}>{t("noExportJobs")}</TableEmptyRow>
           ) : (
             jobs.map((j) => (
               <TR key={j.id}>

@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
+import { Table, TBody, TD, TH, THead, TR, TableEmptyRow } from "@/components/ui/table";
 import { CursorPager } from "@/components/ui/cursor-pager";
 import { EmptyState } from "@/components/ui/states";
 import {
@@ -210,7 +210,7 @@ export default async function AttendancePage({
                       <TD className="text-right">{s.rate == null ? "—" : `${s.rate}%`}</TD>
                     </TR>
                   ))}
-                  {stats.data.students.length === 0 && <TableEmpty colSpan={5}>{t("noStudents")}</TableEmpty>}
+                  {stats.data.students.length === 0 && <TableEmptyRow colSpan={5}>{t("noStudents")}</TableEmptyRow>}
                 </TBody>
               </Table>
             </CardBody>
@@ -248,7 +248,7 @@ export default async function AttendancePage({
                       <TD className="text-xs text-ink-faint">{h.taken_by ?? "—"}</TD>
                     </TR>
                   ))}
-                  {history.data.items.length === 0 && <TableEmpty colSpan={5}>{t("noRecords")}</TableEmpty>}
+                  {history.data.items.length === 0 && <TableEmptyRow colSpan={5}>{t("noRecords")}</TableEmptyRow>}
                 </TBody>
               </Table>
               <CursorPager

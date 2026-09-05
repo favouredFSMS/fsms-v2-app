@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
+import { Table, TBody, TD, TH, THead, TR, TableEmpty, TableEmptyRow } from "@/components/ui/table";
 import { CursorPager } from "@/components/ui/cursor-pager";
 import {
   requireDbContext,
@@ -187,7 +187,7 @@ export default async function CurriculumPage({
                       </TR>
                     ))
                   ) : (
-                    <TableEmpty colSpan={4}>{t("noTopics")}</TableEmpty>
+                    <TableEmptyRow colSpan={4}>{t("noTopics")}</TableEmptyRow>
                   )}
                 </TBody>
               </Table>
@@ -224,7 +224,7 @@ export default async function CurriculumPage({
                         </TR>
                       ))
                     ) : (
-                      <TableEmpty colSpan={3}>{t("noTargets")}</TableEmpty>
+                      <TableEmptyRow colSpan={3}>{t("noTargets")}</TableEmptyRow>
                     )}
                   </TBody>
                 </Table>
@@ -254,7 +254,7 @@ export default async function CurriculumPage({
                         </TR>
                       ))
                     ) : (
-                      <TableEmpty colSpan={2}>{t("noSkills")}</TableEmpty>
+                      <TableEmptyRow colSpan={2}>{t("noSkills")}</TableEmptyRow>
                     )}
                   </TBody>
                 </Table>
@@ -409,7 +409,7 @@ export default async function CurriculumPage({
                           </TR>
                         ))
                       ) : (
-                        <TableEmpty colSpan={5}>{t("noEvidenceForStudent")}</TableEmpty>
+                        <TableEmptyRow colSpan={5}>{t("noEvidenceForStudent")}</TableEmptyRow>
                       )}
                     </TBody>
                   </Table>

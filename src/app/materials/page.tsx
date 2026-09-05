@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
+import { Table, TBody, TD, TH, THead, TR, TableEmpty, TableEmptyRow } from "@/components/ui/table";
 import { CursorPager } from "@/components/ui/cursor-pager";
 import { requireDbContext, MaterialRepository, ClassRepository, localized } from "@/lib/db";
 import { requireUser } from "@/lib/auth/guards";
@@ -161,7 +161,7 @@ export default async function MaterialsPage({
                           </TR>
                         ))
                       ) : (
-                        <TableEmpty colSpan={2}>{t("noUnits")}</TableEmpty>
+                        <TableEmptyRow colSpan={2}>{t("noUnits")}</TableEmptyRow>
                       )}
                     </TBody>
                   </Table>
@@ -201,7 +201,7 @@ export default async function MaterialsPage({
                           </TR>
                         ))
                       ) : (
-                        <TableEmpty colSpan={canDecide ? 4 : 3}>{t("noMappings")}</TableEmpty>
+                        <TableEmptyRow colSpan={canDecide ? 4 : 3}>{t("noMappings")}</TableEmptyRow>
                       )}
                     </TBody>
                   </Table>

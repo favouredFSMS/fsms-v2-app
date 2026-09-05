@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
+import { Table, TBody, TD, TH, THead, TR, TableEmptyRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { requireUser } from "@/lib/auth/guards";
 import { profileCan } from "@/lib/auth/authorize";
@@ -69,7 +69,7 @@ export default async function FinancePage() {
                 </THead>
                 <TBody>
                   {clients.length === 0 ? (
-                    <TableEmpty colSpan={5}>{t("noStudents")}</TableEmpty>
+                    <TableEmptyRow colSpan={5}>{t("noStudents")}</TableEmptyRow>
                   ) : (
                     clients.map((c) => (
                       <TR key={c.id}>
@@ -119,7 +119,7 @@ export default async function FinancePage() {
               </THead>
               <TBody>
                 {payments.length === 0 ? (
-                  <TableEmpty colSpan={isMoney ? 7 : 6}>{t("noPayments")}</TableEmpty>
+                  <TableEmptyRow colSpan={isMoney ? 7 : 6}>{t("noPayments")}</TableEmptyRow>
                 ) : (
                   payments.map((p) => (
                     <TR key={p.id}>
@@ -161,7 +161,7 @@ export default async function FinancePage() {
                 </THead>
                 <TBody>
                   {pricing.length === 0 ? (
-                    <TableEmpty colSpan={4}>{t("noPricing")}</TableEmpty>
+                    <TableEmptyRow colSpan={4}>{t("noPricing")}</TableEmptyRow>
                   ) : (
                     pricing.map((p) => (
                       <TR key={p.id}>
@@ -195,7 +195,7 @@ export default async function FinancePage() {
                 </THead>
                 <TBody>
                   {wallet.length === 0 ? (
-                    <TableEmpty colSpan={2}>{t("noTeachers")}</TableEmpty>
+                    <TableEmptyRow colSpan={2}>{t("noTeachers")}</TableEmptyRow>
                   ) : (
                     wallet.map((w) => (
                       <TR key={w.id}>

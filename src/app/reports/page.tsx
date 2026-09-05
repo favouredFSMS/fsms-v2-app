@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { PageShell } from "@/components/layout/page-shell";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/table";
+import { Table, TBody, TD, TH, THead, TR, TableEmptyRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/states";
 import { requireUser } from "@/lib/auth/guards";
@@ -426,7 +426,7 @@ function OverviewCard({
           </THead>
           <TBody>
             {report.students.length === 0 ? (
-              <TableEmpty colSpan={7}>{t("noEnrolled")}</TableEmpty>
+              <TableEmptyRow colSpan={7}>{t("noEnrolled")}</TableEmptyRow>
             ) : (
               report.students.map((s) => (
                 <TR key={s.id}>
@@ -480,7 +480,7 @@ function AttendanceCard({
           </THead>
           <TBody>
             {report.students.length === 0 ? (
-              <TableEmpty colSpan={6}>{t("noAttendance")}</TableEmpty>
+              <TableEmptyRow colSpan={6}>{t("noAttendance")}</TableEmptyRow>
             ) : (
               report.students.map((s) => (
                 <TR key={s.id}>
@@ -529,7 +529,7 @@ function AssessmentCard({
           </THead>
           <TBody>
             {report.students.length === 0 ? (
-              <TableEmpty colSpan={5}>{t("noAssessments")}</TableEmpty>
+              <TableEmptyRow colSpan={5}>{t("noAssessments")}</TableEmptyRow>
             ) : (
               report.students.map((s) => (
                 <TR key={s.id}>
@@ -644,7 +644,7 @@ function TeacherReportCard({
             </THead>
             <TBody>
               {report.classes.length === 0 ? (
-                <TableEmpty colSpan={5}>{t("noClassesAssigned")}</TableEmpty>
+                <TableEmptyRow colSpan={5}>{t("noClassesAssigned")}</TableEmptyRow>
               ) : (
                 report.classes.map((c) => (
                   <TR key={c.id}>
@@ -699,7 +699,7 @@ function CoverageCard({
           </THead>
           <TBody>
             {report.taught.length === 0 ? (
-              <TableEmpty colSpan={4}>{t("noLessonsLogged")}</TableEmpty>
+              <TableEmptyRow colSpan={4}>{t("noLessonsLogged")}</TableEmptyRow>
             ) : (
               report.taught.map((l, i) => (
                 <TR key={i}>
@@ -752,7 +752,7 @@ function AnalyticsCard({
             </THead>
             <TBody>
               {groupRows(report.targets as never).length === 0 ? (
-                <TableEmpty colSpan={3}>{t("noTargets")}</TableEmpty>
+                <TableEmptyRow colSpan={3}>{t("noTargets")}</TableEmptyRow>
               ) : (
                 groupRows(report.targets as never).map((r, i) => (
                   <TR key={i}>
@@ -781,7 +781,7 @@ function AnalyticsCard({
             </THead>
             <TBody>
               {groupRows(report.evidence as never).length === 0 ? (
-                <TableEmpty colSpan={3}>{t("noEvidence")}</TableEmpty>
+                <TableEmptyRow colSpan={3}>{t("noEvidence")}</TableEmptyRow>
               ) : (
                 groupRows(report.evidence as never).map((r, i) => (
                   <TR key={i}>
@@ -828,7 +828,7 @@ function EarningsCard({
           </THead>
           <TBody>
             {report.rows.length === 0 ? (
-              <TableEmpty colSpan={6}>{t("noActiveClasses")}</TableEmpty>
+              <TableEmptyRow colSpan={6}>{t("noActiveClasses")}</TableEmptyRow>
             ) : (
               report.rows.map((r) => (
                 <TR key={r.id}>
@@ -878,7 +878,7 @@ function SalaryCard({
           </THead>
           <TBody>
             {report.rows.length === 0 ? (
-              <TableEmpty colSpan={5}>{t("noSalaryRecords")}</TableEmpty>
+              <TableEmptyRow colSpan={5}>{t("noSalaryRecords")}</TableEmptyRow>
             ) : (
               report.rows.map((r) => (
                 <TR key={r.id}>

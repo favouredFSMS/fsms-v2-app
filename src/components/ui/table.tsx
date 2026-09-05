@@ -37,7 +37,7 @@ export function TD({ className, ...rest }: TdHTMLAttributes<HTMLTableCellElement
   return <td className={cn("px-4 py-3 align-middle text-ink", className)} {...rest} />;
 }
 
-export function TableEmpty({
+export function TableEmptyRow({
   colSpan,
   children,
 }: {
@@ -50,5 +50,27 @@ export function TableEmpty({
         {children}
       </td>
     </tr>
+  );
+}
+
+/**
+ * Standalone empty-state placeholder: a complete, valid <table> (with its own
+ * <tbody>) so it can be rendered directly inside a CardBody <div> without the
+ * invalid `<tr> inside <div>` nesting that breaks hydration. Use `TableEmptyRow`
+ * when the empty state sits inside an existing <TBody> instead.
+ */
+export function TableEmpty({
+  colSpan,
+  children,
+}: {
+  colSpan: number;
+  children: ReactNode;
+}) {
+  return (
+    <Table>
+      <TBody>
+        <TableEmptyRow colSpan={colSpan}>{children}</TableEmptyRow>
+      </TBody>
+    </Table>
   );
 }

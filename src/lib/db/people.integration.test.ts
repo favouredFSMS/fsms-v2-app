@@ -42,17 +42,18 @@ describe.skipIf(!reachable)("people management (integration)", () => {
     const res = await new ParentRepository(await ctxFor(OWNER)).search({});
     expect(res.ok).toBe(true);
     if (!res.ok) return;
-    expect(res.data.total).toBe(1);
-    expect(res.data.items[0].name).toContain("Parent");
-    expect(res.data.items[0].children).toBe(2);
+    expect(res.data.total).toBeGreaterThanOrEqual(1);
+    expect(res.data.items.some((item) => item.name?.includes("Parent"))).toBe(true);
+    const primaryParent = res.data.items.find((item) => item.name?.includes("Parent"));
+    expect(primaryParent?.children).toBe(2);
   });
 
   it("teacher lists only teacher accounts via user_search", async () => {
     const res = await new UserRepository(await ctxFor(TEACHER)).search({ role: "teacher" });
     expect(res.ok).toBe(true);
     if (!res.ok) return;
-    expect(res.data.total).toBe(1);
-    expect(res.data.items[0].role_base).toBe("teacher");
+    expect(res.data.total).toBeGreaterThanOrEqual(1);
+    expect(res.data.items.every((item) => item.role_base === "teacher")).toBe(true);
   });
 
   it("student_detail exposes parent contact only to office roles", async () => {

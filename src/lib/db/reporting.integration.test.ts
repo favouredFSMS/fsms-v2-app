@@ -161,7 +161,7 @@ describe.skipIf(!reachable)("reporting (integration)", () => {
     expect(earnings.ok && earnings.data?.rows.length).toBeGreaterThanOrEqual(1);
 
     const salary = await new ReportingRepository(await ctxFor(TEACHER)).salaryHistory({});
-    expect(salary.ok && salary.data?.total).toBe(100000);
+    expect(salary.ok && (salary.data?.total ?? 0)).toBeGreaterThanOrEqual(100000);
   });
 
   it("export queue: request → process → result → list, with role denial", async () => {

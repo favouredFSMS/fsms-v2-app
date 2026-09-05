@@ -1,5 +1,26 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { DEFAULT_LOCALE, LOCALES, isAppLocale, normaliseLocale } from "./locales";
+
+function getFlattenedKeys(obj: unknown, prefix = ""): string[] {
+  if (!obj || typeof obj !== "object" || Array.isArray(obj)) return [];
+  const keys: string[] = [];
+  for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
+    const full = prefix ? `${prefix}.${k}` : k;
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      keys.push(...getFlattenedKeys(v, full));
+    } else {
+      keys.push(full);
+    }
+  }
+  return keys;
+}
+
+function loadCatalog(locale: string): Record<string, unknown> {
+  const catalogPath = resolve(__dirname, `../../messages/${locale}.json`);
+  return JSON.parse(readFileSync(catalogPath, "utf-8"));
+}
 
 describe("i18n locales", () => {
   it("recognises the four supported locales", () => {
@@ -28,4 +49,15 @@ describe("i18n locales", () => {
     expect(normaliseLocale("")).toBe(DEFAULT_LOCALE);
     expect(DEFAULT_LOCALE).toBe("en");
   });
+
+  it("guarantees 100% key parity across all 4 message catalogs (EN, RU, FR, ZH)", () => {
+    const enKeys = getFlattenedKeys(loadCatalog("en")).sort();
+    expect(enKeys.length).toBeGreaterThan(1000);
+
+    for (const locale of ["ru", "fr", "zh"] as const) {
+      const locKeys = getFlattenedKeys(loadCatalog(locale)).sort();
+      expect(locKeys).toEqual(enKeys);
+    }
+  });
 });
+

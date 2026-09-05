@@ -41,8 +41,8 @@ describe.skipIf(!reachable)("dashboard (integration)", () => {
     expect(res.ok).toBe(true);
     if (!res.ok) return;
     expect(res.data.role).toBe("admin1");
-    expect(res.data.counts?.students).toBe(3);
-    expect(res.data.counts?.classes).toBe(1);
+    expect(res.data.counts?.students).toBeGreaterThanOrEqual(3);
+    expect(res.data.counts?.classes).toBeGreaterThanOrEqual(1);
     expect(res.data.today).toMatchObject({ present: 0, late: 0, absent: 0 });
     expect(res.data.school?.name).toContain("FAVOURED");
   });

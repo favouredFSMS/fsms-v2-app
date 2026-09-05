@@ -6,6 +6,7 @@ import { env } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isLocalAuthEnabled, verifyLocalCredentials, issueLocalSession } from "@/lib/auth/local";
 import { getAuthProfile } from "@/lib/auth/session";
+import type { AuthProfile } from "@/lib/auth/types";
 import { translate } from "@/i18n/server";
 import { LOCALE_COOKIE, normaliseLocale } from "@/i18n/locales";
 
@@ -53,6 +54,8 @@ export async function loginAction(_prev: AuthFormState, formData: FormData): Pro
     return { error: await translate("auth.emailPasswordRequired") };
   }
 
+  let profile: AuthProfile | null = null;
+
   if (isLocalAuthEnabled()) {
     const id = await verifyLocalCredentials(email, password);
     if (!id) return { error: await translate("auth.invalidCredentials") };
@@ -64,22 +67,30 @@ export async function loginAction(_prev: AuthFormState, formData: FormData): Pro
       maxAge: SESSION_MAX_AGE,
       path: "/",
     });
+    profile = await getAuthProfile();
   } else {
     const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      return { error: error.message };
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (signInError) {
+      return { error: signInError.message };
     }
+    // Pass the active client that just authenticated to ensure immediate session availability
+    profile = await getAuthProfile(supabase);
   }
 
-  // Verify that an active profile exists before completing the login redirect
-  const profile = await getAuthProfile();
-  if (!profile || profile.status !== "active") {
+  if (!profile) {
+    return { error: "Authentication succeeded but profile could not be loaded. Please try again." };
+  }
+
+  if (profile.status !== "active") {
     if (!isLocalAuthEnabled()) {
       const supabase = await createSupabaseServerClient();
       await supabase.auth.signOut().catch(() => {});
     }
-    return { error: await translate("auth.invalidCredentials") };
+    return { error: "Your account is not active. Please contact an administrator." };
   }
 
   // Mirror the durable per-user UI language into the locale cookie so the

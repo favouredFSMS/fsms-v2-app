@@ -22,6 +22,37 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(async () => headerStore),
 }));
 
+vi.mock("./local", async () => {
+  const actual = await vi.importActual<typeof import("./local")>("./local");
+  return {
+    ...actual,
+    isLocalAuthEnabled: vi.fn(() => true),
+    verifyLocalCredentials: vi.fn(async (email: string, pass: string) => {
+      if (email === "owner@favoured.test" && pass === "owner123") {
+        return "00000000-0000-0000-0000-000000000201";
+      }
+      return null;
+    }),
+    fetchLocalProfile: vi.fn(async () => ({
+      id: "00000000-0000-0000-0000-000000000201",
+      school_id: "00000000-0000-0000-0000-000000000001",
+      email: "owner@favoured.test",
+      name: "Owner",
+      role_id: "00000000-0000-0000-0000-000000000101",
+      role_base: "admin1" as const,
+      role_key: "admin1",
+      role_label: "Owner",
+      rank: 200,
+      locale: "en" as const,
+      notify_lang: "en" as const,
+      status: "active" as const,
+      must_change_password: false,
+      linked_ids: [],
+      permissions: ["*"],
+    })),
+  };
+});
+
 const redirectTargets: string[] = [];
 vi.mock("next/navigation", () => ({
   redirect: vi.fn((url: string) => {

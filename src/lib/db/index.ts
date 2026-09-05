@@ -132,3 +132,9 @@ export {
   type PayrollRow,
   type CreditAudit,
 } from "./repos/finance";
+export {
+  SettingsRepository,
+  type SchoolProfile,
+  type SettingRow,
+  type SettingsList,
+} from "./repos/settings";

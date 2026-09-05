@@ -534,7 +534,7 @@
     "recording": "Enregistrement…",
     "createAssessmentTest": "Créer le test d'évaluation",
     "tasksJson": "Tâches (tableau JSON)",
-    "eachTaskHint": "Chaque tâche : { n, skill, text }",
+    "eachTaskHint": "Chaque tâche : '{' n, skill, text '}'",
     "typesLabel": "Types (séparés par des virgules)",
     "saveAssessment": "Enregistrer l'évaluation"
   },
@@ -1184,5 +1184,33 @@
     "uploadDeleted": "Fichier supprimé",
     "uploadDeleteFailed": "Impossible de supprimer le fichier",
     "uploadTypeBlocked": "Ce type de fichier n'est pas autorisé"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "schoolProfile": "Profil de l'école",
+    "schoolProfileDesc": "Résumé en lecture seule de la configuration de cette école.",
+    "schoolName": "Nom de l'école",
+    "timezone": "Fuseau horaire",
+    "currency": "Devise",
+    "defaultLocale": "Langue par défaut",
+    "addEdit": "Ajouter ou modifier un paramètre",
+    "addEditDesc": "Configuration clé/valeur de cette école. Les secrets n'y sont jamais stockés.",
+    "configured": "Paramètres enregistrés",
+    "configuredDesc": "Tout ce qui est stocké pour cette école, dernières mises à jour en premier.",
+    "key": "Clé",
+    "value": "Valeur",
+    "valueType": "Type de valeur",
+    "typeText": "Texte",
+    "typeNumber": "Nombre",
+    "typeBoolean": "Booléen",
+    "typeJson": "JSON",
+    "noSettings": "Aucun paramètre configuré pour le moment.",
+    "remove": "Supprimer",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "updatedBy": "Modifié par",
+    "invalidKey": "Clé de paramètre invalide.",
+    "saveDenied": "Vous n'avez pas le droit de modifier les paramètres.",
+    "saveFailed": "Impossible d'enregistrer le paramètre."
   }
 }

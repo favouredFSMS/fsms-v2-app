@@ -534,7 +534,7 @@
     "recording": "记录中…",
     "createAssessmentTest": "创建评估测试",
     "tasksJson": "题目（JSON 数组）",
-    "eachTaskHint": "每题格式：{ n, skill, text }",
+    "eachTaskHint": "每题格式：'{' n, skill, text '}'",
     "typesLabel": "类型（逗号分隔）",
     "saveAssessment": "保存评估"
   },
@@ -1184,5 +1184,33 @@
     "uploadDeleted": "文件已删除",
     "uploadDeleteFailed": "删除文件失败",
     "uploadTypeBlocked": "不允许此文件类型"
+  },
+  "settings": {
+    "title": "设置",
+    "schoolProfile": "学校资料",
+    "schoolProfileDesc": "本校配置的只读摘要。",
+    "schoolName": "学校名称",
+    "timezone": "时区",
+    "currency": "货币",
+    "defaultLocale": "默认语言",
+    "addEdit": "添加或修改设置",
+    "addEditDesc": "本校的键值配置。此处绝不存储机密信息。",
+    "configured": "已保存的设置",
+    "configuredDesc": "本校存储的全部设置，最新更新在前。",
+    "key": "键",
+    "value": "值",
+    "valueType": "值类型",
+    "typeText": "文本",
+    "typeNumber": "数字",
+    "typeBoolean": "布尔值",
+    "typeJson": "JSON",
+    "noSettings": "尚未配置任何设置。",
+    "remove": "删除",
+    "save": "保存",
+    "saving": "保存中…",
+    "updatedBy": "修改人",
+    "invalidKey": "设置键无效。",
+    "saveDenied": "您没有修改设置的权限。",
+    "saveFailed": "无法保存设置。"
   }
 }

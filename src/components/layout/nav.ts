@@ -38,7 +38,7 @@ export const NAV_SECTIONS: NavSection[] = [
   {
     title: "school",
     items: [
-      { href: "/people", label: "people", icon: "people", permission: "people" },
+      { href: "/people", label: "people", icon: "people", permission: "users" },
       { href: "/students", label: "students", icon: "students", permission: "students" },
       { href: "/parents", label: "parents", icon: "parents", permission: "parents" },
       { href: "/classes", label: "classes", icon: "classes", permission: "classes" },
@@ -77,22 +77,13 @@ export const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
-    title: "learning",
-    items: [
-      { href: "/learning", label: "myLearning", icon: "learning", permission: "learning" },
-      { href: "/family", label: "family", icon: "family", permission: "familyDashboard" },
-    ],
-  },
-  {
     title: "administration",
     items: [
       // canonical "reports" lands in Phase 20; the base `report` action is granted
       // to every role, and each report re-checks its own finer permission inside
       // its SECURITY DEFINER RPC.
       { href: "/reports", label: "reports", icon: "reports", permission: "report" },
-      { href: "/roles", label: "roles", icon: "roles", permission: "roles" },
       { href: "/settings", label: "settings", icon: "settings", permission: "settings" },
-      { href: "/admin", label: "admin", icon: "admin", permission: "admin" },
     ],
   },
 ];

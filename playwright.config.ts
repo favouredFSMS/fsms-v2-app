@@ -25,11 +25,14 @@ export default defineConfig({
   webServer: {
     command: "npm run dev",
     url: "http://localhost:3000/login",
-    // Always start a fresh server: the e2e/run.sh runner invokes Playwright
-    // once per spec group precisely so each group gets its own low-memory
-    // dev server. Reusing a long-lived server accumulates compiled routes and
-    // gets OOM-killed in the ~2 GB sandbox.
-    reuseExistingServer: false,
+    // Two supported modes, selected by run.sh:
+    //   E2E_REUSE=0 (default) — always start a fresh server per spec group so
+    //     each group gets its own low-memory dev server (memory-safe in the
+    //     ~2 GB sandbox).
+    //   E2E_REUSE=1 — reuse an already-running, PREWARMED dev server (all
+    //     routes compiled once via curl) so a long suite never re-pays compile
+    //     cost and cannot OOM from back-to-back server restarts.
+    reuseExistingServer: process.env.E2E_REUSE === "1",
     timeout: 180_000,
   },
   projects: [

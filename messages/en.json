@@ -534,7 +534,7 @@
     "recording": "Recording…",
     "createAssessmentTest": "Create assessment test",
     "tasksJson": "Tasks (JSON array)",
-    "eachTaskHint": "Each task: { n, skill, text }",
+    "eachTaskHint": "Each task: '{' n, skill, text '}'",
     "typesLabel": "Types (comma-separated)",
     "saveAssessment": "Save assessment"
   },
@@ -1184,5 +1184,33 @@
     "uploadDeleted": "File deleted",
     "uploadDeleteFailed": "Failed to delete file",
     "uploadTypeBlocked": "This file type is not allowed"
+  },
+  "settings": {
+    "title": "Settings",
+    "schoolProfile": "School profile",
+    "schoolProfileDesc": "Read-only summary of this school's configuration.",
+    "schoolName": "School name",
+    "timezone": "Timezone",
+    "currency": "Currency",
+    "defaultLocale": "Default locale",
+    "addEdit": "Add or edit a setting",
+    "addEditDesc": "Key/value configuration for this school. Secrets are never stored here.",
+    "configured": "Configured settings",
+    "configuredDesc": "Everything stored for this school, newest updates shown.",
+    "key": "Key",
+    "value": "Value",
+    "valueType": "Value type",
+    "typeText": "Text",
+    "typeNumber": "Number",
+    "typeBoolean": "Boolean",
+    "typeJson": "JSON",
+    "noSettings": "No settings configured yet.",
+    "remove": "Remove",
+    "save": "Save",
+    "saving": "Saving…",
+    "updatedBy": "Updated by",
+    "invalidKey": "Invalid setting key.",
+    "saveDenied": "You do not have permission to change settings.",
+    "saveFailed": "Could not save the setting."
   }
 }

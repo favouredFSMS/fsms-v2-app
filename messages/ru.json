@@ -534,7 +534,7 @@
     "recording": "Запись…",
     "createAssessmentTest": "Создать тест",
     "tasksJson": "Задания (JSON-массив)",
-    "eachTaskHint": "Каждое задание: { n, skill, text }",
+    "eachTaskHint": "Каждое задание: '{' n, skill, text '}'",
     "typesLabel": "Типы (через запятую)",
     "saveAssessment": "Сохранить оценку"
   },
@@ -1184,5 +1184,33 @@
     "uploadDeleted": "Файл удалён",
     "uploadDeleteFailed": "Не удалось удалить файл",
     "uploadTypeBlocked": "Этот тип файла запрещён"
+  },
+  "settings": {
+    "title": "Настройки",
+    "schoolProfile": "Профиль школы",
+    "schoolProfileDesc": "Сводка настроек этой школы (только чтение).",
+    "schoolName": "Название школы",
+    "timezone": "Часовой пояс",
+    "currency": "Валюта",
+    "defaultLocale": "Язык по умолчанию",
+    "addEdit": "Добавить или изменить настройку",
+    "addEditDesc": "Конфигурация школы в формате «ключ — значение». Секреты здесь не хранятся.",
+    "configured": "Сохранённые настройки",
+    "configuredDesc": "Все настройки этой школы, последние изменения сверху.",
+    "key": "Ключ",
+    "value": "Значение",
+    "valueType": "Тип значения",
+    "typeText": "Текст",
+    "typeNumber": "Число",
+    "typeBoolean": "Логический",
+    "typeJson": "JSON",
+    "noSettings": "Настройки пока не заданы.",
+    "remove": "Удалить",
+    "save": "Сохранить",
+    "saving": "Сохранение…",
+    "updatedBy": "Кто изменил",
+    "invalidKey": "Недопустимый ключ настройки.",
+    "saveDenied": "У вас нет прав изменять настройки.",
+    "saveFailed": "Не удалось сохранить настройку."
   }
 }

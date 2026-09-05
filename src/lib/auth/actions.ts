@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { env } from "@/lib/env";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -19,6 +19,31 @@ import { LOCALE_COOKIE, normaliseLocale } from "@/i18n/locales";
 export type AuthFormState = { error?: string; ok?: boolean } | null;
 
 const SESSION_MAX_AGE = 7 * 24 * 60 * 60;
+
+/**
+ * Resolve the dynamic application origin for auth redirects (password recovery, OAuth, magic links).
+ *
+ * Priority:
+ * 1. Request headers (x-forwarded-host / host + x-forwarded-proto), which accurately
+ *    detects the active Vercel domain, branch preview URL, or localhost.
+ * 2. Fallback to `env.appUrl` (NEXT_PUBLIC_APP_URL, VERCEL_URL, or localhost).
+ */
+export async function getAuthRedirectBaseUrl(): Promise<string> {
+  try {
+    const headersList = await headers();
+    const forwardedHost = headersList.get("x-forwarded-host");
+    const host = forwardedHost ?? headersList.get("host");
+    if (host) {
+      const proto =
+        headersList.get("x-forwarded-proto") ??
+        (host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https");
+      return `${proto}://${host}`.replace(/\/+$/, "");
+    }
+  } catch {
+    // Outside of request context
+  }
+  return env.appUrl;
+}
 
 export async function loginAction(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const email = String(formData.get("email") ?? "").trim();
@@ -85,8 +110,9 @@ export async function forgotPasswordAction(
   }
 
   const supabase = await createSupabaseServerClient();
+  const baseUrl = await getAuthRedirectBaseUrl();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${env.appUrl}/auth/reset-password`,
+    redirectTo: `${baseUrl}/auth/callback?next=/auth/reset-password`,
   });
   if (error) return { error: error.message };
   // Generic response — never reveal whether the account exists.
@@ -118,9 +144,10 @@ export async function googleLoginAction(): Promise<void> {
     redirect("/login?error=google-unavailable");
   }
   const supabase = await createSupabaseServerClient();
+  const baseUrl = await getAuthRedirectBaseUrl();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: `${env.appUrl}/auth/callback` },
+    options: { redirectTo: `${baseUrl}/auth/callback` },
   });
   if (error || !data?.url) {
     redirect("/login?error=google");

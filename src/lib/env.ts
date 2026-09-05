@@ -77,7 +77,15 @@ export const env = {
 
   /** Canonical app URL (O4) — used in email/notification links. */
   get appUrl(): string {
-    return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    const raw =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.NEXT_PUBLIC_STAGING_URL ||
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL
+        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+        : "") ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
+      "http://localhost:3000";
+    return raw.replace(/\/+$/, "");
   },
 
   /**

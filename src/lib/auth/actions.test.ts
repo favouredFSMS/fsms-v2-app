@@ -16,7 +16,11 @@ const cookieStore = {
     this.values.delete(name);
   },
 };
-vi.mock("next/headers", () => ({ cookies: vi.fn(async () => cookieStore) }));
+const headerStore = new Headers();
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(async () => cookieStore),
+  headers: vi.fn(async () => headerStore),
+}));
 
 const redirectTargets: string[] = [];
 vi.mock("next/navigation", () => ({
@@ -26,12 +30,21 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-import { loginAction, logoutAction } from "./actions";
+import { loginAction, logoutAction, getAuthRedirectBaseUrl } from "./actions";
 
 describe("auth server actions (local mode)", () => {
   beforeEach(() => {
     cookieStore.values.clear();
     redirectTargets.length = 0;
+  });
+
+  it("resolves dynamic origin from request headers", async () => {
+    headerStore.set("x-forwarded-host", "fsms-v2-staging.vercel.app");
+    headerStore.set("x-forwarded-proto", "https");
+    const url = await getAuthRedirectBaseUrl();
+    expect(url).toBe("https://fsms-v2-staging.vercel.app");
+    headerStore.delete("x-forwarded-host");
+    headerStore.delete("x-forwarded-proto");
   });
 
   it("logs in with valid seeded credentials, sets the session cookie, and redirects", async () => {

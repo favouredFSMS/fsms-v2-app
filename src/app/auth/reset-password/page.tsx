@@ -1,10 +1,19 @@
 import { getTranslations } from "next-intl/server";
 import { ResetForm } from "./reset-form";
 import { Card, CardBody } from "@/components/ui/card";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata = { title: "Set new password — FSMS V2" };
 
-export default async function ResetPasswordPage() {
+export default async function ResetPasswordPage(props: {
+  searchParams?: Promise<{ code?: string }>;
+}) {
+  const searchParams = props.searchParams ? await props.searchParams : undefined;
+  if (searchParams?.code) {
+    const supabase = await createSupabaseServerClient();
+    await supabase.auth.exchangeCodeForSession(searchParams.code);
+  }
+
   const t = await getTranslations("auth");
   return (
     <main className="flex min-h-screen flex-col items-center justify-center px-4 py-10">

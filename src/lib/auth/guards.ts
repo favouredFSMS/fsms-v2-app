@@ -37,7 +37,7 @@ export async function requireProfile(): Promise<AuthProfile> {
 /** Redirect to /login when anonymous (for Server Components / pages). */
 export async function requireUser(): Promise<AuthProfile> {
   const profile = await getAuthProfile();
-  if (!profile) redirect("/login");
+  if (!profile) redirect("/login?error=session-expired");
   if (profile.status !== "active") redirect("/login?reason=inactive");
   return profile;
 }

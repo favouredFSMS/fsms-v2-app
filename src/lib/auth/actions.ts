@@ -72,10 +72,19 @@ export async function loginAction(_prev: AuthFormState, formData: FormData): Pro
     }
   }
 
+  // Verify that an active profile exists before completing the login redirect
+  const profile = await getAuthProfile();
+  if (!profile || profile.status !== "active") {
+    if (!isLocalAuthEnabled()) {
+      const supabase = await createSupabaseServerClient();
+      await supabase.auth.signOut().catch(() => {});
+    }
+    return { error: await translate("auth.invalidCredentials") };
+  }
+
   // Mirror the durable per-user UI language into the locale cookie so the
   // i18n request config resolves it without a DB round-trip on every request.
-  const profile = await getAuthProfile();
-  const locale = normaliseLocale(profile?.locale);
+  const locale = normaliseLocale(profile.locale);
   (await cookies()).set(LOCALE_COOKIE, locale, {
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",

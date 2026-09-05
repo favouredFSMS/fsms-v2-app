@@ -26,8 +26,21 @@ const PUBLIC_PATHS = [
 const isPublicPath = (pathname: string) =>
   PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
 
+function redirectWithCookies(url: URL, sourceResponse: NextResponse): NextResponse {
+  const redirectRes = NextResponse.redirect(url);
+  sourceResponse.cookies.getAll().forEach((cookie) => {
+    redirectRes.cookies.set(cookie.name, cookie.value, cookie);
+  });
+  return redirectRes;
+}
+
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  const hasAuthParams =
+    request.nextUrl.searchParams.has("reason") ||
+    request.nextUrl.searchParams.has("error") ||
+    request.nextUrl.searchParams.has("logout");
 
   // ── local dev harness ──────────────────────────────────────────────────
   if (!env.supabaseUrl) {
@@ -37,9 +50,10 @@ export default async function proxy(request: NextRequest) {
       url.pathname = "/login";
       return NextResponse.redirect(url);
     }
-    if (hasSession && (pathname === "/login" || pathname === "/")) {
+    if (hasSession && (pathname === "/login" || pathname === "/") && !hasAuthParams) {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
+      url.search = "";
       return NextResponse.redirect(url);
     }
     return NextResponse.next();
@@ -67,12 +81,13 @@ export default async function proxy(request: NextRequest) {
   if (!user && !isPublicPath(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    return NextResponse.redirect(url);
+    return redirectWithCookies(url, response);
   }
-  if (user && (pathname === "/login" || pathname === "/")) {
+  if (user && (pathname === "/login" || pathname === "/") && !hasAuthParams) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
-    return NextResponse.redirect(url);
+    url.search = "";
+    return redirectWithCookies(url, response);
   }
 
   return response;

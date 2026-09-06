@@ -1,20 +1,26 @@
 "use client";
 
 import React, { useState } from "react";
-import { CefrBadgeShield, CelebrationModal } from "@/components/achievements/cefr-badge-shield";
-import { AppShell } from "@/components/layout/app-shell";
+import { CefrBadgeShield, CelebrationModal, type CefrLevel } from "@/components/achievements/cefr-badge-shield";
 
-const ALL_ACHIEVEMENTS = [
-  { level: "A1", title: "Starters Foundation", skill: "Overall" as const, earnedDate: "2026-05-10", isUnlocked: true, score: 98 },
-  { level: "A1", title: "Phonics & Greetings", skill: "Speaking" as const, earnedDate: "2026-05-14", isUnlocked: true, score: 100 },
-  { level: "A2", title: "Elementary Mastery", skill: "Overall" as const, earnedDate: "2026-08-20", isUnlocked: true, score: 92 },
-  { level: "A2", title: "Past Simple Narrative", skill: "Grammar" as const, earnedDate: "2026-08-25", isUnlocked: true, score: 88 },
-  { level: "A2", title: "Story Dialogue", skill: "Listening" as const, earnedDate: "2026-09-02", isUnlocked: true, score: 95 },
-  { level: "B1", title: "Intermediate Threshold", skill: "Overall" as const, isUnlocked: false },
-  { level: "B1", title: "Complex Sentence Writing", skill: "Writing" as const, isUnlocked: false },
-  { level: "B2", title: "Vantage Fluency", skill: "Speaking" as const, isUnlocked: false },
-  { level: "C1", title: "Advanced Proficiency", skill: "Reading" as const, isUnlocked: false },
-  { level: "C2", title: "Mastery Crown", skill: "Overall" as const, isUnlocked: false },
+const ALL_ACHIEVEMENTS: Array<{
+  level: CefrLevel;
+  title: string;
+  skill: "Overall" | "Speaking" | "Grammar" | "Listening" | "Writing" | "Reading";
+  earnedDate?: string;
+  isUnlocked: boolean;
+  score?: number;
+}> = [
+  { level: "PRE_A1", title: "Starters Foundation", skill: "Overall", earnedDate: "2026-05-10", isUnlocked: true, score: 98 },
+  { level: "A1", title: "Phonics & Greetings", skill: "Speaking", earnedDate: "2026-05-14", isUnlocked: true, score: 100 },
+  { level: "A2", title: "Elementary Mastery", skill: "Overall", earnedDate: "2026-08-20", isUnlocked: true, score: 92 },
+  { level: "A2", title: "Past Simple Narrative", skill: "Grammar", earnedDate: "2026-08-25", isUnlocked: true, score: 88 },
+  { level: "A2", title: "Story Dialogue", skill: "Listening", earnedDate: "2026-09-02", isUnlocked: true, score: 95 },
+  { level: "B1", title: "Intermediate Threshold", skill: "Overall", isUnlocked: false },
+  { level: "B1", title: "Complex Sentence Writing", skill: "Writing", isUnlocked: false },
+  { level: "B2", title: "Vantage Fluency", skill: "Speaking", isUnlocked: false },
+  { level: "C1", title: "Advanced Proficiency", skill: "Reading", isUnlocked: false },
+  { level: "C2", title: "Mastery Crown", skill: "Overall", isUnlocked: false },
 ];
 
 export default function AchievementsPage() {
@@ -96,15 +102,17 @@ export default function AchievementsPage() {
         {/* Shields Grid */}
         <div className="mt-6 grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {filtered.map((item, idx) => (
-            <CefrBadgeShield
-              key={idx}
-              level={item.level}
-              title={item.title}
-              skill={item.skill}
-              earnedDate={item.earnedDate}
-              isUnlocked={item.isUnlocked}
-              score={item.score}
-            />
+            <div key={idx} className="flex flex-col items-center gap-2 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm text-center">
+              <CefrBadgeShield
+                level={item.level}
+                unlocked={item.isUnlocked}
+                score={item.score}
+              />
+              <div>
+                <h4 className="text-xs font-bold text-slate-900">{item.title}</h4>
+                <p className="text-[11px] text-slate-500">{item.skill} · {item.isUnlocked ? item.earnedDate : "Locked"}</p>
+              </div>
+            </div>
           ))}
         </div>
       </div>

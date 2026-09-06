@@ -7,7 +7,7 @@ import Link from "next/link";
 export const metadata = { title: "Study — FSMS" };
 
 export default async function StudyPage() {
-  const user = await requireUser();
+  await requireUser();
 
   const studyModules = [
     {

@@ -1,8 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Icon } from "@/components/ui/icons";
-import { useTranslations } from "next-intl";
 
 export interface StudentRow {
   id: string;
@@ -115,7 +113,6 @@ export function QuickEntryModal({
   defaultClassId,
   onSuccess,
 }: QuickEntryModalProps) {
-  const t = useTranslations("dashboard");
   const [selectedClassId, setSelectedClassId] = useState(defaultClassId || classes[0]?.id || "");
   const [date, setDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [lessonNo, setLessonNo] = useState("14");
@@ -253,6 +250,7 @@ export function QuickEntryModal({
         note: skillNotes[s] || "",
       })),
     };
+    void payload;
 
     // Simulate atomic save latency
     await new Promise((r) => setTimeout(r, 600));

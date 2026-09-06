@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Icon } from "@/components/ui/icons";
 import { CelebrationModal } from "@/components/achievements/cefr-badge-shield";
 import Link from "next/link";
 

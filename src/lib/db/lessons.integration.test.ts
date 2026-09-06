@@ -84,7 +84,7 @@ describe.skipIf(!reachable)("lessons (integration)", () => {
     });
     expect(second.ok && second.data?.id).toBe(id);
 
-    const logs = await teacher.logs({ classId: A2KIDS, pageSize: 30 });
+    const logs = await teacher.logs({ classId: A2KIDS, from: DATE, to: DATE, pageSize: 30 });
     expect(logs.ok && logs.data?.total).toBe(1);
     expect(logs.ok && logs.data?.items[0]?.topic).toBe("Greetings v2");
 

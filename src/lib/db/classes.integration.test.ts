@@ -50,6 +50,8 @@ afterAll(async () => {
     await c.query("set session_replication_role = replica");
     if (created.classId) {
       await c.query("delete from public.audit_log where entity = 'classes' and entity_id = $1", [created.classId]);
+      await c.query("delete from public.class_teachers where class_id = $1", [created.classId]);
+      await c.query("delete from public.enrolments where class_id = $1", [created.classId]);
       await c.query("delete from public.classes where id = $1", [created.classId]);
     }
     if (created.subjectId) await c.query("delete from public.subjects where id = $1", [created.subjectId]);

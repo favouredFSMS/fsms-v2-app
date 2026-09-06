@@ -41,8 +41,8 @@ afterAll(async () => {
   await c.connect();
   try {
     await c.query("set session_replication_role = replica");
-    await c.query("delete from public.assessments where student_id = $1", [ANNA]);
-    await c.query("delete from public.assessment_tests where student_id = $1", [ANNA]);
+    await c.query("delete from public.assessments where title like '%(integration)%' or title = 'For family'");
+    await c.query("delete from public.assessment_tests where title like '%(integration)%'");
     await c.query("set session_replication_role = default");
   } finally {
     await c.end();

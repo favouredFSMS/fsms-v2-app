@@ -66,12 +66,20 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
           {pending ? t("signingIn") : t("signIn")}
         </Button>
 
-        <a
-          href="/forgot-password"
-          className="text-center text-sm text-brand-600 hover:text-brand-700"
-        >
-          {t("forgotPassword")}
-        </a>
+        <div className="flex flex-col gap-2 text-center text-sm">
+          <a
+            href="/forgot-password"
+            className="text-brand-600 hover:text-brand-700"
+          >
+            {t("forgotPassword")}
+          </a>
+          <a
+            href="/signup"
+            className="font-medium text-brand-600 hover:text-brand-700"
+          >
+            {t("dontHaveAccount")}
+          </a>
+        </div>
       </form>
 
       {googleEnabled && (

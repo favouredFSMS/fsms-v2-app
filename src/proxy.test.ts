@@ -79,4 +79,20 @@ describe("proxy (middleware) redirect loop prevention", () => {
     expect(res.status).toBe(200);
     expect(res.headers.get("location")).toBeNull();
   });
+
+  it("allows unauthenticated visitor to access /signup without redirect", async () => {
+    mockUser = null;
+    const req = new NextRequest("https://fsms-v2-staging.vercel.app/signup");
+    const res = await proxy(req);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("location")).toBeNull();
+  });
+
+  it("redirects authenticated user from /signup to /dashboard", async () => {
+    mockUser = { id: "user-1", email: "owner@favoured.test" };
+    const req = new NextRequest("https://fsms-v2-staging.vercel.app/signup");
+    const res = await proxy(req);
+    expect(res.status).toBe(307);
+    expect(res.headers.get("location")).toBe("https://fsms-v2-staging.vercel.app/dashboard");
+  });
 });

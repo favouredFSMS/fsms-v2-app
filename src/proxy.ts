@@ -16,6 +16,7 @@ import { env } from "@/lib/env";
 
 const PUBLIC_PATHS = [
   "/login",
+  "/signup",
   "/forgot-password",
   "/auth/callback",
   "/auth/confirm",
@@ -50,7 +51,7 @@ export default async function proxy(request: NextRequest) {
       url.pathname = "/login";
       return NextResponse.redirect(url);
     }
-    if (hasSession && (pathname === "/login" || pathname === "/") && !hasAuthParams) {
+    if (hasSession && (pathname === "/login" || pathname === "/signup" || pathname === "/") && !hasAuthParams) {
       const url = request.nextUrl.clone();
       url.pathname = "/dashboard";
       url.search = "";
@@ -83,7 +84,7 @@ export default async function proxy(request: NextRequest) {
     url.pathname = "/login";
     return redirectWithCookies(url, response);
   }
-  if (user && (pathname === "/login" || pathname === "/") && !hasAuthParams) {
+  if (user && (pathname === "/login" || pathname === "/signup" || pathname === "/") && !hasAuthParams) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     url.search = "";

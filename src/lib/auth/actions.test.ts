@@ -24,8 +24,22 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(async () => headerStore),
 }));
 
+vi.mock("@/lib/env", () => ({
+  env: {
+    supabaseUrl: "https://example.supabase.co",
+    supabaseAnonKey: "anon-key",
+    supabaseServiceRoleKey: "service-key",
+    appUrl: "https://example.com",
+    localAuthSecret: "fsms-local-dev-secret-change-me",
+  },
+}));
+
 let mockLocalAuth = true;
 let mockSignInResult: { error: { message: string } | null } = { error: null };
+let mockSignUpResult: {
+  data?: { user?: { id: string; email: string } | null; session?: { access_token: string } | null };
+  error: { message: string } | null;
+} = { data: { user: { id: "new-user-1", email: "new@favoured.test" }, session: null }, error: null };
 let mockAuthProfileResult: AuthProfile | null = null;
 
 vi.mock("./local", async () => {
@@ -63,10 +77,29 @@ vi.mock("@/lib/supabase/server", () => ({
   createSupabaseServerClient: vi.fn(async () => ({
     auth: {
       signInWithPassword: vi.fn(async () => mockSignInResult),
+      signUp: vi.fn(async () => mockSignUpResult),
       signOut: vi.fn(async () => ({})),
+      resetPasswordForEmail: vi.fn(async () => ({ error: null })),
+      updateUser: vi.fn(async () => ({ error: null })),
     },
   })),
-  getServerClient: vi.fn(() => ({})),
+  getServerClient: vi.fn(() => ({
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({
+        order: vi.fn(() => ({
+          limit: vi.fn(() => ({
+            maybeSingle: vi.fn(async () => ({ data: { id: "school-1" } })),
+          })),
+        })),
+        eq: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            maybeSingle: vi.fn(async () => ({ data: { id: "role-1", key: "parent", label: "Parent", rank: 20 } })),
+          })),
+        })),
+      })),
+      upsert: vi.fn(async () => ({ error: null })),
+    })),
+  })),
 }));
 
 vi.mock("./session", () => ({
@@ -81,7 +114,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-import { loginAction, logoutAction, getAuthRedirectBaseUrl } from "./actions";
+import { loginAction, signupAction, logoutAction, getAuthRedirectBaseUrl } from "./actions";
 
 const defaultOwnerProfile: AuthProfile = {
   id: "00000000-0000-0000-0000-000000000201",
@@ -148,12 +181,29 @@ describe("auth server actions (local mode)", () => {
     await expect(logoutAction()).rejects.toThrow("NEXT_REDIRECT:/login");
     expect(cookieStore.get("fsms_local_session")).toBeUndefined();
   });
+
+  it("signup succeeds in local dev mode", async () => {
+    const fd = new FormData();
+    fd.set("name", "Jane Doe");
+    fd.set("email", "jane@favoured.test");
+    fd.set("password", "secret123");
+    fd.set("confirm", "secret123");
+    fd.set("role", "parent");
+
+    const state = await signupAction(null, fd);
+    expect(state?.ok).toBe(true);
+    expect(state?.error).toBeUndefined();
+  });
 });
 
 describe("auth server actions (Supabase mode)", () => {
   beforeEach(() => {
     mockLocalAuth = false;
     mockSignInResult = { error: null };
+    mockSignUpResult = {
+      data: { user: { id: "new-user-1", email: "new@favoured.test" }, session: null },
+      error: null,
+    };
     mockAuthProfileResult = {
       id: "user-1",
       school_id: "school-1",
@@ -184,14 +234,24 @@ describe("auth server actions (Supabase mode)", () => {
     expect(cookieStore.get("fsms_locale")?.value).toBe("en");
   });
 
-  it("returns GoTrue error message transparently when signInWithPassword fails", async () => {
+  it("returns sanitized error message when signInWithPassword fails with invalid credentials", async () => {
     mockSignInResult = { error: { message: "Invalid login credentials" } };
     const fd = new FormData();
     fd.set("email", "owner@favoured.test");
     fd.set("password", "bad-password");
 
     const state = await loginAction(null, fd);
-    expect(state?.error).toBe("Invalid login credentials");
+    expect(state?.error).toBe("Invalid email or password.");
+  });
+
+  it("sanitizes network 'fetch failed' errors to helpful connection guidance", async () => {
+    mockSignInResult = { error: { message: "fetch failed" } };
+    const fd = new FormData();
+    fd.set("email", "owner@favoured.test");
+    fd.set("password", "some-password");
+
+    const state = await loginAction(null, fd);
+    expect(state?.error).toMatch(/Unable to connect to the authentication server/i);
   });
 
   it("returns inactive message when profile status is not active", async () => {
@@ -214,5 +274,48 @@ describe("auth server actions (Supabase mode)", () => {
 
     const state = await loginAction(null, fd);
     expect(state?.error).toMatch(/profile could not be loaded/i);
+  });
+
+  it("signup creates account and returns ok when email confirmation is required", async () => {
+    const fd = new FormData();
+    fd.set("name", "New Student");
+    fd.set("email", "student@example.com");
+    fd.set("password", "password123");
+    fd.set("confirm", "password123");
+    fd.set("role", "student");
+
+    const state = await signupAction(null, fd);
+    expect(state?.ok).toBe(true);
+    expect(state?.error).toBeUndefined();
+  });
+
+  it("signup rejects password mismatch", async () => {
+    const fd = new FormData();
+    fd.set("name", "New Student");
+    fd.set("email", "student@example.com");
+    fd.set("password", "password123");
+    fd.set("confirm", "different123");
+
+    const state = await signupAction(null, fd);
+    expect(state?.error).toMatch(/passwords do not match/i);
+  });
+
+  it("signup redirects to dashboard immediately if session is returned (email confirmation disabled)", async () => {
+    mockSignUpResult = {
+      data: {
+        user: { id: "new-user-1", email: "instant@example.com" },
+        session: { access_token: "mock-jwt" },
+      },
+      error: null,
+    };
+
+    const fd = new FormData();
+    fd.set("name", "Instant User");
+    fd.set("email", "instant@example.com");
+    fd.set("password", "password123");
+    fd.set("confirm", "password123");
+
+    await expect(signupAction(null, fd)).rejects.toThrow("NEXT_REDIRECT:/dashboard");
+    expect(cookieStore.get("fsms_locale")?.value).toBe("en");
   });
 });

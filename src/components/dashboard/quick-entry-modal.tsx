@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Icon } from "@/components/ui/icons";
 import { useTranslations } from "next-intl";
 
@@ -27,6 +27,83 @@ const DEFAULT_TOPIC_SUGGESTIONS = [
   "Present Continuous vs Present Simple",
 ];
 
+export type CefrSkillKey = "speaking" | "listening" | "reading" | "writing" | "vocabulary" | "grammar";
+
+export const CEFR_SKILL_DEFINITIONS: Array<{
+  key: CefrSkillKey;
+  label: string;
+  emoji: string;
+}> = [
+  { key: "speaking", label: "Speaking", emoji: "🗣️" },
+  { key: "listening", label: "Listening", emoji: "👂" },
+  { key: "reading", label: "Reading", emoji: "📖" },
+  { key: "writing", label: "Writing", emoji: "✍️" },
+  { key: "vocabulary", label: "Vocabulary", emoji: "🌐" },
+  { key: "grammar", label: "Grammar", emoji: "📚" },
+];
+
+export type PerformanceLevel = "not-demonstrated" | "beginning" | "developing" | "secure" | "strong";
+
+export interface SkillEvidenceItem {
+  skill: CefrSkillKey;
+  performance: PerformanceLevel;
+  weight: number;
+  note: string;
+}
+
+/**
+ * Robust auto-balancing of skill weights using largest-remainder distribution.
+ * Guarantees total exactly 100 when skills are selected, with zero divide-by-zero risk.
+ */
+export function autoBalanceWeights(skills: CefrSkillKey[], manualWeights: Partial<Record<CefrSkillKey, number>>): Record<CefrSkillKey, number> {
+  const result: Partial<Record<CefrSkillKey, number>> = {};
+  const n = skills.length;
+  if (n === 0) return result as Record<CefrSkillKey, number>;
+
+  const hasManual = skills.some((s) => (manualWeights[s] ?? 0) > 0);
+  if (!hasManual) {
+    const base = Math.floor(100 / n);
+    const remainder = 100 - base * n;
+    skills.forEach((s, idx) => {
+      result[s] = base + (idx < remainder ? 1 : 0);
+    });
+    return result as Record<CefrSkillKey, number>;
+  }
+
+  const rawSum = skills.reduce((sum, s) => sum + Math.max(0, manualWeights[s] ?? 0), 0);
+  if (rawSum === 0) {
+    const base = Math.floor(100 / n);
+    const remainder = 100 - base * n;
+    skills.forEach((s, idx) => {
+      result[s] = base + (idx < remainder ? 1 : 0);
+    });
+    return result as Record<CefrSkillKey, number>;
+  }
+
+  // Normalize proportionally with largest remainder
+  const parts = skills.map((s) => {
+    const rawVal = Math.max(0, manualWeights[s] ?? 0);
+    const scaled = (rawVal * 100) / rawSum;
+    const floored = Math.floor(scaled);
+    return { skill: s, floored, fraction: scaled - floored };
+  });
+
+  const allocatedSum = parts.reduce((acc, p) => acc + p.floored, 0);
+  let leftover = 100 - allocatedSum;
+
+  parts.sort((a, b) => b.fraction - a.fraction);
+  parts.forEach((p) => {
+    let extra = 0;
+    if (leftover > 0) {
+      extra = 1;
+      leftover--;
+    }
+    result[p.skill] = p.floored + extra;
+  });
+
+  return result as Record<CefrSkillKey, number>;
+}
+
 export function QuickEntryModal({
   isOpen,
   onClose,
@@ -49,6 +126,13 @@ export function QuickEntryModal({
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
+  // Evidence section state (re-architected V100/V101 capability)
+  const [showEvidenceSection, setShowEvidenceSection] = useState(false);
+  const [selectedSkills, setSelectedSkills] = useState<CefrSkillKey[]>([]);
+  const [skillPerf, setSkillPerf] = useState<Partial<Record<CefrSkillKey, PerformanceLevel>>>({});
+  const [skillNotes, setSkillNotes] = useState<Partial<Record<CefrSkillKey, string>>>({});
+  const [manualWeights, setManualWeights] = useState<Partial<Record<CefrSkillKey, number>>>({});
+
   // Roster state
   const [students, setStudents] = useState<
     Array<{
@@ -67,9 +151,20 @@ export function QuickEntryModal({
     { id: "s5", name: "Maxim Smirnov", included: true, status: "Present", hwDone: true, hadHw: true },
   ]);
 
+  // Balanced weights derived safely
+  const balancedWeights = useMemo(
+    () => autoBalanceWeights(selectedSkills, manualWeights),
+    [selectedSkills, manualWeights],
+  );
+
+  const totalEvidenceWeight = useMemo(() => {
+    if (selectedSkills.length === 0) return 0;
+    return selectedSkills.reduce((acc, s) => acc + (balancedWeights[s] ?? 0), 0);
+  }, [selectedSkills, balancedWeights]);
+
   if (!isOpen) return null;
 
-  // Step completion flags
+  // Proven V99 5-step core completion flags
   const includedCount = students.filter((s) => s.included).length;
   const isStep1Done = includedCount > 0 && students.every((s) => !s.included || !!s.status);
   const isStep2Done = students.length > 0;
@@ -77,7 +172,7 @@ export function QuickEntryModal({
   const isStep4Done = participation.trim().length > 0;
   const isStep5Done = teacherNote.trim().length > 0;
 
-  const completedStepsCount = [isStep1Done, isStep2Done, isStep3Done, isStep4Done, isStep5Done].filter(
+  const coreStepsCompleted = [isStep1Done, isStep2Done, isStep3Done, isStep4Done, isStep5Done].filter(
     Boolean,
   ).length;
 
@@ -107,9 +202,59 @@ export function QuickEntryModal({
     );
   };
 
+  const handleToggleSkill = (skill: CefrSkillKey) => {
+    setSelectedSkills((prev) => {
+      if (prev.includes(skill)) {
+        const next = prev.filter((s) => s !== skill);
+        const copyWeights = { ...manualWeights };
+        delete copyWeights[skill];
+        setManualWeights(copyWeights);
+        return next;
+      } else {
+        return [...prev, skill];
+      }
+    });
+  };
+
+  const handleSkillPerfChange = (skill: CefrSkillKey, perf: PerformanceLevel) => {
+    setSkillPerf((prev) => ({ ...prev, [skill]: perf }));
+  };
+
+  const handleSkillNoteChange = (skill: CefrSkillKey, noteText: string) => {
+    setSkillNotes((prev) => ({ ...prev, [skill]: noteText }));
+  };
+
+  const handleManualWeightChange = (skill: CefrSkillKey, weightVal: number) => {
+    setManualWeights((prev) => ({ ...prev, [skill]: Math.max(0, weightVal) }));
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
-    // Simulate save delay
+    // Construct payload combining V99 core and preserved V100/V101 evidence
+    const payload = {
+      classId: selectedClassId,
+      date,
+      lessonNo: parseInt(lessonNo, 10) || 1,
+      topic,
+      participation,
+      lessonRating,
+      teacherNote,
+      attendance: students.map((s) => ({
+        studentId: s.id,
+        status: s.included ? s.status : "Absent",
+      })),
+      homeworkCompleted: students
+        .filter((s) => s.included && s.hwDone)
+        .map((s) => ({ studentId: s.id })),
+      skillEvidence: selectedSkills.map((s) => ({
+        skill: s,
+        performance: skillPerf[s] || "developing",
+        weight: balancedWeights[s] ?? 0,
+        note: skillNotes[s] || "",
+      })),
+    };
+
+    // Simulate atomic save latency
     await new Promise((r) => setTimeout(r, 600));
     setIsSaving(false);
     setSavedSuccess(true);
@@ -180,16 +325,16 @@ export function QuickEntryModal({
           </div>
         </div>
 
-        {/* 5-Step Progress Strip */}
+        {/* 5-Step Core Progress Strip */}
         <div className="border-b border-slate-200 bg-white px-6 py-3">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Step Progress</span>
+            <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Core Lesson Workflow</span>
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-black ${
-                completedStepsCount === 5 ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"
+                coreStepsCompleted === 5 ? "bg-emerald-100 text-emerald-800" : "bg-blue-100 text-blue-800"
               }`}
             >
-              {completedStepsCount}/5 Completed
+              {coreStepsCompleted}/5 Completed
             </span>
           </div>
           <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
@@ -396,6 +541,150 @@ export function QuickEntryModal({
               className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs font-medium text-slate-800 focus:border-blue-500 focus:outline-hidden"
             />
           </div>
+
+          {/* Preserved & Re-architected: Learning Evidence (Optional) */}
+          <div className="rounded-xl border border-blue-200 bg-blue-50/20 p-4 shadow-xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-base">✨</span>
+                <div>
+                  <h3 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                    Learning Evidence (Optional)
+                  </h3>
+                  <p className="text-[11px] text-slate-500">
+                    Record demonstrated CEFR skill performance for this lesson. Weights auto-balance safely to 100%.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowEvidenceSection(!showEvidenceSection)}
+                className="rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs"
+              >
+                {showEvidenceSection ? "Hide Evidence" : "Add Evidence"}
+              </button>
+            </div>
+
+            {showEvidenceSection && (
+              <div className="mt-4 space-y-4 pt-3 border-t border-blue-100">
+                {/* Skill Chips */}
+                <div>
+                  <span className="text-[11px] font-bold text-slate-600 block mb-2">
+                    Select Demonstrated Skills:
+                  </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {CEFR_SKILL_DEFINITIONS.map((def) => {
+                      const isSelected = selectedSkills.includes(def.key);
+                      return (
+                        <button
+                          key={def.key}
+                          type="button"
+                          onClick={() => handleToggleSkill(def.key)}
+                          className={`flex items-center justify-between rounded-xl border p-2.5 text-xs font-bold transition ${
+                            isSelected
+                              ? "border-blue-700 bg-blue-50 text-blue-950 shadow-xs"
+                              : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                          }`}
+                        >
+                          <span className="flex items-center gap-1.5">
+                            <span>{def.emoji}</span>
+                            <span>{def.label}</span>
+                          </span>
+                          <span className="text-xs">{isSelected ? "✓" : "+"}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Evidence Details per Skill */}
+                {selectedSkills.length > 0 && (
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-800">
+                        Selected Skills ({selectedSkills.length})
+                      </span>
+                      <span
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${
+                          totalEvidenceWeight === 100
+                            ? "bg-emerald-100 text-emerald-800"
+                            : "bg-amber-100 text-amber-800"
+                        }`}
+                      >
+                        Total Weight: {totalEvidenceWeight}% (Balanced)
+                      </span>
+                    </div>
+
+                    <div className="space-y-3">
+                      {selectedSkills.map((skill) => {
+                        const def = CEFR_SKILL_DEFINITIONS.find((d) => d.key === skill);
+                        return (
+                          <div
+                            key={skill}
+                            className="rounded-xl border border-slate-200 bg-white p-3 space-y-2 shadow-xs"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                                <span>{def?.emoji}</span>
+                                <span>{def?.label}</span>
+                              </span>
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[11px] text-slate-500">Weight:</span>
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={100}
+                                  value={balancedWeights[skill] ?? 0}
+                                  onChange={(e) =>
+                                    handleManualWeightChange(skill, parseInt(e.target.value, 10) || 0)
+                                  }
+                                  className="w-14 rounded-md border border-slate-300 px-2 py-0.5 text-xs font-bold text-right"
+                                />
+                                <span className="text-xs font-bold text-slate-600">%</span>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                              <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase">
+                                  Performance Level
+                                </label>
+                                <select
+                                  value={skillPerf[skill] || "developing"}
+                                  onChange={(e) =>
+                                    handleSkillPerfChange(skill, e.target.value as PerformanceLevel)
+                                  }
+                                  className="mt-0.5 block w-full rounded-md border border-slate-300 bg-white px-2 py-1 text-xs font-semibold"
+                                >
+                                  <option value="not-demonstrated">Not Demonstrated</option>
+                                  <option value="beginning">Beginning (Needs support)</option>
+                                  <option value="developing">Developing (Satisfactory)</option>
+                                  <option value="secure">Secure (Confident)</option>
+                                  <option value="strong">Strong (Mastered)</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase">
+                                  Observation Note (Optional)
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. Good pronunciation, clear sentences"
+                                  value={skillNotes[skill] || ""}
+                                  onChange={(e) => handleSkillNoteChange(skill, e.target.value)}
+                                  className="mt-0.5 block w-full rounded-md border border-slate-300 px-2 py-1 text-xs"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer */}
@@ -413,14 +702,14 @@ export function QuickEntryModal({
           <div className="flex items-center gap-2">
             {savedSuccess ? (
               <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
-                <span>✓</span> Lesson Saved Successfully!
+                <span>✓</span> Lesson & Evidence Saved!
               </span>
             ) : (
               <button
                 type="button"
                 disabled={isSaving}
                 onClick={handleSave}
-                className="flex items-center gap-2 rounded-xl bg-blue-900 px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-blue-800 transition disabled:opacity-50"
+                className="flex items-center gap-2 rounded-xl bg-blue-900 px-5 py-2 text-xs font-bold text-white shadow-xs hover:bg-blue-800 transition disabled:opacity-50"
               >
                 {isSaving ? "Saving..." : "Save & Finish Lesson"}
               </button>

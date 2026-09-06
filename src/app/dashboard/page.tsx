@@ -15,8 +15,18 @@ import {
 import { Table, TBody, TD, TR } from "@/components/ui/table";
 import { requireDbContext, DashboardRepository } from "@/lib/db";
 import { StaffStudentsCard } from "@/components/dashboard/staff-students-card";
+import { KpiMetricsRow } from "@/components/dashboard/kpi-metrics-row";
+import { TodaysClassesCard } from "@/components/dashboard/todays-classes-card";
+import { QuickEntryCard } from "@/components/dashboard/quick-entry-card";
+import { QuickPrepCard } from "@/components/dashboard/quick-prep-card";
+import { LessonCalendarCard } from "@/components/dashboard/lesson-calendar-card";
+import { ActivityFeedCard } from "@/components/dashboard/activity-feed-card";
+import { StaffRemarksCard } from "@/components/dashboard/staff-remarks-card";
+import { StudentRosterCard } from "@/components/dashboard/student-roster-card";
+import { MonthlySpotlightCard } from "@/components/dashboard/monthly-spotlight-card";
+import { FamilyDashboardView } from "@/components/dashboard/family-dashboard-view";
 
-export const metadata = { title: "Dashboard — FSMS V2" };
+export const metadata = { title: "Dashboard — Favoured School Management System" };
 
 export const dynamic = "force-dynamic";
 
@@ -64,11 +74,13 @@ export default async function DashboardPage() {
   ] as const;
 
   const s = summary.ok ? summary.data : null;
+  const isStaffUser = isStaff(profile.role_base);
 
   return (
     <AppShell
-      brand="FSMS V2"
-      title={t("title")}
+      brand="FSMS"
+      title={t("welcome", { name: profile.name ?? profile.email ?? "" })}
+      subtitle={`${s?.school?.name ?? "Favoured School Management System"} · ${profile.email}`}
       user={{
         name: profile.name ?? profile.email ?? "FSMS user",
         email: profile.email ?? "",
@@ -76,51 +88,40 @@ export default async function DashboardPage() {
       }}
       sections={sections}
     >
-      <div className="grid gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {t("welcome", { name: profile.name ?? profile.email ?? "" })}
-              <span className="ml-2 align-middle">
-                <Badge variant="brand">{roleLabel}</Badge>
-              </span>
-            </CardTitle>
-            <CardDescription>
-              {s?.school?.name} · {profile.email}
-            </CardDescription>
-          </CardHeader>
-          <CardBody>
-            <dl className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
-              <Row k={t("schoolTenant")} v={profile.school_id} />
-              <Row k={t("role")} v={`${roleLabel} · rank ${profile.rank} · base ${profile.role_base}`} />
-              <Row k={t("status")} v={profile.status} />
-              <Row k={t("uiLanguage")} v={profile.locale} />
-            </dl>
-          </CardBody>
-        </Card>
+      <div className="space-y-6">
+        {/* V99 5-KPI Delta Metric Cards (Staff / Leadership / Teachers) */}
+        {isStaffUser && s?.stats && (
+          <KpiMetricsRow stats={s.stats} />
+        )}
 
-        {s?.counts && (
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {(
-              [
-                [t("students"), s.counts.students],
-                [t("teachers"), s.counts.teachers],
-                [t("parents"), s.counts.parents],
-                [t("classes"), s.counts.classes],
-              ] as const
-            ).map(([label, value]) => (
-              <Card key={label}>
-                <CardBody className="py-4">
-                  <p className="text-2xl font-semibold tabular-nums">{value}</p>
-                  <p className="text-sm text-ink-muted">{label}</p>
-                </CardBody>
-              </Card>
-            ))}
+        {/* V99 3-Column Operational Command Center (Staff / Leadership / Teachers) */}
+        {isStaffUser && (
+          <div className="dash">
+            {/* Column 1: Operational Flow */}
+            <div className="dash-col">
+              <TodaysClassesCard classes={s?.todaysClasses ?? []} />
+              <QuickEntryCard />
+              <QuickPrepCard />
+            </div>
+
+            {/* Column 2: Calendar, Activity & Remarks */}
+            <div className="dash-col">
+              <LessonCalendarCard />
+              <ActivityFeedCard activities={s?.activities ?? []} />
+              <StaffRemarksCard remarks={s?.remarks ?? []} />
+            </div>
+
+            {/* Column 3: Roster & Spotlight Recognition */}
+            <div className="dash-col">
+              <StudentRosterCard roster={s?.roster ?? []} />
+              <MonthlySpotlightCard spotlight={s?.spotlight ?? []} />
+            </div>
           </div>
         )}
 
+        {/* Teacher Assigned Classes & Grading Queue */}
         {profile.role_base === "teacher" && (
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid gap-5 lg:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>{t("myClasses")}</CardTitle>
@@ -170,124 +171,17 @@ export default async function DashboardPage() {
           </div>
         )}
 
-        {profile.role_base === "parent" && (
-          <div className="grid gap-4 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("myChildren")}</CardTitle>
-                <CardDescription>{t("myChildrenDesc")}</CardDescription>
-              </CardHeader>
-              <CardBody className="px-0">
-                <Table>
-                  <TBody>
-                    {s?.myChildren.map((c) => (
-                      <TR key={c.id}>
-                        <TD className="font-medium">{c.name}</TD>
-                        <TD className="font-mono text-xs text-ink-faint">{c.student_no}</TD>
-                        <TD>{c.level_code?.toUpperCase()}</TD>
-                      </TR>
-                    ))}
-                    {!s?.myChildren.length && (
-                      <TR><TD className="text-ink-faint">{t("noChildrenLinked")}</TD></TR>
-                    )}
-                  </TBody>
-                </Table>
-              </CardBody>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("recentHomework")}</CardTitle>
-                <CardDescription>{t("recentHomeworkDesc")}</CardDescription>
-              </CardHeader>
-              <CardBody className="px-0">
-                <Table>
-                  <TBody>
-                    {s?.childHomework.map((h) => (
-                      <TR key={h.id}>
-                        <TD className="font-medium">{h.title}</TD>
-                        <TD>{h.student}</TD>
-                        <TD className="text-right">
-                          <Badge variant={statusVariant(h.status)}>{h.status && st.has(h.status) ? st(h.status) : h.status}</Badge>
-                        </TD>
-                      </TR>
-                    ))}
-                    {!s?.childHomework.length && (
-                      <TR><TD className="text-ink-faint">{t("noHomeworkYet")}</TD></TR>
-                    )}
-                  </TBody>
-                </Table>
-              </CardBody>
-            </Card>
-          </div>
+        {/* Parent & Student Family Dashboard View */}
+        {!isStaffUser && s && (
+          <FamilyDashboardView summary={s} roleBase={profile.role_base} />
         )}
 
-        {profile.role_base === "student" && (
-          <div className="grid gap-4 lg:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("myHomework")}</CardTitle>
-                <CardDescription>{t("myHomeworkDesc")}</CardDescription>
-              </CardHeader>
-              <CardBody className="px-0">
-                <Table>
-                  <TBody>
-                    {s?.myHomework.map((h) => (
-                      <TR key={h.id}>
-                        <TD className="font-medium">{h.title}</TD>
-                        <TD className="text-right">
-                          <Badge variant={statusVariant(h.status)}>{h.status && st.has(h.status) ? st(h.status) : h.status}</Badge>
-                        </TD>
-                      </TR>
-                    ))}
-                    {!s?.myHomework.length && (
-                      <TR><TD className="text-ink-faint">{t("noHomeworkAssigned")}</TD></TR>
-                    )}
-                  </TBody>
-                </Table>
-              </CardBody>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("assessments")}</CardTitle>
-                <CardDescription>{t("assessmentsDesc")}</CardDescription>
-              </CardHeader>
-              <CardBody className="px-0">
-                <Table>
-                  <TBody>
-                    {s?.myAssessments.map((a) => (
-                      <TR key={a.id}>
-                        <TD className="font-medium">{a.title}</TD>
-                        <TD className="text-right tabular-nums">
-                          {a.score} / {a.max_score}
-                        </TD>
-                      </TR>
-                    ))}
-                    {!s?.myAssessments.length && (
-                      <TR><TD className="text-ink-faint">{t("noAssessmentsYet")}</TD></TR>
-                    )}
-                  </TBody>
-                </Table>
-              </CardBody>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>{t("progress")}</CardTitle>
-                <CardDescription>{t("progressDesc")}</CardDescription>
-              </CardHeader>
-              <CardBody>
-                <dl className="grid grid-cols-2 gap-4">
-                  <Stat k={t("lessonsAchieved")} v={s?.myProgress?.lessons_achieved} />
-                  <Stat k={t("evidenceItems")} v={s?.myProgress?.evidence} />
-                </dl>
-              </CardBody>
-            </Card>
-          </div>
-        )}
-
-        {isStaff(profile.role_base) && (
+        {/* Staff Student Direct Search & Table View */}
+        {isStaffUser && (
           <StaffStudentsCard schoolId={profile.school_id} />
         )}
 
+        {/* Authorization & Tenant Verification Box */}
         <Card>
           <CardHeader>
             <CardTitle>{t("authorization")}</CardTitle>
@@ -322,23 +216,5 @@ export default async function DashboardPage() {
         </Card>
       </div>
     </AppShell>
-  );
-}
-
-function Row({ k, v }: { k: string; v: string }) {
-  return (
-    <div className="flex min-w-0 gap-3 py-0.5">
-      <dt className="w-44 shrink-0 text-sm text-ink-muted">{k}</dt>
-      <dd className="min-w-0 font-mono text-xs break-all text-ink">{v}</dd>
-    </div>
-  );
-}
-
-function Stat({ k, v }: { k: string; v: number | undefined }) {
-  return (
-    <div>
-      <p className="text-2xl font-semibold tabular-nums">{v ?? 0}</p>
-      <p className="text-sm text-ink-muted">{k}</p>
-    </div>
   );
 }

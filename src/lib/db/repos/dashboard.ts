@@ -2,7 +2,7 @@ import { Repository } from "../repository";
 import { ok, fail, type ServiceResult } from "../errors";
 
 /**
- * FSMS V2 — DashboardRepository (Phase 11).
+ * FSMS V2 — DashboardRepository (Phase 11 + Phase 32 V99 Fidelity).
  *
  * The whole dashboard renders from ONE server-side RPC round trip
  * (`fsms.dashboard_summary()`), which is school-scoped + visibility-scoped and
@@ -35,6 +35,62 @@ export interface DashboardToday {
   present: number;
   late: number;
   absent: number;
+}
+
+export interface DashboardStats {
+  totalStudents: number;
+  studentsDelta: number;
+  classesToday: number;
+  attendanceAvg: number;
+  attendanceDelta: number;
+  homeworkAvg: number;
+  homeworkDelta: number;
+  assessmentAvg: number;
+  assessmentDelta: number;
+}
+
+export interface DashboardTodaysClass {
+  id: string;
+  name: string;
+  level_code: string;
+  startTime: string;
+  endTime: string;
+  topic: string;
+  lessonNo: number;
+  students: number;
+}
+
+export interface DashboardActivity {
+  id: string;
+  type: string;
+  action: string;
+  text: string;
+  createdAt: string;
+}
+
+export interface DashboardRemark {
+  id: string;
+  studentName: string;
+  teacherName: string;
+  body: string;
+  date: string;
+}
+
+export interface DashboardRosterItem {
+  id: string;
+  name: string;
+  level: string;
+  className: string;
+  attendance: number;
+  student_no: string;
+}
+
+export interface DashboardSpotlightItem {
+  place: number;
+  name: string;
+  className: string;
+  note: string;
+  studentId: string;
 }
 
 export interface DashboardClass {
@@ -77,6 +133,12 @@ export interface DashboardSummary {
   school: DashboardSchool | null;
   counts: DashboardCounts | null;
   today: DashboardToday | null;
+  stats?: DashboardStats | null;
+  todaysClasses?: DashboardTodaysClass[];
+  activities?: DashboardActivity[];
+  remarks?: DashboardRemark[];
+  roster?: DashboardRosterItem[];
+  spotlight?: DashboardSpotlightItem[];
   myClasses: DashboardClass[];
   gradingQueue: { to_grade: number; recent: DashboardHomeworkItem[] } | null;
   myChildren: DashboardChild[];
@@ -93,6 +155,12 @@ const EMPTY: DashboardSummary = {
   school: null,
   counts: null,
   today: null,
+  stats: null,
+  todaysClasses: [],
+  activities: [],
+  remarks: [],
+  roster: [],
+  spotlight: [],
   myClasses: [],
   gradingQueue: null,
   myChildren: [],

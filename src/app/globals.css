@@ -1,27 +1,31 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   FSMS V2 — Design tokens (Phase 9 design system).
-   Single source of truth for colour, spacing, radius, shadow and typography.
-   All UI consumes these tokens via Tailwind utilities (bg-surface, text-ink,
-   text-brand-600, rounded-card, shadow-dialog, …).
+   FSMS V2 — Authentic V99 Design System Tokens & Styling (Phase 32 Fidelity).
+   Navy brand (#1E3A8A), Gold highlights (#F4B400), 5-KPI delta metric cards,
+   3-column operational layout, Novosibirsk date pill, and lifecycle widgets.
    ──────────────────────────────────────────────────────────────────────────── */
 
 @theme {
-  /* Brand — indigo (professional, calm) */
+  /* Brand — Authentic V99 Royal Navy */
   --color-brand-50: #eef2ff;
   --color-brand-100: #e0e7ff;
   --color-brand-200: #c7d2fe;
   --color-brand-300: #a5b4fc;
   --color-brand-400: #818cf8;
-  --color-brand-500: #6366f1;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-800: #3730a3;
-  --color-brand-900: #312e81;
-  --color-brand-950: #1e1b4b;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e3a8a;
+  --color-brand-900: #172554;
+  --color-brand-950: #0f172a;
 
-  /* Neutral — slate */
+  /* Gold Accent */
+  --color-gold: #f4b400;
+  --color-gold-bg: #fef9e7;
+  --color-gold-dark: #b45309;
+
+  /* Neutral — Slate */
   --color-ink-50: #f8fafc;
   --color-ink-100: #f1f5f9;
   --color-ink-200: #e2e8f0;
@@ -45,18 +49,18 @@
   --color-warning-500: #f59e0b;
   --color-warning-600: #d97706;
   --color-warning-700: #b45309;
-  --color-danger-50: #fff1f2;
-  --color-danger-100: #ffe4e6;
-  --color-danger-500: #f43f5e;
-  --color-danger-600: #e11d48;
-  --color-danger-700: #be123c;
-  --color-info-50: #f0f9ff;
-  --color-info-100: #e0f2fe;
-  --color-info-500: #0ea5e9;
-  --color-info-600: #0284c7;
-  --color-info-700: #0369a1;
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-info-50: #ecfeff;
+  --color-info-100: #cffafe;
+  --color-info-500: #06b6d4;
+  --color-info-600: #0891b2;
+  --color-info-700: #0e7490;
 
-  /* Semantic surfaces + text (component-facing aliases) */
+  /* Semantic surfaces + text */
   --color-surface: #ffffff;
   --color-surface-muted: #f8fafc;
   --color-surface-sunken: #f1f5f9;
@@ -69,25 +73,46 @@
 
   /* Typography */
   --font-sans:
-    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif;
+    'Inter', var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
   --font-mono:
     var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Consolas,
     monospace;
 
   /* Radii */
-  --radius-field: 0.5rem;
-  --radius-card: 0.75rem;
-  --radius-dialog: 0.875rem;
+  --radius-field: 8px;
+  --radius-card: 16px;
+  --radius-dialog: 16px;
 
   /* Elevation */
-  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 3px rgb(15 23 42 / 0.06);
-  --shadow-dialog: 0 10px 30px rgb(15 23 42 / 0.18);
-  --shadow-pop: 0 4px 16px rgb(15 23 42 / 0.12);
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-dialog: 0 10px 24px rgba(16, 24, 40, 0.10);
+  --shadow-pop: 0 4px 12px rgba(16, 24, 40, 0.08);
+}
+
+:root {
+  --primary: #1e3a8a;
+  --primary-light: #3b82f6;
+  --gold: #f4b400;
+  --gold-bg: #fef9e7;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #06b6d4;
+  --neutral: #64748b;
+  --light: #f8fafc;
+  --bg: #ffffff;
+  --border: #e2e8f0;
+  --dark: #0f172a;
+  --primary-050: #eef2ff;
+  --success-bg: #ecfdf5;
+  --warning-bg: #fffbeb;
+  --danger-bg: #fef2f2;
+  --info-bg: #ecfeff;
+  --sidebar-w: 248px;
 }
 
 @layer base {
-  /* default border colour (Tailwind v4 preflight defaults to currentColor) */
   *,
   ::after,
   ::before {
@@ -107,7 +132,6 @@
     overscroll-behavior-y: none;
   }
 
-  /* shared focus treatment — opt in with `.focus-ring` */
   .focus-ring {
     outline: none;
   }
@@ -118,13 +142,11 @@
 }
 
 @layer utilities {
-  /* keep text on tokens readable; thin scrollbars for panels */
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: var(--color-ink-300) transparent;
   }
 
-  /* Phase 25 (PWA/mobile): safe-area insets for notched devices. */
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
@@ -136,3 +158,346 @@
     padding-right: env(safe-area-inset-right);
   }
 }
+
+/* ═══════════════ V99 AUTHENTIC UI COMPONENTS ═══════════════ */
+
+/* Novosibirsk wave animation */
+.wave {
+  display: inline-block;
+  animation: v99wave 2.2s ease-in-out infinite;
+  transform-origin: 70% 70%;
+}
+@keyframes v99wave {
+  0%, 60%, 100% { transform: rotate(0); }
+  70% { transform: rotate(14deg); }
+  80% { transform: rotate(-8deg); }
+  90% { transform: rotate(14deg); }
+}
+
+/* Novosibirsk Date Pill */
+.date-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dark);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+/* V99 5-KPI Delta Metric Cards */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+@media (max-width: 1400px) {
+  .stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1024px) {
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .stats { grid-template-columns: 1fr; gap: 10px; }
+}
+
+.stat {
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+}
+.stat-ico {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+.stat-label {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: #0f172a;
+}
+.stat-delta {
+  font-size: 12px;
+  color: var(--neutral);
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.st-blue { background: #eef2ff; border-color: #dbeafe; }
+.st-blue .stat-label { color: #1e3a8a; }
+.st-green { background: #ecfdf5; border-color: #d1fae5; }
+.st-green .stat-label { color: #047857; }
+.st-amber { background: #fffbeb; border-color: #fde68a; }
+.st-amber .stat-label { color: #b45309; }
+.st-indigo { background: #e0e7ff; border-color: #c7d2fe; }
+.st-indigo .stat-label { color: #4338ca; }
+.st-rose { background: #fef2f2; border-color: #fecaca; }
+.st-rose .stat-label { color: #b91c1c; }
+
+/* 3-Column Operational Command Center Layout */
+.dash {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1.1fr) minmax(0, 0.92fr);
+}
+@media (max-width: 1400px) {
+  .dash { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+}
+@media (max-width: 1024px) {
+  .dash { grid-template-columns: 1fr; }
+}
+.dash-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Today's Classes Rows */
+.cls-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.cls-row:last-child {
+  border-bottom: none;
+}
+.cls-time {
+  flex: 0 0 58px;
+}
+.cls-time .t1 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+}
+.cls-time .t2 {
+  font-size: 12px;
+  color: var(--neutral);
+  white-space: nowrap;
+}
+.cls-meta {
+  flex: 1 1 auto;
+  min-width: 110px;
+}
+.cls-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cls-sub {
+  font-size: 12px;
+  color: var(--neutral);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cls-lesson {
+  flex: 0 0 auto;
+  text-align: left;
+  min-width: 80px;
+}
+.cls-lesson .l1 {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.cls-lesson .l2 {
+  font-size: 12px;
+  color: var(--primary-light);
+  font-weight: 500;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 110px;
+}
+
+/* Quick Entry Lifecycle Steps */
+.qe-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(68px, 1fr));
+  gap: 8px;
+  padding: 4px 0 12px;
+}
+.qe-step {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 6px;
+  text-align: center;
+  transition: all 0.15s ease;
+  background: #ffffff;
+  position: relative;
+}
+.qe-step:hover {
+  border-color: var(--primary-light);
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08);
+  transform: translateY(-2px);
+}
+.qe-ico {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 6px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+}
+.qe-n {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 4px;
+}
+.qe-t {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #0f172a;
+}
+
+/* Activity Feed */
+.act {
+  display: flex;
+  gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.act:last-child {
+  border-bottom: none;
+}
+.act-ico {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+}
+.act-t {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.35;
+  color: #0f172a;
+}
+.act-s {
+  font-size: 12px;
+  color: var(--neutral);
+  margin-top: 2px;
+}
+
+/* Student Roster */
+.roster-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s ease;
+}
+.roster-row:last-child {
+  border-bottom: none;
+}
+.roster-row:hover {
+  background: #f8fafc;
+}
+.roster-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+.roster-meta {
+  font-size: 12px;
+  color: var(--neutral);
+}
+.roster-pct {
+  font-size: 13.5px;
+  font-weight: 700;
+  margin-left: auto;
+}
+
+/* Top Students Monthly Recognition (Spotlight) */
+.top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s ease;
+}
+.top-row:last-child {
+  border-bottom: none;
+}
+.top-row:hover {
+  background: #f8fafc;
+}
+.avatar-wrap {
+  position: relative;
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+.rank-pin {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.3);
+  line-height: 1;
+}
+.rank-pin.rank-1 { background: #f4b400; }
+.rank-pin.rank-2 { background: #94a3b8; }
+.rank-pin.rank-3 { background: #f97316; }
+
+.ts-place {
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.ts-p1 { background: #fef3c7; color: #b45309; }
+.ts-p2 { background: #f1f5f9; color: #475569; }
+.ts-p3 { background: #ffedd5; color: #c2410c; }

@@ -26,7 +26,7 @@ import {
 import { ReportPicker } from "@/components/reports/report-picker";
 import { ExportPanel } from "@/components/reports/export-panel";
 
-export const metadata = { title: "Reports — FSMS V2" };
+export const metadata = { title: "Reports — FSMS" };
 
 type Search = {
   report?: string;

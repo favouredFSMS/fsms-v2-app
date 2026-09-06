@@ -12,7 +12,7 @@ import { ClassEnrolStudentForm } from "@/components/academic/class-enrol-student
 import { EnrolmentStatusForm } from "@/components/academic/enrolment-status-form";
 import { TeacherRemoveButton } from "@/components/academic/teacher-remove-button";
 
-export const metadata = { title: "Class — FSMS V2" };
+export const metadata = { title: "Class — FSMS" };
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 

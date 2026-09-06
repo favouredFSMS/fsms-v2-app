@@ -15,7 +15,7 @@ import { LessonChangeRequestForm } from "@/components/lessons/lesson-change-requ
 import { LessonChangeDecideForm } from "@/components/lessons/lesson-change-decide-form";
 import { LessonControlForm } from "@/components/lessons/lesson-control-form";
 
-export const metadata = { title: "Lessons — FSMS V2" };
+export const metadata = { title: "Lessons — FSMS" };
 
 function decisionVariant(decision: string | null): "success" | "warning" | "neutral" | "danger" {
   if (decision === "approved") return "success";

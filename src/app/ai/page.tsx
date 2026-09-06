@@ -11,7 +11,7 @@ import { AskForm } from "@/components/ai/ask-form";
 import { GenerateForm } from "@/components/ai/generate-form";
 import { ProviderAdmin, type ProviderRow } from "@/components/ai/provider-admin";
 
-export const metadata = { title: "AI — FSMS V2" };
+export const metadata = { title: "AI — FSMS" };
 
 const LEADERSHIP = ["admin1", "admin", "manager"];
 

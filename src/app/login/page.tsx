@@ -4,7 +4,7 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Logo } from "@/components/ui/logo";
 import { env } from "@/lib/env";
 
-export const metadata = { title: "Sign in — FSMS V2" };
+export const metadata = { title: "Sign in — FSMS" };
 
 export default async function LoginPage(props: {
   searchParams?: Promise<{ reason?: string; error?: string }>;
@@ -31,7 +31,7 @@ export default async function LoginPage(props: {
       <div className="mb-6 flex items-center gap-3">
         <Logo size={44} className="rounded-xl shadow-md" />
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-ink">FSMS V2</h1>
+          <h1 className="text-xl font-bold tracking-tight text-ink">FSMS</h1>
           <p className="text-sm text-ink-muted">{t("brand")}</p>
         </div>
       </div>

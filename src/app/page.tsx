@@ -14,7 +14,7 @@ export default async function Home() {
           <Icon name="students" size={24} />
         </span>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-ink">FSMS V2</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-ink">FSMS</h1>
           <p className="text-sm text-ink-muted">{t("tagline")}</p>
         </div>
       </div>

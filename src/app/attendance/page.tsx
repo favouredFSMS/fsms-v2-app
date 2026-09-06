@@ -15,7 +15,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { profileCan } from "@/lib/auth/authorize";
 import { AttendanceSheet } from "@/components/attendance/attendance-sheet";
 
-export const metadata = { title: "Attendance — FSMS V2" };
+export const metadata = { title: "Attendance — FSMS" };
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);

@@ -8,7 +8,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { profileCan } from "@/lib/auth/authorize";
 import { ParentCreateForm } from "@/components/people/parent-create-form";
 
-export const metadata = { title: "Parents — FSMS V2" };
+export const metadata = { title: "Parents — FSMS" };
 
 export default async function ParentsPage({
   searchParams,

@@ -7,7 +7,7 @@ import { CursorPager } from "@/components/ui/cursor-pager";
 import { requireDbContext, UserRepository } from "@/lib/db";
 import { requireUser } from "@/lib/auth/guards";
 
-export const metadata = { title: "Teachers — FSMS V2" };
+export const metadata = { title: "Teachers — FSMS" };
 
 export default async function TeachersPage({
   searchParams,

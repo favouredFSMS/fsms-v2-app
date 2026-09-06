@@ -10,7 +10,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { profileCan } from "@/lib/auth/authorize";
 import { StudentCreateForm } from "@/components/people/student-create-form";
 
-export const metadata = { title: "Students — FSMS V2" };
+export const metadata = { title: "Students — FSMS" };
 
 export default async function StudentsPage({
   searchParams,

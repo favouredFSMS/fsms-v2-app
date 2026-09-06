@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { ForgotForm } from "./forgot-form";
 import { Card, CardBody } from "@/components/ui/card";
 
-export const metadata = { title: "Forgot password — FSMS V2" };
+export const metadata = { title: "Forgot password — FSMS" };
 
 export default async function ForgotPasswordPage() {
   const t = await getTranslations("auth");

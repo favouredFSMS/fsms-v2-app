@@ -14,7 +14,7 @@ import { SubjectCreateForm } from "@/components/academic/subject-create-form";
 import { YearCreateForm } from "@/components/academic/year-create-form";
 import { TermCreateForm } from "@/components/academic/term-create-form";
 
-export const metadata = { title: "Classes — FSMS V2" };
+export const metadata = { title: "Classes — FSMS" };
 
 function statusLabel(st: (k: string) => string, value: string): string {
   const k = value.toLowerCase();

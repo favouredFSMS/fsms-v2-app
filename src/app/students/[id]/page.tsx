@@ -9,7 +9,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { profileCan } from "@/lib/auth/authorize";
 import { LinkParentForm } from "@/components/people/link-parent-form";
 
-export const metadata = { title: "Student — FSMS V2" };
+export const metadata = { title: "Student — FSMS" };
 
 export default async function StudentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [t, st, commonT, statesT] = await Promise.all([

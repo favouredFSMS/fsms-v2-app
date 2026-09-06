@@ -5,7 +5,7 @@ import { Table, TBody, TD, TH, THead, TR, TableEmptyRow } from "@/components/ui/
 import { Badge } from "@/components/ui/badge";
 import { requireDbContext, FinanceRepository } from "@/lib/db";
 
-export const metadata = { title: "Payroll — FSMS V2" };
+export const metadata = { title: "Payroll — FSMS" };
 
 export default async function PayrollPage({
   searchParams,

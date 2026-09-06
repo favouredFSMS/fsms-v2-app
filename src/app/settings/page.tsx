@@ -7,7 +7,7 @@ import { profileCan } from "@/lib/auth/authorize";
 import { requireDbContext, SettingsRepository } from "@/lib/db";
 import { SettingsEditor, SettingsRemoveForm } from "@/components/settings/settings-editor";
 
-export const metadata = { title: "Settings — FSMS V2" };
+export const metadata = { title: "Settings — FSMS" };
 
 function formatValue(value: unknown): string {
   if (value === null || value === undefined) return "—";

@@ -5,7 +5,7 @@ import { requireDbContext, CommsRepository } from "@/lib/db";
 import { NotificationsPanel } from "@/components/comms/notifications-panel";
 import { PrefsForm } from "@/components/comms/prefs-form";
 
-export const metadata = { title: "Notifications — FSMS V2" };
+export const metadata = { title: "Notifications — FSMS" };
 
 export default async function NotificationsPage() {
   const t = await getTranslations("notifications");

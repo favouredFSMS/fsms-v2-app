@@ -3,7 +3,7 @@ import { ResetForm } from "./reset-form";
 import { Card, CardBody } from "@/components/ui/card";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export const metadata = { title: "Set new password — FSMS V2" };
+export const metadata = { title: "Set new password — FSMS" };
 
 export default async function ResetPasswordPage(props: {
   searchParams?: Promise<{ code?: string }>;

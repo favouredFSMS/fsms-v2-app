@@ -23,7 +23,7 @@ import { CurriculumArchiveButton } from "@/components/curriculum/curriculum-arch
 import { CurriculumGovernanceActions } from "@/components/curriculum/curriculum-governance-actions";
 import { CurriculumAssignForm } from "@/components/curriculum/curriculum-assign-form";
 
-export const metadata = { title: "Curriculum — FSMS V2" };
+export const metadata = { title: "Curriculum — FSMS" };
 
 function qualityVariant(q: string | null): BadgeVariant {
   if (q === "strong") return "success";

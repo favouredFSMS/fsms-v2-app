@@ -19,7 +19,7 @@ import { TeacherMaterialForm } from "@/components/materials/teacher-material-for
 import { MaterialFeedbackForm } from "@/components/materials/material-feedback-form";
 import { FileUploadForm } from "@/components/materials/file-upload-form";
 
-export const metadata = { title: "Materials — FSMS V2" };
+export const metadata = { title: "Materials — FSMS" };
 
 export default async function MaterialsPage({
   searchParams,

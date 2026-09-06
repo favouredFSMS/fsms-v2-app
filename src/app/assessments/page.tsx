@@ -16,7 +16,7 @@ import { AssessmentTestForm } from "@/components/assessments/assessment-test-for
 import { AssessmentRecordForm } from "@/components/assessments/assessment-record-form";
 import { AssessmentArchiveButton } from "@/components/assessments/assessment-archive-button";
 
-export const metadata = { title: "Assessments — FSMS V2" };
+export const metadata = { title: "Assessments — FSMS" };
 
 function pct(score: number | string | null, max: number | string | null): string {
   const s = typeof score === "string" ? Number(score) : score;

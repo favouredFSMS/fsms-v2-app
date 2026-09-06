@@ -8,7 +8,7 @@ import { requireDbContext, UserRepository } from "@/lib/db";
 import { requireUser } from "@/lib/auth/guards";
 import { UserAdminRow } from "@/components/people/user-admin-row";
 
-export const metadata = { title: "People — FSMS V2" };
+export const metadata = { title: "People — FSMS" };
 
 export default async function PeoplePage({
   searchParams,

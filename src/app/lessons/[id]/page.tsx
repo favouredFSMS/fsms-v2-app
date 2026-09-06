@@ -8,7 +8,7 @@ import { Table, TBody, TD, TH, THead, TR, TableEmpty } from "@/components/ui/tab
 import { requireDbContext, LessonRepository, localized } from "@/lib/db";
 import { requireUser } from "@/lib/auth/guards";
 
-export const metadata = { title: "Lesson — FSMS V2" };
+export const metadata = { title: "Lesson — FSMS" };
 
 export default async function LessonDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [t, commonT] = await Promise.all([getTranslations("lessonDetail"), getTranslations("common")]);

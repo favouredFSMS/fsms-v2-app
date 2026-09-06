@@ -36,7 +36,7 @@ export async function PageShell({
 
   if (permission && !profileCan(profile, permission)) {
     return (
-      <AppShell brand="FSMS V2" title={title} user={user} sections={sections}>
+      <AppShell brand="FSMS" title={title} user={user} sections={sections}>
         <EmptyState
           icon="warning"
           title={t("accessDenied")}
@@ -47,7 +47,7 @@ export async function PageShell({
   }
 
   return (
-    <AppShell brand="FSMS V2" title={title} user={user} sections={sections}>
+    <AppShell brand="FSMS" title={title} user={user} sections={sections}>
       {children}
     </AppShell>
   );

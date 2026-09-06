@@ -9,7 +9,7 @@ import { requireDbContext, FinanceRepository } from "@/lib/db";
 import { PaymentActions } from "@/components/finance/payment-actions";
 import { RequestPaymentForm } from "@/components/finance/request-payment-form";
 
-export const metadata = { title: "Payments — FSMS V2" };
+export const metadata = { title: "Payments — FSMS" };
 
 const MONEY = ["admin1", "admin", "manager", "accountant"];
 

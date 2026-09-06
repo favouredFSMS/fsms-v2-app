@@ -16,7 +16,7 @@ import { HomeworkAssignForm } from "@/components/homework/homework-assign-form";
 import { HomeworkGradeForm } from "@/components/homework/homework-grade-form";
 import { HomeworkSubmitForm } from "@/components/homework/homework-submit-form";
 
-export const metadata = { title: "Homework — FSMS V2" };
+export const metadata = { title: "Homework — FSMS" };
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);

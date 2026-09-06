@@ -7,7 +7,7 @@ import { requireDbContext, CommsRepository } from "@/lib/db";
 import { MessageComposer } from "@/components/comms/message-composer";
 import { ThreadPanel } from "@/components/comms/thread-panel";
 
-export const metadata = { title: "Messaging — FSMS V2" };
+export const metadata = { title: "Messaging — FSMS" };
 
 export default async function MessagingPage({
   searchParams,
